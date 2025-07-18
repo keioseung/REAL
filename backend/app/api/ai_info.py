@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from typing import List
 import json
@@ -119,3 +119,7 @@ def fetch_ai_news():
         return {"news": news_items[:3]}  # 상위 3개만 반환
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch news: {str(e)}") 
+
+@router.options("/")
+def options_ai_info():
+    return Response(status_code=200) 
