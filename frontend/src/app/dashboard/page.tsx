@@ -10,7 +10,6 @@ import ProgressSection from '@/components/progress-section'
 import useAIInfo from '@/hooks/use-ai-info'
 import useUserProgress from '@/hooks/use-user-progress'
 import { useRouter } from 'next/navigation'
-import { Tabs, Tab } from "@headlessui/react"
 
 export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(() => {
