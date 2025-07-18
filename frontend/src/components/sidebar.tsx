@@ -75,9 +75,9 @@ function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
 
       {/* 사이드바 */}
       <motion.aside
-        initial={{ x: -300 }}
-        animate={{ x: isOpen ? 0 : -300 }}
-        className={`fixed lg:relative lg:translate-x-0 top-0 left-0 h-full w-80 glass rounded-r-2xl lg:rounded-2xl p-6 z-40 overflow-y-auto`}
+        initial={false}
+        animate={{ x: 0 }}
+        className={`w-full max-w-2xl glass rounded-2xl p-6 mx-auto mb-4`}
       >
         <div className="space-y-6">
           {/* 헤더 */}
