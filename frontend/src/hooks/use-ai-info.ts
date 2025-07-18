@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { aiInfoAPI } from '@/lib/api'
 import type { AIInfoItem, AIInfoCreate } from '@/types'
 
-export function useAIInfo(date: string) {
+function useAIInfo(date: string) {
   return useQuery({
     queryKey: ['ai-info', date],
     queryFn: async () => {
@@ -12,6 +12,8 @@ export function useAIInfo(date: string) {
     enabled: !!date,
   })
 }
+
+export default useAIInfo
 
 export function useAddAIInfo() {
   const queryClient = useQueryClient()
