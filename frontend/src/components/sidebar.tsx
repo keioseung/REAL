@@ -23,7 +23,7 @@ interface SidebarProps {
   sessionId: string
 }
 
-export function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
+function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isAddingInfo, setIsAddingInfo] = useState(false)
   const [newInfoTitle, setNewInfoTitle] = useState('')
@@ -231,4 +231,6 @@ export function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps)
       )}
     </>
   )
-} 
+}
+
+export default Sidebar 
