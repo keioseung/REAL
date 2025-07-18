@@ -11,7 +11,7 @@ interface QuizSectionProps {
   sessionId: string
 }
 
-export function QuizSection({ sessionId }: QuizSectionProps) {
+function QuizSection({ sessionId }: QuizSectionProps) {
   const [selectedTopic, setSelectedTopic] = useState('AI')
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -232,4 +232,6 @@ export function QuizSection({ sessionId }: QuizSectionProps) {
       </div>
     </section>
   )
-} 
+}
+
+export default QuizSection 
