@@ -157,27 +157,27 @@ export default function AdminPromptPage() {
       </section>
       {/* 기반 내용 관리 */}
       <section>
-        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 flex items-center gap-2">📄 기반 내용 관리</h2>
-        <form onSubmit={handleBaseSubmit} className="mb-8 bg-blue-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
+        <h2 className="text-3xl font-extrabold mb-8 text-pink-700 flex items-center gap-2">📄 기반 내용 관리</h2>
+        <form onSubmit={handleBaseSubmit} className="mb-8 bg-pink-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
           <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-blue-700">기반 내용 제목</label>
-            <input type="text" placeholder="기반 내용 제목" value={baseTitle} onChange={e => setBaseTitle(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
+            <label className="font-semibold text-pink-700">기반 내용 제목</label>
+            <input type="text" placeholder="기반 내용 제목" value={baseTitle} onChange={e => setBaseTitle(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" />
           </div>
           <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-blue-700">기반 내용</label>
-            <textarea placeholder="기반 내용" value={baseContent} onChange={e => setBaseContent(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" rows={2} />
+            <label className="font-semibold text-pink-700">기반 내용</label>
+            <textarea placeholder="기반 내용" value={baseContent} onChange={e => setBaseContent(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" rows={2} />
           </div>
           <div className="flex flex-col gap-2">
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">{baseEditId ? '수정' : '등록'}</button>
+            <button type="submit" className="px-4 py-2 bg-pink-600 text-white rounded-xl font-bold hover:bg-pink-700 transition">{baseEditId ? '수정' : '등록'}</button>
             {baseEditId && <button type="button" onClick={() => { setBaseEditId(null); setBaseTitle(''); setBaseContent('') }} className="px-4 py-2 bg-gray-400 text-white rounded-xl font-bold hover:bg-gray-500 transition">취소</button>}
           </div>
         </form>
         <div className="grid gap-6 mb-10">
           {baseContents.length === 0 && <div className="text-gray-400 text-center">등록된 기반 내용이 없습니다.</div>}
           {baseContents.map(b => (
-            <div key={b.id} className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
+            <div key={b.id} className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
               <div className="flex-1">
-                <div className="font-bold text-lg text-blue-900 mb-1">{b.title}</div>
+                <div className="font-bold text-lg text-pink-900 mb-1">{b.title}</div>
                 <div className="text-gray-700 text-sm whitespace-pre-line">{b.content}</div>
               </div>
               <div className="flex gap-2 mt-2 md:mt-0">
