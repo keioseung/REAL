@@ -95,3 +95,13 @@ class BaseContentResponse(BaseModel):
 
     class Config:
         from_attributes = True 
+
+# Term Schemas
+class TermResponse(BaseModel):
+    id: int
+    term: str
+    description: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True 
