@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Brain, BookOpen, Trophy, Target, TrendingUp } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Brain, BookOpen, Trophy, Target, TrendingUp, Calendar } from 'lucide-react'
 import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
 import QuizSection from '@/components/quiz-section'
@@ -50,25 +50,54 @@ export default function DashboardPage() {
     { label: '성취', value: userProgress?.achievements?.length || 0, icon: Trophy, color: 'bg-yellow-500' },
   ]
 
+  // 토스트 알림 상태
+  const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ type, message })
+    setTimeout(() => setToast(null), 2500)
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 font-sans">
+      {/* 토스트 알림 */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            className={`fixed top-8 left-1/2 z-50 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-xl text-white font-bold text-lg ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
+          >
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 헤더 */}
-      <div className="text-center mb-8 pt-8">
-        <h1 className="text-5xl font-bold gradient-text mb-4">
+      <div className="text-center mb-8 pt-12">
+        <h1 className="text-6xl font-extrabold gradient-text mb-4 drop-shadow-lg tracking-tight">
           AI Mastery Hub
         </h1>
-        <p className="text-xl text-white/80">
+        <p className="text-2xl text-white/90 font-medium drop-shadow-sm">
           인공지능의 세계를 탐험하고 학습하세요
         </p>
       </div>
 
-      {/* 사이드바를 타이틀 아래에 가로로 배치 */}
-      <div className="flex justify-center mb-8">
-        <Sidebar 
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          sessionId={sessionId}
-        />
+      {/* 날짜 선택 - 상단 고정, 오늘 강조 */}
+      <div className="flex justify-center mb-10 sticky top-0 z-30">
+        <div className="glass rounded-2xl px-8 py-4 flex items-center gap-6 shadow-xl border border-white/10">
+          <Calendar className="w-6 h-6 text-blue-400" />
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)}
+            className="p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-300 text-lg font-semibold shadow"
+            style={{ minWidth: 180 }}
+          />
+          <span className="ml-4 px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-sm shadow">
+            {selectedDate === new Date().toISOString().split('T')[0] ? '오늘' : selectedDate}
+          </span>
+        </div>
       </div>
 
       {/* 메인 컨텐츠 */}
@@ -77,40 +106,42 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-6xl mx-auto"
+          className="max-w-7xl mx-auto"
         >
           {/* 통계 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="glass rounded-2xl p-6 text-center card-hover"
+                className="glass rounded-2xl p-8 text-center card-hover shadow-xl border border-white/10 hover:scale-105 transition-transform"
               >
-                <div className={`inline-flex p-3 rounded-full ${stat.color} text-white mb-4`}>
-                  <stat.icon className="w-6 h-6" />
+                <div className={`inline-flex p-4 rounded-full ${stat.color} text-white mb-4 shadow-lg`}>
+                  <stat.icon className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{stat.value}</h3>
-                <p className="text-white/70">{stat.label}</p>
+                <h3 className="text-3xl font-extrabold text-white mb-2 tracking-tight drop-shadow">
+                  {stat.value}
+                </h3>
+                <p className="text-white/80 text-lg font-semibold">{stat.label}</p>
               </motion.div>
             ))}
           </div>
 
           {/* AI 정보 섹션 */}
-          <section className="mb-8">
-            <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-              <Brain className="w-8 h-8" />
+          <section className="mb-16">
+            <h2 className="text-4xl font-extrabold text-white mb-8 flex items-center gap-4 drop-shadow">
+              <Brain className="w-10 h-10" />
               오늘의 AI 정보
             </h2>
             {aiInfoLoading ? (
-              <div className="glass rounded-2xl p-8 text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
-                <p className="text-white/70 mt-4">AI 정보를 불러오는 중...</p>
+              <div className="glass rounded-2xl p-12 text-center shadow-xl">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto"></div>
+                <p className="text-white/80 mt-6 text-xl font-semibold">AI 정보를 불러오는 중...</p>
               </div>
             ) : aiInfo && aiInfo.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {aiInfo.map((info, index) => (
                   <AIInfoCard
                     key={index}
@@ -123,9 +154,9 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="glass rounded-2xl p-8 text-center">
-                <BookOpen className="w-16 h-16 text-white/50 mx-auto mb-4" />
-                <p className="text-white/70 text-lg">
+              <div className="glass rounded-2xl p-12 text-center shadow-xl">
+                <BookOpen className="w-20 h-20 text-white/50 mx-auto mb-6" />
+                <p className="text-white/80 text-2xl font-semibold">
                   {selectedDate}에 등록된 AI 정보가 없습니다.
                 </p>
               </div>
@@ -133,10 +164,14 @@ export default function DashboardPage() {
           </section>
 
           {/* 퀴즈 섹션 */}
-          <QuizSection sessionId={sessionId} />
+          <section className="mb-16">
+            <QuizSection sessionId={sessionId} />
+          </section>
 
           {/* 진행상황 섹션 */}
-          <ProgressSection sessionId={sessionId} />
+          <section className="mb-16">
+            <ProgressSection sessionId={sessionId} />
+          </section>
         </motion.div>
       </main>
     </div>
