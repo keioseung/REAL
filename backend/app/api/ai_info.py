@@ -79,7 +79,8 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
         return {
             "id": existing_info.id,
             "date": existing_info.date,
-            "infos": build_infos(existing_info)
+            "infos": build_infos(existing_info),
+            "created_at": str(existing_info.created_at) if existing_info.created_at else None
         }
     else:
         # 새 데이터 생성
@@ -98,7 +99,8 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
         return {
             "id": db_ai_info.id,
             "date": db_ai_info.date,
-            "infos": build_infos(db_ai_info)
+            "infos": build_infos(db_ai_info),
+            "created_at": str(db_ai_info.created_at) if db_ai_info.created_at else None
         }
 
 @router.delete("/{date}")
