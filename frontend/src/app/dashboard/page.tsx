@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, BookOpen, Trophy, Target, TrendingUp, Calendar, Clipboard, FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers } from 'react-icons/fa'
+import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaTarget, FaTrendingUp } from 'react-icons/fa'
 import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
 import QuizSection from '@/components/quiz-section'
@@ -101,10 +101,10 @@ export default function DashboardPage() {
   }, [router])
 
   const stats = [
-    { label: '총 학습', value: userProgress?.total_learned || 0, icon: BookOpen, color: 'from-blue-500 to-cyan-500' },
-    { label: '연속 학습', value: userProgress?.streak_days || 0, icon: TrendingUp, color: 'from-green-500 to-emerald-500' },
-    { label: '퀴즈 점수', value: userProgress?.quiz_score || 0, icon: Target, color: 'from-purple-500 to-pink-500' },
-    { label: '성취', value: userProgress?.achievements?.length || 0, icon: Trophy, color: 'from-yellow-500 to-orange-500' },
+    { label: '총 학습', value: userProgress?.total_learned || 0, icon: FaBookOpen, color: 'from-blue-500 to-cyan-500' },
+    { label: '연속 학습', value: userProgress?.streak_days || 0, icon: FaTrendingUp, color: 'from-green-500 to-emerald-500' },
+    { label: '퀴즈 점수', value: userProgress?.quiz_score || 0, icon: FaTarget, color: 'from-purple-500 to-pink-500' },
+    { label: '성취', value: userProgress?.achievements?.length || 0, icon: FaTrophy, color: 'from-yellow-500 to-orange-500' },
   ]
 
   // AI 정보 3개만 정확히 보여줌
@@ -239,7 +239,7 @@ export default function DashboardPage() {
       {activeTab === 'ai' && (
         <div className="flex justify-center mb-6 md:mb-8">
           <div className="glass backdrop-blur-xl rounded-2xl px-4 md:px-8 py-3 md:py-4 flex items-center gap-4 md:gap-6 shadow-xl border border-white/10">
-            <Calendar className="w-5 h-5 md:w-6 md:h-6 text-blue-400" />
+            <FaCalendar className="w-5 h-5 md:w-6 md:h-6 text-blue-400" />
             <input 
               type="date" 
               value={selectedDate} 
@@ -266,13 +266,13 @@ export default function DashboardPage() {
           {activeTab === 'ai' && (
             <section className="mb-8 md:mb-16">
               <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
-                <Brain className="w-6 h-6 md:w-8 md:h-8" />
+                <FaBrain className="w-6 h-6 md:w-8 md:h-8" />
                 오늘의 AI 정보
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 {aiInfoFixed.length === 0 && (
                   <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center text-white/70 shadow-xl min-h-[180px] border border-white/10">
-                    <BookOpen className="w-10 h-10 md:w-12 md:h-12 mb-3 opacity-60" />
+                    <FaBookOpen className="w-10 h-10 md:w-12 md:h-12 mb-3 opacity-60" />
                     <span className="text-base md:text-lg font-semibold">AI 정보가 없습니다</span>
                   </div>
                 )}
@@ -315,7 +315,7 @@ export default function DashboardPage() {
           {activeTab === 'news' && (
             <section className="mb-8 md:mb-16">
               <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
-                <BookOpen className="w-6 h-6 md:w-8 md:h-8" />
+                <FaBookOpen className="w-6 h-6 md:w-8 md:h-8" />
                 AI 뉴스
               </h2>
               {newsLoading ? (
@@ -344,7 +344,7 @@ export default function DashboardPage() {
           {activeTab === 'term' && (
             <section className="mb-8 md:mb-16">
               <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
-                <Brain className="w-6 h-6 md:w-8 md:h-8" />
+                <FaBrain className="w-6 h-6 md:w-8 md:h-8" />
                 랜덤 용어 학습
               </h2>
               <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center text-white shadow-xl min-h-[180px] border border-white/10">
