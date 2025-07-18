@@ -10,6 +10,7 @@ import ProgressSection from '@/components/progress-section'
 import useAIInfo from '@/hooks/use-ai-info'
 import useUserProgress from '@/hooks/use-user-progress'
 import { useRouter } from 'next/navigation'
+import { Tabs, Tab } from "@headlessui/react"
 
 export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -30,6 +31,7 @@ export default function DashboardPage() {
   const { data: aiInfo, isLoading: aiInfoLoading } = useAIInfo(selectedDate)
   const { data: userProgress, isLoading: progressLoading } = useUserProgress(sessionId)
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState<'ai' | 'quiz' | 'progress'>('ai')
 
   useEffect(() => {
     const userStr = localStorage.getItem('currentUser')
@@ -83,22 +85,48 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* 날짜 선택 - 상단 고정, 오늘 강조 */}
-      <div className="flex justify-center mb-10 sticky top-0 z-30">
-        <div className="glass rounded-2xl px-8 py-4 flex items-center gap-6 shadow-xl border border-white/10">
-          <Calendar className="w-6 h-6 text-blue-400" />
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
-            className="p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-300 text-lg font-semibold shadow"
-            style={{ minWidth: 180 }}
-          />
-          <span className="ml-4 px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-sm shadow">
-            {selectedDate === new Date().toISOString().split('T')[0] ? '오늘' : selectedDate}
-          </span>
+      {/* 탭 메뉴 */}
+      <div className="flex justify-center mb-10">
+        <div className="flex gap-4 bg-white/10 rounded-2xl p-2 shadow-lg border border-white/10">
+          <button
+            className={`px-8 py-3 rounded-xl font-bold text-lg transition-all ${activeTab === 'ai' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow' : 'text-white/70 hover:bg-white/10'}`}
+            onClick={() => setActiveTab('ai')}
+          >
+            AI 정보
+          </button>
+          <button
+            className={`px-8 py-3 rounded-xl font-bold text-lg transition-all ${activeTab === 'quiz' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow' : 'text-white/70 hover:bg-white/10'}`}
+            onClick={() => setActiveTab('quiz')}
+          >
+            퀴즈
+          </button>
+          <button
+            className={`px-8 py-3 rounded-xl font-bold text-lg transition-all ${activeTab === 'progress' ? 'bg-gradient-to-r from-pink-500 to-blue-500 text-white shadow' : 'text-white/70 hover:bg-white/10'}`}
+            onClick={() => setActiveTab('progress')}
+          >
+            진행률
+          </button>
         </div>
       </div>
+
+      {/* 날짜 선택 (AI 정보 탭에서만 표시) */}
+      {activeTab === 'ai' && (
+        <div className="flex justify-center mb-10 sticky top-0 z-30">
+          <div className="glass rounded-2xl px-8 py-4 flex items-center gap-6 shadow-xl border border-white/10">
+            <Calendar className="w-6 h-6 text-blue-400" />
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={e => setSelectedDate(e.target.value)}
+              className="p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-300 text-lg font-semibold shadow"
+              style={{ minWidth: 180 }}
+            />
+            <span className="ml-4 px-3 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-sm shadow">
+              {selectedDate === new Date().toISOString().split('T')[0] ? '오늘' : selectedDate}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* 메인 컨텐츠 */}
       <main className="flex-1 p-6 overflow-y-auto">
@@ -106,72 +134,53 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-7xl mx-auto"
+          className="max-w-3xl mx-auto"
         >
-          {/* 통계 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="glass rounded-2xl p-8 text-center card-hover shadow-xl border border-white/10 hover:scale-105 transition-transform"
-              >
-                <div className={`inline-flex p-4 rounded-full ${stat.color} text-white mb-4 shadow-lg`}>
-                  <stat.icon className="w-7 h-7" />
+          {/* 탭별 컨텐츠 */}
+          {activeTab === 'ai' && (
+            <section className="mb-16">
+              <h2 className="text-3xl font-extrabold text-white mb-8 flex items-center gap-4 drop-shadow">
+                <Brain className="w-8 h-8" />
+                오늘의 AI 정보
+              </h2>
+              {aiInfoLoading ? (
+                <div className="glass rounded-2xl p-12 text-center shadow-xl">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto"></div>
+                  <p className="text-white/80 mt-6 text-xl font-semibold">AI 정보를 불러오는 중...</p>
                 </div>
-                <h3 className="text-3xl font-extrabold text-white mb-2 tracking-tight drop-shadow">
-                  {stat.value}
-                </h3>
-                <p className="text-white/80 text-lg font-semibold">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* AI 정보 섹션 */}
-          <section className="mb-16">
-            <h2 className="text-4xl font-extrabold text-white mb-8 flex items-center gap-4 drop-shadow">
-              <Brain className="w-10 h-10" />
-              오늘의 AI 정보
-            </h2>
-            {aiInfoLoading ? (
-              <div className="glass rounded-2xl p-12 text-center shadow-xl">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto"></div>
-                <p className="text-white/80 mt-6 text-xl font-semibold">AI 정보를 불러오는 중...</p>
-              </div>
-            ) : aiInfo && aiInfo.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {aiInfo.map((info, index) => (
-                  <AIInfoCard
-                    key={index}
-                    info={info}
-                    index={index}
-                    date={selectedDate}
-                    sessionId={sessionId}
-                    isLearned={userProgress?.[selectedDate]?.includes(index) || false}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="glass rounded-2xl p-12 text-center shadow-xl">
-                <BookOpen className="w-20 h-20 text-white/50 mx-auto mb-6" />
-                <p className="text-white/80 text-2xl font-semibold">
-                  {selectedDate}에 등록된 AI 정보가 없습니다.
-                </p>
-              </div>
-            )}
-          </section>
-
-          {/* 퀴즈 섹션 */}
-          <section className="mb-16">
-            <QuizSection sessionId={sessionId} />
-          </section>
-
-          {/* 진행상황 섹션 */}
-          <section className="mb-16">
-            <ProgressSection sessionId={sessionId} />
-          </section>
+              ) : aiInfo && aiInfo.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {aiInfo.map((info, index) => (
+                    <AIInfoCard
+                      key={index}
+                      info={info}
+                      index={index}
+                      date={selectedDate}
+                      sessionId={sessionId}
+                      isLearned={userProgress?.[selectedDate]?.includes(index) || false}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="glass rounded-2xl p-12 text-center shadow-xl">
+                  <BookOpen className="w-20 h-20 text-white/50 mx-auto mb-6" />
+                  <p className="text-white/80 text-2xl font-semibold">
+                    {selectedDate}에 등록된 AI 정보가 없습니다.
+                  </p>
+                </div>
+              )}
+            </section>
+          )}
+          {activeTab === 'quiz' && (
+            <section className="mb-16">
+              <QuizSection sessionId={sessionId} />
+            </section>
+          )}
+          {activeTab === 'progress' && (
+            <section className="mb-16">
+              <ProgressSection sessionId={sessionId} />
+            </section>
+          )}
         </motion.div>
       </main>
     </div>
