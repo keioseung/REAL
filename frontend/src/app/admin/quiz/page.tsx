@@ -38,7 +38,7 @@ export default function AdminQuizPage() {
   const addOrUpdateMutation = useMutation({
     mutationFn: async () => {
       if (editId) {
-        return quizAPI.update(editId, {
+        return quizAPI.update(Number(editId), {
           question,
           answer,
           choices,
