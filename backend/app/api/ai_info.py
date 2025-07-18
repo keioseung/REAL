@@ -64,16 +64,19 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
         return infos
 
     if existing_info:
-        # 기존 데이터 업데이트
-        if len(ai_info_data.infos) >= 1:
-            existing_info.info1_title = ai_info_data.infos[0].title
-            existing_info.info1_content = ai_info_data.infos[0].content
-        if len(ai_info_data.infos) >= 2:
-            existing_info.info2_title = ai_info_data.infos[1].title
-            existing_info.info2_content = ai_info_data.infos[1].content
-        if len(ai_info_data.infos) >= 3:
-            existing_info.info3_title = ai_info_data.infos[2].title
-            existing_info.info3_content = ai_info_data.infos[2].content
+        # 기존 데이터 업데이트 (비어있는 info2, info3에 순차적으로 채움)
+        infos_to_add = [i for i in ai_info_data.infos if i.title and i.content]
+        fields = [
+            ("info1_title", "info1_content"),
+            ("info2_title", "info2_content"),
+            ("info3_title", "info3_content"),
+        ]
+        for i, (title_field, content_field) in enumerate(fields):
+            if getattr(existing_info, title_field) == '' or getattr(existing_info, content_field) == '':
+                if infos_to_add:
+                    info = infos_to_add.pop(0)
+                    setattr(existing_info, title_field, info.title)
+                    setattr(existing_info, content_field, info.content)
         db.commit()
         db.refresh(existing_info)
         return {
