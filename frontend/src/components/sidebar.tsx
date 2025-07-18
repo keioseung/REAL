@@ -187,7 +187,7 @@ function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
                 최신 AI 뉴스
               </h3>
               <div className="space-y-3">
-                {news.slice(0, 3).map((item, index) => (
+                {news.slice(0, 3).map((item: { title: string; content: string }, index: number) => (
                   <div key={index} className="p-3 bg-white/5 rounded-lg">
                     <h4 className="text-white font-medium text-sm mb-1 line-clamp-2">
                       {item.title}
