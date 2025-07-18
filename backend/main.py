@@ -13,10 +13,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS 설정
+# CORS 설정 (운영 도메인으로 수정)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://your-frontend-domain.com"],
+    allow_origins=[
+        "https://real-production-376e.up.railway.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,4 +37,4 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"} 
+    return {"status": "healthy"}
