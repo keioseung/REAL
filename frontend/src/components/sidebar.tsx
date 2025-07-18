@@ -142,53 +142,55 @@ function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
           )}
 
           {/* AI 정보 추가 */}
-          <div>
-            <button
-              onClick={() => setIsAddingInfo(!isAddingInfo)}
-              className="w-full flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all"
-            >
-              <Plus className="w-5 h-5" />
-              AI 정보 추가
-            </button>
-
-            {isAddingInfo && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="mt-4 space-y-3"
+          {userRole === 'admin' && (
+            <>
+              <button
+                onClick={() => setIsAddingInfo(!isAddingInfo)}
+                className="w-full flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all"
               >
-                <input
-                  type="text"
-                  placeholder="제목"
-                  value={newInfoTitle}
-                  onChange={(e) => setNewInfoTitle(e.target.value)}
-                  className="w-full p-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/50 text-sm"
-                />
-                <textarea
-                  placeholder="내용"
-                  value={newInfoContent}
-                  onChange={(e) => setNewInfoContent(e.target.value)}
-                  rows={3}
-                  className="w-full p-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/50 text-sm resize-none"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleAddInfo}
-                    disabled={addAIInfoMutation.isPending}
-                    className="flex-1 p-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 disabled:opacity-50"
-                  >
-                    {addAIInfoMutation.isPending ? '추가 중...' : '추가'}
-                  </button>
-                  <button
-                    onClick={() => setIsAddingInfo(false)}
-                    className="flex-1 p-2 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
-                  >
-                    취소
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </div>
+                <Plus className="w-5 h-5" />
+                AI 정보 추가
+              </button>
+
+              {isAddingInfo && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-4 space-y-3"
+                >
+                  <input
+                    type="text"
+                    placeholder="제목"
+                    value={newInfoTitle}
+                    onChange={(e) => setNewInfoTitle(e.target.value)}
+                    className="w-full p-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/50 text-sm"
+                  />
+                  <textarea
+                    placeholder="내용"
+                    value={newInfoContent}
+                    onChange={(e) => setNewInfoContent(e.target.value)}
+                    rows={3}
+                    className="w-full p-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/50 text-sm resize-none"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleAddInfo}
+                      disabled={addAIInfoMutation.isPending}
+                      className="flex-1 p-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 disabled:opacity-50"
+                    >
+                      {addAIInfoMutation.isPending ? '추가 중...' : '추가'}
+                    </button>
+                    <button
+                      onClick={() => setIsAddingInfo(false)}
+                      className="flex-1 p-2 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </>
+          )}
 
           {/* 최신 뉴스 */}
           {news && news.length > 0 && (
