@@ -8,7 +8,7 @@ interface ProgressSectionProps {
   sessionId: string
 }
 
-export function ProgressSection({ sessionId }: ProgressSectionProps) {
+function ProgressSection({ sessionId }: ProgressSectionProps) {
   const { data: stats } = useUserStats(sessionId)
 
   const achievements = [
@@ -170,4 +170,6 @@ export function ProgressSection({ sessionId }: ProgressSectionProps) {
       )}
     </section>
   )
-} 
+}
+
+export default ProgressSection 
