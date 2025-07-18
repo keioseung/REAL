@@ -53,6 +53,16 @@ def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
 def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
     existing_info = db.query(AIInfo).filter(AIInfo.date == ai_info_data.date).first()
     
+    def build_infos(obj):
+        infos = []
+        if obj.info1_title and obj.info1_content:
+            infos.append({"title": obj.info1_title, "content": obj.info1_content})
+        if obj.info2_title and obj.info2_content:
+            infos.append({"title": obj.info2_title, "content": obj.info2_content})
+        if obj.info3_title and obj.info3_content:
+            infos.append({"title": obj.info3_title, "content": obj.info3_content})
+        return infos
+
     if existing_info:
         # 기존 데이터 업데이트
         if len(ai_info_data.infos) >= 1:
@@ -66,7 +76,10 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
             existing_info.info3_content = ai_info_data.infos[2].content
         db.commit()
         db.refresh(existing_info)
-        return existing_info
+        return {
+            "date": existing_info.date,
+            "infos": build_infos(existing_info)
+        }
     else:
         # 새 데이터 생성
         db_ai_info = AIInfo(
@@ -81,7 +94,10 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
         db.add(db_ai_info)
         db.commit()
         db.refresh(db_ai_info)
-        return db_ai_info
+        return {
+            "date": db_ai_info.date,
+            "infos": build_infos(db_ai_info)
+        }
 
 @router.delete("/{date}")
 def delete_ai_info(date: str, db: Session = Depends(get_db)):
