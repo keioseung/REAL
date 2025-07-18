@@ -92,7 +92,7 @@ export default function AdminQuizPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await quizAPI.delete(id)
+      await quizAPI.delete(Number(id))
       refetch()
       setSuccess('삭제가 완료되었습니다!')
     } catch {
