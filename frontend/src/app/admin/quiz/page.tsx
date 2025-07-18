@@ -6,6 +6,7 @@ import { quizAPI } from '@/lib/api'
 
 interface Quiz {
   id?: string
+  topic: string
   question: string
   answer: string
   choices: string[]
@@ -14,9 +15,10 @@ interface Quiz {
 
 export default function AdminQuizPage() {
   const queryClient = useQueryClient()
+  const [topic, setTopic] = useState('')
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
-  const [choices, setChoices] = useState(['', '', ''])
+  const [choices, setChoices] = useState(['', '', '', ''])
   const [explanation, setExplanation] = useState('')
   const [editId, setEditId] = useState<string | null>(null)
   const [error, setError] = useState('')
@@ -37,20 +39,24 @@ export default function AdminQuizPage() {
 
   const addOrUpdateMutation = useMutation({
     mutationFn: async () => {
+      const correctIndex = choices.findIndex(c => c.trim() === answer.trim())
+      if (correctIndex === -1) {
+        throw new Error('정답이 오답 목록에 없습니다.')
+      }
+      const quizPayload = {
+        topic,
+        question,
+        option1: choices[0],
+        option2: choices[1],
+        option3: choices[2],
+        option4: choices[3],
+        correct: correctIndex,
+        explanation
+      }
       if (editId) {
-        return quizAPI.update(Number(editId), {
-          question,
-          answer,
-          choices,
-          explanation
-        })
+        return quizAPI.update(Number(editId), quizPayload)
       } else {
-        return quizAPI.add({
-          question,
-          answer,
-          choices,
-          explanation
-        })
+        return quizAPI.add(quizPayload)
       }
     },
     onMutate: () => {
@@ -59,15 +65,16 @@ export default function AdminQuizPage() {
     },
     onSuccess: () => {
       refetch()
+      setTopic('')
       setQuestion('')
       setAnswer('')
-      setChoices(['', '', ''])
+      setChoices(['', '', '', ''])
       setExplanation('')
       setEditId(null)
       setSuccess('등록이 완료되었습니다!')
     },
-    onError: () => {
-      setError('등록에 실패했습니다. 다시 시도해주세요.')
+    onError: (err: any) => {
+      setError(err?.message || '등록에 실패했습니다. 다시 시도해주세요.')
     }
   })
 
@@ -75,8 +82,12 @@ export default function AdminQuizPage() {
     e.preventDefault()
     setError('')
     setSuccess('')
-    if (!question.trim() || !answer.trim() || choices.some(c => !c.trim())) {
-      setError('모든 문제, 정답, 오답을 입력하세요.')
+    if (!topic.trim() || !question.trim() || !answer.trim() || choices.some(c => !c.trim())) {
+      setError('모든 항목(주제, 문제, 정답, 오답)을 입력하세요.')
+      return
+    }
+    if (!choices.includes(answer)) {
+      setError('정답은 오답 목록 중 하나여야 합니다.')
       return
     }
     addOrUpdateMutation.mutate()
@@ -84,9 +95,10 @@ export default function AdminQuizPage() {
 
   const handleEdit = (q: Quiz) => {
     setEditId(q.id || null)
+    setTopic(q.topic)
     setQuestion(q.question)
     setAnswer(q.answer)
-    setChoices([...q.choices])
+    setChoices([...q.choices, '', '', '', ''].slice(0, 4))
     setExplanation(q.explanation || '')
   }
 
@@ -105,6 +117,10 @@ export default function AdminQuizPage() {
       <h2 className="text-3xl font-extrabold mb-8 text-purple-700 flex items-center gap-2">🎯 퀴즈 관리</h2>
       <form onSubmit={handleSubmit} className="mb-10 bg-purple-50 rounded-xl p-6 shadow flex flex-col gap-6">
         <div className="bg-white rounded-xl border border-purple-100 shadow-sm p-6 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-purple-700">주제</label>
+            <input type="text" placeholder="주제" value={topic} onChange={e => setTopic(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-purple-300" />
+          </div>
           <div className="flex flex-col gap-2">
             <label className="font-semibold text-purple-700">문제</label>
             <input type="text" placeholder="문제" value={question} onChange={e => setQuestion(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-purple-300" />
