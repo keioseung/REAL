@@ -77,6 +77,7 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(existing_info)
         return {
+            "id": existing_info.id,
             "date": existing_info.date,
             "infos": build_infos(existing_info)
         }
@@ -95,6 +96,7 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_ai_info)
         return {
+            "id": db_ai_info.id,
             "date": db_ai_info.date,
             "infos": build_infos(db_ai_info)
         }
