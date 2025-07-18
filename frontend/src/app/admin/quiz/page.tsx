@@ -152,20 +152,23 @@ export default function AdminQuizPage() {
       </form>
       <div className="grid gap-6">
         {quizzes.length === 0 && <div className="text-gray-400 text-center">등록된 퀴즈가 없습니다.</div>}
-        {quizzes.map(q => (
-          <div key={q.id} className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
-            <div className="flex-1">
-              <div className="font-bold text-lg text-purple-900 mb-1">{q.question}</div>
-              <div className="text-green-700 text-sm mb-1">정답: {q[`option${q.correct+1}`]}</div>
-              <div className="text-gray-700 text-sm mb-1">오답: {[q.option1, q.option2, q.option3, q.option4].filter((_,i)=>i!==q.correct).join(', ')}</div>
-              {q.explanation && <div className="text-purple-700 text-sm bg-purple-50 rounded p-2 mt-2">해설: {q.explanation}</div>}
+        {quizzes.map(q => {
+          const options = [q.option1, q.option2, q.option3, q.option4];
+          return (
+            <div key={q.id} className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
+              <div className="flex-1">
+                <div className="font-bold text-lg text-purple-900 mb-1">{q.question}</div>
+                <div className="text-green-700 text-sm mb-1">정답: {options[q.correct]}</div>
+                <div className="text-gray-700 text-sm mb-1">오답: {options.filter((_,i)=>i!==q.correct).join(', ')}</div>
+                {q.explanation && <div className="text-purple-700 text-sm bg-purple-50 rounded p-2 mt-2">해설: {q.explanation}</div>}
+              </div>
+              <div className="flex gap-2 mt-2 md:mt-0">
+                <button onClick={() => handleEdit(q)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
+                <button onClick={() => handleDelete(q.id.toString())} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
+              </div>
             </div>
-            <div className="flex gap-2 mt-2 md:mt-0">
-              <button onClick={() => handleEdit(q)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
-              <button onClick={() => handleDelete(q.id.toString())} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   )
