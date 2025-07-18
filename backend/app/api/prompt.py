@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -56,3 +56,7 @@ def delete_prompt(prompt_id: int, db: Session = Depends(get_db)):
 def get_prompts_by_category(category: str, db: Session = Depends(get_db)):
     prompts = db.query(Prompt).filter(Prompt.category == category).all()
     return prompts 
+
+@router.options("/")
+def options_prompt():
+    return Response(status_code=200) 

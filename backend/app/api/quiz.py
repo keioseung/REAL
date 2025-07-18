@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -63,6 +63,10 @@ def delete_quiz(quiz_id: int, db: Session = Depends(get_db)):
     db.delete(quiz)
     db.commit()
     return {"message": "Quiz deleted successfully"}
+
+@router.options("/")
+def options_quiz():
+    return Response(status_code=200)
 
 @router.get("/generate/{topic}")
 def generate_quiz(topic: str):

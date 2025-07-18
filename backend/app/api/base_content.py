@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -12,6 +12,10 @@ router = APIRouter()
 def get_all_base_contents(db: Session = Depends(get_db)):
     contents = db.query(BaseContent).order_by(BaseContent.created_at.desc()).all()
     return contents
+
+@router.options("/")
+def options_base_content():
+    return Response(status_code=200)
 
 @router.post("/", response_model=BaseContentResponse)
 def add_base_content(content_data: BaseContentCreate, db: Session = Depends(get_db)):
