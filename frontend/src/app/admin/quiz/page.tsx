@@ -98,7 +98,7 @@ export default function AdminQuizPage() {
   }
 
   const handleEdit = (q: Quiz) => {
-    setEditId(q.id || null)
+    setEditId(q.id.toString())
     setTopic(q.topic)
     setQuestion(q.question)
     setAnswer(q.option1) // 편집 시 정답은 option1로 설정
