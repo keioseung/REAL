@@ -9,6 +9,8 @@ import QuizSection from '@/components/quiz-section'
 import ProgressSection from '@/components/progress-section'
 import useAIInfo from '@/hooks/use-ai-info'
 import useUserProgress from '@/hooks/use-user-progress'
+import { useAuth } from '@/components/providers'
+import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -30,6 +32,14 @@ export default function HomePage() {
 
   const { data: aiInfo, isLoading: aiInfoLoading } = useAIInfo(selectedDate)
   const { data: userProgress, isLoading: progressLoading } = useUserProgress(sessionId)
+  const { isLoggedIn, logout } = useAuth()
+  const router = useRouter()
+
+  // 로그인 안 했으면 /login으로 이동
+  if (typeof window !== 'undefined' && !isLoggedIn) {
+    router.replace('/login')
+    return null
+  }
 
   const stats = [
     { label: '총 학습', value: userProgress?.total_learned || 0, icon: BookOpen, color: 'bg-blue-500' },
@@ -48,6 +58,7 @@ export default function HomePage() {
         <p className="text-xl text-white/80">
           인공지능의 세계를 탐험하고 학습하세요
         </p>
+        <button onClick={logout} className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">로그아웃</button>
       </div>
 
       {/* 사이드바를 타이틀 아래에 가로로 배치 */}
