@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, BookOpen, Trophy, Target, TrendingUp, Calendar } from 'lucide-react'
+import { Brain, BookOpen, Trophy, Target, TrendingUp, Calendar, Clipboard } from 'lucide-react'
 import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
 import QuizSection from '@/components/quiz-section'
@@ -51,6 +51,21 @@ export default function DashboardPage() {
     { label: '성취', value: userProgress?.achievements?.length || 0, icon: Trophy, color: 'bg-yellow-500' },
   ]
 
+  // AI 정보 3개로 고정, 부족하면 빈 카드
+  const aiInfoFixed = aiInfo && aiInfo.length > 0
+    ? [...aiInfo, ...Array(3 - aiInfo.length).fill(null)].slice(0, 3)
+    : [null, null, null]
+
+  // 오늘의 요약 배너 데이터
+  const todayStats = [
+    { label: '총 학습', value: userProgress?.total_learned || 0 },
+    { label: '연속 학습', value: userProgress?.streak_days || 0 },
+    { label: '퀴즈 점수', value: userProgress?.quiz_score || 0 }
+  ]
+
+  // 새로고침 핸들러(탭별)
+  const handleRefresh = () => window.location.reload()
+
   // 토스트 알림 상태
   const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const showToast = (type: 'success' | 'error', message: string) => {
@@ -60,6 +75,15 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 font-sans">
+      {/* 오늘의 요약 배너 */}
+      <div className="flex justify-center gap-6 pt-6 pb-2">
+        {todayStats.map(stat => (
+          <div key={stat.label} className="bg-white/10 rounded-xl px-6 py-3 text-white font-bold text-lg shadow border border-white/10">
+            <span className="block text-base text-white/70 font-medium mb-1">{stat.label}</span>
+            <span className="text-2xl">{stat.value}</span>
+          </div>
+        ))}
+      </div>
       {/* 토스트 알림 */}
       <AnimatePresence>
         {toast && (
@@ -106,6 +130,10 @@ export default function DashboardPage() {
             진행률
           </button>
         </div>
+        {/* 탭별 새로고침 버튼 */}
+        <button onClick={handleRefresh} className="ml-6 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all font-semibold shadow">
+          새로고침
+        </button>
       </div>
 
       {/* 날짜 선택 (AI 정보 탭에서만 표시) */}
@@ -142,14 +170,9 @@ export default function DashboardPage() {
                 <Brain className="w-8 h-8" />
                 오늘의 AI 정보
               </h2>
-              {aiInfoLoading ? (
-                <div className="glass rounded-2xl p-12 text-center shadow-xl">
-                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto"></div>
-                  <p className="text-white/80 mt-6 text-xl font-semibold">AI 정보를 불러오는 중...</p>
-                </div>
-              ) : aiInfo && aiInfo.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {aiInfo.map((info, index) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {aiInfoFixed.map((info, index) =>
+                  info ? (
                     <AIInfoCard
                       key={index}
                       info={info}
@@ -158,25 +181,31 @@ export default function DashboardPage() {
                       sessionId={sessionId}
                       isLearned={userProgress?.[selectedDate]?.includes(index) || false}
                     />
-                  ))}
-                </div>
-              ) : (
-                <div className="glass rounded-2xl p-12 text-center shadow-xl">
-                  <BookOpen className="w-20 h-20 text-white/50 mx-auto mb-6" />
-                  <p className="text-white/80 text-2xl font-semibold">
-                    {selectedDate}에 등록된 AI 정보가 없습니다.
-                  </p>
-                </div>
-              )}
+                  ) : (
+                    <div key={index} className="glass rounded-2xl p-8 flex flex-col items-center justify-center text-center text-white/70 shadow-xl min-h-[180px]">
+                      <BookOpen className="w-12 h-12 mb-3 opacity-60" />
+                      <span className="text-lg font-semibold">AI 정보가 없습니다</span>
+                    </div>
+                  )
+                )}
+              </div>
             </section>
           )}
           {activeTab === 'quiz' && (
             <section className="mb-16">
+              <div className="flex justify-end mb-4">
+                <button onClick={handleRefresh} className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all font-semibold shadow">
+                  랜덤 퀴즈 풀기
+                </button>
+              </div>
               <QuizSection sessionId={sessionId} />
             </section>
           )}
           {activeTab === 'progress' && (
             <section className="mb-16">
+              <div className="flex justify-end mb-4">
+                <span className="bg-blue-500/80 text-white px-4 py-2 rounded-lg font-semibold shadow">최고 연속 학습일: {userProgress?.max_streak || 0}일</span>
+              </div>
               <ProgressSection sessionId={sessionId} />
             </section>
           )}
