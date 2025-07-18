@@ -14,7 +14,7 @@ interface AIInfoCardProps {
   isLearned: boolean
 }
 
-export function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps) {
+function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const updateProgressMutation = useUpdateUserProgress()
 
@@ -118,4 +118,6 @@ export function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCa
       )}
     </motion.div>
   )
-} 
+}
+
+export default AIInfoCard 
