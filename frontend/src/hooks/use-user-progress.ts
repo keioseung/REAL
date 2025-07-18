@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { userProgressAPI } from '@/lib/api'
 import type { UserProgress, UserStats } from '@/types'
 
-export function useUserProgress(sessionId: string) {
+function useUserProgress(sessionId: string) {
   return useQuery({
     queryKey: ['user-progress', sessionId],
     queryFn: async () => {
@@ -12,6 +12,8 @@ export function useUserProgress(sessionId: string) {
     enabled: !!sessionId,
   })
 }
+
+export default useUserProgress
 
 export function useUserStats(sessionId: string) {
   return useQuery({
