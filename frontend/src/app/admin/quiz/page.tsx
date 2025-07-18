@@ -4,12 +4,16 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { quizAPI } from '@/lib/api'
 
+// Quiz 타입을 API 응답에 맞게 수정
 interface Quiz {
-  id?: string
+  id: number
   topic: string
   question: string
-  answer: string
-  choices: string[]
+  option1: string
+  option2: string
+  option3: string
+  option4: string
+  correct: number
   explanation: string
 }
 
@@ -24,11 +28,11 @@ export default function AdminQuizPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
+  // useQuery에서 받아온 데이터를 바로 사용
   const { data: quizzes = [], refetch } = useQuery({
     queryKey: ['quizzes'],
     queryFn: async () => {
       const res = await quizAPI.getTopics()
-      // get all quizzes for the first topic (for demo)
       if (res.data.length > 0) {
         const quizRes = await quizAPI.getByTopic(res.data[0])
         return quizRes.data as Quiz[]
@@ -97,8 +101,8 @@ export default function AdminQuizPage() {
     setEditId(q.id || null)
     setTopic(q.topic)
     setQuestion(q.question)
-    setAnswer(q.answer)
-    setChoices([...q.choices, '', '', '', ''].slice(0, 4))
+    setAnswer(q.option1) // 편집 시 정답은 option1로 설정
+    setChoices([q.option1, q.option2, q.option3, q.option4])
     setExplanation(q.explanation || '')
   }
 
@@ -152,13 +156,13 @@ export default function AdminQuizPage() {
           <div key={q.id} className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
             <div className="flex-1">
               <div className="font-bold text-lg text-purple-900 mb-1">{q.question}</div>
-              <div className="text-green-700 text-sm mb-1">정답: {q.answer}</div>
-              <div className="text-gray-700 text-sm mb-1">오답: {q.choices.join(', ')}</div>
+              <div className="text-green-700 text-sm mb-1">정답: {q[`option${q.correct+1}`]}</div>
+              <div className="text-gray-700 text-sm mb-1">오답: {[q.option1, q.option2, q.option3, q.option4].filter((_,i)=>i!==q.correct).join(', ')}</div>
               {q.explanation && <div className="text-purple-700 text-sm bg-purple-50 rounded p-2 mt-2">해설: {q.explanation}</div>}
             </div>
             <div className="flex gap-2 mt-2 md:mt-0">
               <button onClick={() => handleEdit(q)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
-              <button onClick={() => handleDelete(q.id!)} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
+              <button onClick={() => handleDelete(q.id.toString())} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
             </div>
           </div>
         ))}
