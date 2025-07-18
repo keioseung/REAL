@@ -12,8 +12,7 @@ interface AIInfo {
 export default function AdminAIInfoPage() {
   const [aiInfos, setAIInfos] = useState<AIInfo[]>([])
   const [date, setDate] = useState('')
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+  const [inputs, setInputs] = useState([{ title: '', content: '' }])
   const [editId, setEditId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -25,28 +24,39 @@ export default function AdminAIInfoPage() {
     localStorage.setItem('aiInfos', JSON.stringify(aiInfos))
   }, [aiInfos])
 
+  const handleInputChange = (idx: number, field: 'title' | 'content', value: string) => {
+    setInputs(inputs => inputs.map((input, i) => i === idx ? { ...input, [field]: value } : input))
+  }
+
+  const handleAddInput = () => {
+    setInputs([...inputs, { title: '', content: '' }])
+  }
+
+  const handleRemoveInput = (idx: number) => {
+    setInputs(inputs => inputs.length === 1 ? inputs : inputs.filter((_, i) => i !== idx))
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!date || !title || !content) return
+    if (!date || inputs.some(input => !input.title || !input.content)) return
     if (editId) {
-      setAIInfos(aiInfos.map(info => info.id === editId ? { ...info, date, title, content } : info))
+      // 단일 수정 모드(기존 방식 유지)
+      setAIInfos(aiInfos.map(info => info.id === editId ? { ...info, date, title: inputs[0].title, content: inputs[0].content } : info))
       setEditId(null)
     } else {
       setAIInfos([
         ...aiInfos,
-        { id: Date.now().toString(), date, title, content }
+        ...inputs.map(input => ({ id: Date.now().toString() + Math.random(), date, ...input }))
       ])
     }
     setDate('')
-    setTitle('')
-    setContent('')
+    setInputs([{ title: '', content: '' }])
   }
 
   const handleEdit = (info: AIInfo) => {
     setEditId(info.id)
     setDate(info.date)
-    setTitle(info.title)
-    setContent(info.content)
+    setInputs([{ title: info.title, content: info.content }])
   }
 
   const handleDelete = (id: string) => {
@@ -54,30 +64,37 @@ export default function AdminAIInfoPage() {
     if (editId === id) {
       setEditId(null)
       setDate('')
-      setTitle('')
-      setContent('')
+      setInputs([{ title: '', content: '' }])
     }
   }
 
   return (
     <div className="max-w-3xl mx-auto mt-16 p-8 bg-white rounded-3xl shadow-2xl">
       <h2 className="text-3xl font-extrabold mb-8 text-blue-700 flex items-center gap-2">📝 AI 정보 관리</h2>
-      <form onSubmit={handleSubmit} className="mb-10 bg-blue-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
-        <div className="flex-1 flex flex-col gap-2">
-          <label className="font-semibold text-blue-700">날짜</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
+      <form onSubmit={handleSubmit} className="mb-10 bg-blue-50 rounded-xl p-6 shadow flex flex-col gap-4">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end">
+          <div className="flex-1 flex flex-col gap-2">
+            <label className="font-semibold text-blue-700">날짜</label>
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
+          </div>
         </div>
-        <div className="flex-1 flex flex-col gap-2">
-          <label className="font-semibold text-blue-700">제목</label>
-          <input type="text" placeholder="제목" value={title} onChange={e => setTitle(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
-        </div>
-        <div className="flex-1 flex flex-col gap-2">
-          <label className="font-semibold text-blue-700">내용</label>
-          <textarea placeholder="내용" value={content} onChange={e => setContent(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" rows={2} />
-        </div>
-        <div className="flex flex-col gap-2">
-          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">{editId ? '수정' : '등록'}</button>
-          {editId && <button type="button" onClick={() => { setEditId(null); setDate(''); setTitle(''); setContent('') }} className="px-4 py-2 bg-gray-400 text-white rounded-xl font-bold hover:bg-gray-500 transition">취소</button>}
+        {inputs.map((input, idx) => (
+          <div key={idx} className="flex flex-col md:flex-row gap-2 items-end bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="font-semibold text-blue-700">제목</label>
+              <input type="text" placeholder={`제목 ${idx+1}`} value={input.title} onChange={e => handleInputChange(idx, 'title', e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
+            </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="font-semibold text-blue-700">내용</label>
+              <textarea placeholder={`내용 ${idx+1}`} value={input.content} onChange={e => handleInputChange(idx, 'content', e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" rows={2} />
+            </div>
+            <button type="button" onClick={() => handleRemoveInput(idx)} className="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition mt-6">-</button>
+          </div>
+        ))}
+        <button type="button" onClick={handleAddInput} className="px-4 py-2 bg-blue-200 text-blue-700 rounded-xl font-bold hover:bg-blue-300 transition w-fit">정보 추가</button>
+        <div className="flex flex-col gap-2 md:flex-row md:items-end">
+          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition w-full md:w-40">{editId ? '수정' : '등록'}</button>
+          {editId && <button type="button" onClick={() => { setEditId(null); setDate(''); setInputs([{ title: '', content: '' }]) }} className="px-4 py-2 bg-gray-400 text-white rounded-xl font-bold hover:bg-gray-500 transition w-full md:w-40">취소</button>}
         </div>
       </form>
       <div className="grid gap-6">
