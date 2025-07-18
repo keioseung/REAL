@@ -15,7 +15,7 @@ class AIInfoResponse(BaseModel):
     id: int
     date: str
     infos: List[AIInfoItem]
-    created_at: datetime
+    created_at: str
 
     class Config:
         from_attributes = True
@@ -91,7 +91,7 @@ class BaseContentResponse(BaseModel):
     title: str
     content: str
     category: str
-    created_at: datetime
+    created_at: str
 
     class Config:
         from_attributes = True 
