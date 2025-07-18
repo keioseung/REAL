@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Calendar, 
@@ -28,11 +28,22 @@ function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
   const [isAddingInfo, setIsAddingInfo] = useState(false)
   const [newInfoTitle, setNewInfoTitle] = useState('')
   const [newInfoContent, setNewInfoContent] = useState('')
+  const [userRole, setUserRole] = useState<string | null>(null)
   
   const { data: dates } = useAIInfoDates()
   const { data: news } = useFetchAINews()
   const addAIInfoMutation = useAddAIInfo()
   const deleteAIInfoMutation = useDeleteAIInfo()
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('currentUser')
+      if (userStr) {
+        const user = JSON.parse(userStr)
+        setUserRole(user.role)
+      }
+    }
+  }, [])
 
   const handleAddInfo = async () => {
     if (!newInfoTitle.trim() || !newInfoContent.trim()) return
@@ -202,23 +213,25 @@ function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
           )}
 
           {/* 관리자 메뉴 */}
-          <div className="pt-6 border-t border-white/10">
-            <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-              <Settings className="w-5 h-5" />
-              관리
-            </h3>
-            <div className="space-y-2">
-              <button className="w-full text-left p-2 text-white/70 hover:text-white hover:bg-white/5 rounded text-sm">
-                퀴즈 관리
-              </button>
-              <button className="w-full text-left p-2 text-white/70 hover:text-white hover:bg-white/5 rounded text-sm">
-                프롬프트 관리
-              </button>
-              <button className="w-full text-left p-2 text-white/70 hover:text-white hover:bg-white/5 rounded text-sm">
-                사용자 통계
-              </button>
+          {userRole === 'admin' && (
+            <div className="pt-6 border-t border-white/10">
+              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                관리
+              </h3>
+              <div className="space-y-2">
+                <button className="w-full text-left p-2 text-white/70 hover:text-white hover:bg-white/5 rounded text-sm">
+                  퀴즈 관리
+                </button>
+                <button className="w-full text-left p-2 text-white/70 hover:text-white hover:bg-white/5 rounded text-sm">
+                  프롬프트 관리
+                </button>
+                <button className="w-full text-left p-2 text-white/70 hover:text-white hover:bg-white/5 rounded text-sm">
+                  사용자 통계
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </motion.aside>
 
