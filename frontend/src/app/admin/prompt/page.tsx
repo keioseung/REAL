@@ -169,9 +169,42 @@ export default function AdminPromptPage() {
 
   return (
     <div className="max-w-4xl mx-auto mt-16 p-8 bg-white rounded-3xl shadow-2xl flex flex-col gap-12">
-      {/* AI 정보 관리 (위) */}
+      {/* 프롬프트 관리 */}
       <section>
-        <h2 className="text-3xl font-extrabold mb-8 text-blue-700 flex items-center gap-2">📝 AI 정보 관리</h2>
+        <h2 className="text-3xl font-extrabold mb-8 text-pink-700 flex items-center gap-2">🤖 프롬프트 관리</h2>
+        <form onSubmit={handlePromptSubmit} className="mb-8 bg-pink-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
+          <div className="flex-1 flex flex-col gap-2">
+            <label className="font-semibold text-pink-700">프롬프트 제목</label>
+            <input type="text" placeholder="프롬프트 제목" value={promptTitle} onChange={e => setPromptTitle(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" />
+          </div>
+          <div className="flex-1 flex flex-col gap-2">
+            <label className="font-semibold text-pink-700">프롬프트 내용</label>
+            <textarea placeholder="프롬프트 내용" value={promptContent} onChange={e => setPromptContent(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" rows={2} />
+          </div>
+          <div className="flex flex-col gap-2">
+            <button type="submit" className="px-4 py-2 bg-pink-600 text-white rounded-xl font-bold hover:bg-pink-700 transition">{promptEditId ? '수정' : '등록'}</button>
+            {promptEditId && <button type="button" onClick={() => { setPromptEditId(null); setPromptTitle(''); setPromptContent('') }} className="px-4 py-2 bg-gray-400 text-white rounded-xl font-bold hover:bg-gray-500 transition">취소</button>}
+          </div>
+        </form>
+        <div className="grid gap-6 mb-10">
+          {prompts.length === 0 && <div className="text-gray-400 text-center">등록된 프롬프트가 없습니다.</div>}
+          {prompts.map(p => (
+            <div key={p.id} className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
+              <div className="flex-1">
+                <div className="font-bold text-lg text-pink-900 mb-1">{p.title}</div>
+                <div className="text-gray-700 text-sm whitespace-pre-line">{p.content}</div>
+              </div>
+              <div className="flex gap-2 mt-2 md:mt-0">
+                <button onClick={() => handlePromptEdit(p)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
+                <button onClick={() => handlePromptDelete(p.id)} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      {/* 기반 내용 관리 */}
+      <section>
+        <h2 className="text-3xl font-extrabold mb-8 text-pink-700 flex items-center gap-2">📄 기반 내용 관리</h2>
         <form onSubmit={handleBaseSubmit} className="mb-8 bg-pink-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
           <div className="flex-1 flex flex-col gap-2">
             <label className="font-semibold text-pink-700">기반 내용 제목</label>
@@ -197,39 +230,6 @@ export default function AdminPromptPage() {
               <div className="flex gap-2 mt-2 md:mt-0">
                 <button onClick={() => handleBaseEdit(b)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
                 <button onClick={() => handleBaseDelete(b.id)} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-      {/* 프롬프트 관리 (아래) */}
-      <section>
-        <h2 className="text-3xl font-extrabold mb-8 text-pink-700 flex items-center gap-2">🤖 프롬프트 관리</h2>
-        <form onSubmit={handlePromptSubmit} className="mb-8 bg-pink-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
-          <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-pink-700">프롬프트 제목</label>
-            <input type="text" placeholder="프롬프트 제목" value={promptTitle} onChange={e => setPromptTitle(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" />
-          </div>
-          <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-pink-700">프롬프트 내용</label>
-            <textarea placeholder="프롬프트 내용" value={promptContent} onChange={e => setPromptContent(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" rows={2} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <button type="submit" className="px-4 py-2 bg-pink-600 text-white rounded-xl font-bold hover:bg-pink-700 transition">{promptEditId ? '수정' : '등록'}</button>
-            {promptEditId && <button type="button" onClick={() => { setPromptEditId(null); setPromptTitle(''); setPromptContent('') }} className="px-4 py-2 bg-gray-400 text-white rounded-xl font-bold hover:bg-gray-500 transition">취소</button>}
-          </div>
-        </form>
-        <div className="grid gap-6 mb-10">
-          {prompts.length === 0 && <div className="text-gray-400 text-center">등록된 프롬프트가 없습니다.</div>}
-          {prompts.map(p => (
-            <div key={p.id} className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
-              <div className="flex-1">
-                <div className="font-bold text-lg text-pink-900 mb-1">{p.title}</div>
-                {/* 내용은 미리보기에서만 보여주고, 목록에서는 제목만 */}
-              </div>
-              <div className="flex gap-2 mt-2 md:mt-0">
-                <button onClick={() => handlePromptEdit(p)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
-                <button onClick={() => handlePromptDelete(p.id)} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
               </div>
             </div>
           ))}
