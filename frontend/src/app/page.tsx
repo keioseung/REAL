@@ -1,12 +1,47 @@
 "use client"
 
 import { useRouter } from 'next/navigation'
-import { FaRobot, FaArrowRight } from 'react-icons/fa'
-import { useEffect, useRef } from 'react'
+import { FaRobot, FaArrowRight, FaBrain, FaRocket, FaTrophy, FaChartLine, FaLightbulb, FaUsers, FaGlobe, FaCode } from 'react-icons/fa'
+import { useEffect, useRef, useState } from 'react'
 
 export default function IntroPage() {
   const router = useRouter()
   const cardRef = useRef<HTMLDivElement>(null)
+  const [typedText, setTypedText] = useState('')
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isTyping, setIsTyping] = useState(true)
+  
+  const fullText = "AI Mastery Hub"
+  const taglines = [
+    "인공지능의 미래를 탐험하세요",
+    "매일 업데이트되는 AI 트렌드",
+    "실전 퀴즈로 실력 점검",
+    "나만의 학습 통계와 성취"
+  ]
+  const [currentTagline, setCurrentTagline] = useState(0)
+
+  // 타이핑 애니메이션
+  useEffect(() => {
+    if (currentIndex < fullText.length) {
+      const timeout = setTimeout(() => {
+        setTypedText(fullText.slice(0, currentIndex + 1))
+        setCurrentIndex(currentIndex + 1)
+      }, 150)
+      return () => clearTimeout(timeout)
+    } else {
+      setIsTyping(false)
+    }
+  }, [currentIndex, fullText])
+
+  // 태그라인 순환
+  useEffect(() => {
+    if (!isTyping) {
+      const interval = setInterval(() => {
+        setCurrentTagline((prev) => (prev + 1) % taglines.length)
+      }, 3000)
+      return () => clearInterval(interval)
+    }
+  }, [isTyping, taglines.length])
 
   useEffect(() => {
     if (cardRef.current) {
@@ -14,7 +49,7 @@ export default function IntroPage() {
         { transform: 'scale(0.95) rotateX(10deg)', opacity: 0 },
         { transform: 'scale(1) rotateX(0deg)', opacity: 1 }
       ], {
-        duration: 900,
+        duration: 1200,
         easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
         fill: 'forwards'
       })
@@ -22,62 +57,153 @@ export default function IntroPage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-700 via-purple-700 to-pink-600 relative overflow-hidden">
-      {/* 3D Glass Morphism 배경 */}
-      <div className="absolute -top-40 -left-40 w-[32rem] h-[32rem] bg-pink-400 opacity-30 rounded-full blur-3xl animate-pulse z-0" />
-      <div className="absolute -bottom-40 -right-40 w-[32rem] h-[32rem] bg-blue-400 opacity-30 rounded-full blur-3xl animate-pulse z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none z-0" />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* 고급스러운 배경 효과 */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.15),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,255,0.15),transparent_50%)]" />
+      
+      {/* 움직이는 파티클 효과 */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/20 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 4}s`
+            }}
+          />
+        ))}
+      </div>
+
       {/* 메인 카드 */}
-      <div ref={cardRef} className="relative z-10 flex flex-col items-center justify-center bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl px-14 py-20 max-w-2xl border border-white/40 ring-4 ring-purple-200/30 hover:ring-pink-300/40 transition-all duration-500 group">
-        <div className="flex items-center gap-5 mb-6">
-          <span className="text-6xl text-purple-600 drop-shadow-2xl animate-bounce-slow"><FaRobot /></span>
-          <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-2xl tracking-tight animate-gradient-x">AI Mastery Hub</h1>
+      <div ref={cardRef} className="relative z-10 flex flex-col items-center justify-center bg-white/10 backdrop-blur-3xl rounded-[3rem] shadow-2xl px-16 py-24 max-w-4xl border border-white/20 ring-1 ring-white/30 hover:ring-purple-400/50 transition-all duration-700 group">
+        {/* 상단 아이콘과 제목 */}
+        <div className="flex items-center gap-6 mb-8">
+          <div className="relative">
+            <span className="text-7xl text-purple-400 drop-shadow-2xl animate-bounce-slow">
+              <FaRobot />
+            </span>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full animate-pulse" />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-7xl md:text-8xl font-black bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight">
+              {typedText}
+              {isTyping && <span className="animate-blink">|</span>}
+            </h1>
+            <div className="h-8 mt-2">
+              <p className="text-xl md:text-2xl text-purple-300 font-medium animate-fade-in-out">
+                {taglines[currentTagline]}
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="text-xl md:text-2xl text-gray-700 mb-10 text-center max-w-xl font-semibold animate-fade-in">
-          <span className="text-pink-600 font-extrabold text-2xl md:text-3xl">AI 학습의 새로운 차원!</span><br/>
-          <span className="text-purple-600 font-bold">최신 AI 정보</span>와 <span className="text-blue-600 font-bold">퀴즈</span>로<br/>
-          인공지능의 세계를 쉽고 재미있게 탐험해보세요.
+
+        {/* 메인 설명 */}
+        <p className="text-2xl md:text-3xl text-gray-300 mb-12 text-center max-w-3xl font-light leading-relaxed animate-fade-in">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 font-bold">
+            AI 학습의 새로운 차원
+          </span>
+          <br />
+          <span className="text-white/90">
+            최신 AI 정보와 실전 퀴즈로 인공지능의 세계를
+          </span>
+          <br />
+          <span className="text-white/90">
+            쉽고 재미있게 탐험해보세요
+          </span>
         </p>
-        <ul className="mb-10 text-gray-700 text-lg md:text-xl space-y-3 text-left max-w-md animate-fade-in">
-          <li className="flex items-center gap-2"><span className="text-blue-500 text-2xl">•</span> <span className="font-bold">매일 업데이트되는 AI 트렌드</span></li>
-          <li className="flex items-center gap-2"><span className="text-purple-500 text-2xl">•</span> <span className="font-bold">실전 퀴즈로 실력 점검</span></li>
-          <li className="flex items-center gap-2"><span className="text-pink-500 text-2xl">•</span> <span className="font-bold">나만의 학습 통계와 성취</span></li>
-        </ul>
+
+        {/* 기능 카드들 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 w-full max-w-4xl">
+          {[
+            { icon: FaBrain, title: "AI 트렌드", desc: "매일 업데이트되는 최신 정보", color: "from-blue-500 to-cyan-500" },
+            { icon: FaRocket, title: "실전 퀴즈", desc: "실력 점검과 성장", color: "from-purple-500 to-pink-500" },
+            { icon: FaChartLine, title: "학습 통계", desc: "개인별 진행 상황 추적", color: "from-green-500 to-emerald-500" },
+            { icon: FaTrophy, title: "성취 시스템", desc: "목표 달성과 보상", color: "from-yellow-500 to-orange-500" },
+            { icon: FaLightbulb, title: "스마트 학습", desc: "개인화된 학습 경로", color: "from-indigo-500 to-purple-500" },
+            { icon: FaUsers, title: "커뮤니티", desc: "함께 성장하는 공간", color: "from-pink-500 to-rose-500" }
+          ].map((feature, index) => (
+            <div
+              key={index}
+              className="group bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 hover:bg-white/10"
+            >
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                <feature.icon className="text-white text-xl" />
+              </div>
+              <h3 className="text-white font-bold text-lg mb-2">{feature.title}</h3>
+              <p className="text-gray-400 text-sm">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA 버튼 */}
         <button
-          className="group px-12 py-5 bg-gradient-to-r from-blue-500 to-pink-500 text-white text-2xl rounded-full font-extrabold shadow-2xl hover:from-blue-700 hover:to-pink-700 transition-all flex items-center gap-4 animate-fade-in hover:scale-105 active:scale-95"
+          className="group px-16 py-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white text-2xl rounded-full font-bold shadow-2xl hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all flex items-center gap-4 animate-fade-in hover:scale-105 active:scale-95 relative overflow-hidden"
           onClick={() => router.push('/auth')}
         >
-          지금 시작하기
-          <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform duration-200" />
+          <span className="relative z-10">지금 시작하기</span>
+          <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform duration-200 relative z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
         </button>
+
+        {/* 하단 통계 */}
+        <div className="flex items-center gap-8 mt-12 text-white/60 text-sm">
+          <div className="flex items-center gap-2">
+            <FaGlobe className="text-purple-400" />
+            <span>글로벌 AI 커뮤니티</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FaCode className="text-pink-400" />
+            <span>최신 기술 트렌드</span>
+          </div>
+        </div>
       </div>
+
       {/* 하단 크레딧 */}
-      <div className="absolute bottom-8 text-white/80 text-base z-10 select-none animate-fade-in">
-        © {new Date().getFullYear()} <span className="font-bold text-white/90">AI Mastery Hub</span>. All rights reserved.
+      <div className="absolute bottom-8 text-white/60 text-base z-10 select-none animate-fade-in">
+        © {new Date().getFullYear()} <span className="font-bold text-white/80">AI Mastery Hub</span>. All rights reserved.
       </div>
+
       {/* 커스텀 애니메이션 스타일 */}
       <style jsx global>{`
-        @keyframes gradient-x {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
         }
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: gradient-x 4s ease-in-out infinite;
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
         }
         @keyframes bounce-slow {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-18px); }
+          50% { transform: translateY(-20px); }
         }
         .animate-bounce-slow {
-          animation: bounce-slow 2.2s infinite;
+          animation: bounce-slow 3s infinite;
+        }
+        @keyframes blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        .animate-blink {
+          animation: blink 1s infinite;
+        }
+        @keyframes fade-in-out {
+          0%, 100% { opacity: 0; transform: translateY(10px); }
+          20%, 80% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-out {
+          animation: fade-in-out 3s ease-in-out infinite;
         }
         @keyframes fade-in {
-          from { opacity: 0; transform: translateY(24px); }
+          from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: none; }
         }
         .animate-fade-in {
-          animation: fade-in 1.2s cubic-bezier(0.22,1,0.36,1) both;
+          animation: fade-in 1.5s cubic-bezier(0.22,1,0.36,1) both;
         }
       `}</style>
     </div>
