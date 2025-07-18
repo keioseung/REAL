@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, BookOpen, Trophy, Target, TrendingUp, Users } from 'lucide-react'
-import { Sidebar } from '@/components/sidebar'
-import { AIInfoCard } from '@/components/ai-info-card'
-import { QuizSection } from '@/components/quiz-section'
-import { ProgressSection } from '@/components/progress-section'
-import { useAIInfo } from '@/hooks/use-ai-info'
-import { useUserProgress } from '@/hooks/use-user-progress'
+import Sidebar from '@/components/sidebar'
+import AIInfoCard from '@/components/ai-info-card'
+import QuizSection from '@/components/quiz-section'
+import ProgressSection from '@/components/progress-section'
+import useAIInfo from '@/hooks/use-ai-info'
+import useUserProgress from '@/hooks/use-user-progress'
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState(() => {
