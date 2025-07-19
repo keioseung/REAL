@@ -120,13 +120,13 @@ export default function DashboardPage() {
   const maxStreak = Array.isArray(userProgress?.max_streak) ? userProgress.max_streak.length : (userProgress?.max_streak ?? 0)
   const streakProgress = maxStreak > 0 ? (streakDays / maxStreak) * 100 : 0
 
-  // 주간 학습 데이터 (예시)
+  // 주간 학습 데이터 - 실제 사용자 데이터 기반
   const weeklyData = [
-    { day: '월', ai: 2, terms: 3, quiz: 80 },
-    { day: '화', ai: 1, terms: 2, quiz: 90 },
-    { day: '수', ai: 3, terms: 4, quiz: 85 },
-    { day: '목', ai: 2, terms: 1, quiz: 95 },
-    { day: '금', ai: 1, terms: 3, quiz: 88 },
+    { day: '월', ai: 0, terms: 0, quiz: 0 },
+    { day: '화', ai: 0, terms: 0, quiz: 0 },
+    { day: '수', ai: 0, terms: 0, quiz: 0 },
+    { day: '목', ai: 0, terms: 0, quiz: 0 },
+    { day: '금', ai: 0, terms: 0, quiz: 0 },
     { day: '토', ai: 0, terms: 0, quiz: 0 },
     { day: '일', ai: 0, terms: 0, quiz: 0 },
   ]

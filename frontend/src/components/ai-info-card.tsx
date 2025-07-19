@@ -24,6 +24,8 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
   const [showLearnComplete, setShowLearnComplete] = useState(false)
   const [learnedTerms, setLearnedTerms] = useState<Set<string>>(new Set())
   const [isLearning, setIsLearning] = useState(false)
+  const [showAllTermsComplete, setShowAllTermsComplete] = useState(false)
+  const [showRelearnButton, setShowRelearnButton] = useState(false)
   const updateProgressMutation = useUpdateUserProgress()
   const checkAchievementsMutation = useCheckAchievements()
   const updateTermProgressMutation = useUpdateTermProgress()
@@ -50,9 +52,12 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
             return newSet
           })
           
-          // 용어 학습 완료 알림
-          setShowTermAchievement(true)
-          setTimeout(() => setShowTermAchievement(false), 3000)
+          // 모든 용어 학습 완료 시에만 알림 표시
+          if (learnedTerms.size + 1 === info.terms!.length) {
+            setShowAllTermsComplete(true)
+            setShowRelearnButton(true)
+            setTimeout(() => setShowAllTermsComplete(false), 3000)
+          }
           
           // 진행률 업데이트 콜백 호출
           if (onProgressUpdate) {
@@ -184,12 +189,25 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
                 <span className="text-white/60 text-xs">
                   {currentTermIndex + 1} / {info.terms?.length || 0}
                 </span>
-                <button
-                  onClick={handleNextTerm}
-                  className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
-                >
-                  다음 용어
-                </button>
+                {showRelearnButton ? (
+                  <button
+                    onClick={() => {
+                      setCurrentTermIndex(0)
+                      setLearnedTerms(new Set())
+                      setShowRelearnButton(false)
+                    }}
+                    className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm font-medium"
+                  >
+                    재학습
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNextTerm}
+                    className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
+                  >
+                    다음 용어
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
@@ -249,18 +267,18 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
         )}
       </AnimatePresence>
 
-      {/* 용어 학습 완료 알림 */}
+      {/* 모든 용어 학습 완료 알림 */}
       <AnimatePresence>
-        {showTermAchievement && (
+        {showAllTermsComplete && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded-xl shadow-2xl border border-blue-300"
+            className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 rounded-xl shadow-2xl border border-green-300"
           >
             <div className="flex items-center gap-2">
               <Star className="w-5 h-5 animate-bounce" />
-              <span className="font-bold text-sm">✨ 용어 학습 완료!</span>
+              <span className="font-bold text-sm">🎉 모든 용어 학습 완료!</span>
             </div>
           </motion.div>
         )}
