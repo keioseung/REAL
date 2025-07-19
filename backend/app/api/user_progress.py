@@ -103,7 +103,7 @@ def update_user_statistics(session_id: str, db: Session):
     # AI 정보 학습 기록 가져오기
     ai_progress = db.query(UserProgress).filter(
         UserProgress.session_id == session_id,
-        UserProgress.date.notlike('__%')
+        ~UserProgress.date.like('__%')
     ).all()
     
     # 용어 학습 기록 가져오기
