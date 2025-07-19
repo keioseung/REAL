@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, Circle, BookOpen, ExternalLink, Brain, Trophy, Star, Sparkles } from 'lucide-react'
-import { useUpdateUserProgress, useCheckAchievements, useUpdateTermProgress } from '@/hooks/use-user-progress'
+import { useUpdateUserProgress, useCheckAchievements, useUpdateTermProgress, useLearnedTerms } from '@/hooks/use-user-progress'
 import type { AIInfoItem, TermItem } from '@/types'
 import { userProgressAPI } from '@/lib/api'
 
@@ -25,7 +25,6 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   const [showAchievement, setShowAchievement] = useState(false)
   const [showTermAchievement, setShowTermAchievement] = useState(false)
   const [showLearnComplete, setShowLearnComplete] = useState(false)
-  const [learnedTerms, setLearnedTerms] = useState<Set<string>>(new Set())
   const [isLearning, setIsLearning] = useState(false)
   const [showAllTermsComplete, setShowAllTermsComplete] = useState(false)
   const [showRelearnButton, setShowRelearnButton] = useState(false)
@@ -33,6 +32,9 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   const checkAchievementsMutation = useCheckAchievements()
   const updateTermProgressMutation = useUpdateTermProgress()
   const [isLearned, setIsLearned] = useState(isLearnedProp)
+  
+  // 용어 학습 상태를 React Query로 관리
+  const { data: learnedTerms = new Set<string>() } = useLearnedTerms(sessionId, date, index)
   
   // prop이 바뀌거나 forceUpdate, selectedDate가 바뀌면 동기화
   useEffect(() => {
@@ -56,32 +58,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   const hasTerms = info.terms && info.terms.length > 0
   const currentTerm = hasTerms && info.terms ? info.terms[currentTermIndex] : null
 
-  // 용어 학습 상태 불러오기
-  useEffect(() => {
-    const loadLearnedTerms = async () => {
-      if (!hasTerms || !info.terms) return;
-      
-      try {
-        // 백엔드에서 해당 info의 학습된 용어들 가져오기
-        const response = await userProgressAPI.get(sessionId);
-        const data = response.data;
-        
-        // __terms__{date}_{info_index} 형식의 키 찾기
-        const termKey = `__terms__${date}_${index}`;
-        if (data[termKey]) {
-          const learnedTermsList = data[termKey];
-          setLearnedTerms(new Set(learnedTermsList));
-        } else {
-          setLearnedTerms(new Set());
-        }
-      } catch (error) {
-        console.error('Failed to load learned terms:', error);
-        setLearnedTerms(new Set());
-      }
-    };
 
-    loadLearnedTerms();
-  }, [sessionId, date, index, hasTerms, info.terms, forceUpdate]);
 
   const handleNextTerm = async () => {
     if (hasTerms && info.terms) {
@@ -94,11 +71,6 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
             term: currentTerm.term,
             date,
             infoIndex: index
-          })
-          setLearnedTerms(prev => {
-            const newSet = new Set(prev)
-            newSet.add(currentTerm.term)
-            return newSet
           })
 
           // N개 학습완료 알림 매번 표시

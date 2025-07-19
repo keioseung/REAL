@@ -116,9 +116,10 @@ export function useUpdateTermProgress() {
       })
       return response.data
     },
-    onSuccess: (data, { sessionId }) => {
+    onSuccess: (data, { sessionId, date, infoIndex }) => {
       queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] })
       queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] })
+      queryClient.invalidateQueries({ queryKey: ['learned-terms-detail', sessionId, date, infoIndex] })
     },
   })
 }
@@ -134,5 +135,23 @@ export function useCheckAchievements() {
     onSuccess: (data, sessionId) => {
       queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] })
     },
+  })
+}
+
+export function useLearnedTerms(sessionId: string, date: string, infoIndex: number) {
+  return useQuery({
+    queryKey: ['learned-terms-detail', sessionId, date, infoIndex],
+    queryFn: async () => {
+      const response = await userProgressAPI.get(sessionId)
+      const data = response.data
+      
+      // __terms__{date}_{info_index} 형식의 키 찾기
+      const termKey = `__terms__${date}_${infoIndex}`
+      if (data[termKey]) {
+        return new Set(data[termKey])
+      }
+      return new Set<string>()
+    },
+    enabled: !!sessionId && !!date,
   })
 } 
