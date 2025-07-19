@@ -204,15 +204,58 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
         UserProgress.date == '__stats__'
     ).first()
     
+    # 오늘 날짜
+    from datetime import datetime
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    # 오늘 학습 데이터 가져오기
+    today_ai_info = 0
+    today_terms = 0
+    today_quiz_score = 0
+    
+    # 오늘 AI 정보 학습 수
+    today_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date == today
+    ).first()
+    
+    if today_progress and today_progress.learned_info:
+        try:
+            today_ai_info = len(json.loads(today_progress.learned_info))
+        except json.JSONDecodeError:
+            today_ai_info = 0
+    
+    # 오늘 용어 학습 수
+    today_terms_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date.like(f'__terms__{today}%')
+    ).all()
+    
+    for term_progress in today_terms_progress:
+        if term_progress.learned_info:
+            try:
+                today_terms += len(json.loads(term_progress.learned_info))
+            except json.JSONDecodeError:
+                continue
+    
     if progress and progress.stats:
-        return json.loads(progress.stats)
+        stats = json.loads(progress.stats)
+        stats.update({
+            'today_ai_info': today_ai_info,
+            'today_terms': today_terms,
+            'today_quiz_score': today_quiz_score
+        })
+        return stats
     
     return {
         'total_learned': 0,
         'streak_days': 0,
         'last_learned_date': None,
         'quiz_score': 0,
-        'achievements': []
+        'achievements': [],
+        'today_ai_info': today_ai_info,
+        'today_terms': today_terms,
+        'today_quiz_score': today_quiz_score
     }
 
 @router.post("/stats/{session_id}")

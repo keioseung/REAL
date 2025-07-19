@@ -551,132 +551,93 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* 학습 성장 지표 */}
-              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
-                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <Target className="w-5 h-5 md:w-6 md:h-6" />
-                  학습 성장 지표
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {/* 연속 학습 */}
-                  <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-4 text-white">
-                    <div className="flex items-center gap-3 mb-3">
-                      <TrendingUp className="w-6 h-6" />
-                      <h4 className="font-bold text-lg">연속 학습</h4>
-                    </div>
-                    <div className="text-3xl font-bold mb-2">{streakDays}일</div>
-                    <div className="text-sm opacity-90">최고 기록: {maxStreak}일</div>
-                  </div>
-
-                  {/* 총 학습일 */}
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 text-white">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Calendar className="w-6 h-6" />
-                      <h4 className="font-bold text-lg">총 학습일</h4>
-                    </div>
-                    <div className="text-3xl font-bold mb-2">{userProgress?.total_days || 0}일</div>
-                    <div className="text-sm opacity-90">꾸준한 학습 중!</div>
-                  </div>
-
-                  {/* 총 AI 정보 */}
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 text-white">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Trophy className="w-6 h-6" />
-                      <h4 className="font-bold text-lg">총 AI 정보</h4>
-                    </div>
-                    <div className="text-3xl font-bold mb-2">{userProgress?.total_ai_info || 0}개</div>
-                    <div className="text-sm opacity-90">지식이 쌓이고 있어요!</div>
-                  </div>
-
-                  {/* 총 용어 */}
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-4 text-white">
-                    <div className="flex items-center gap-3 mb-3">
-                      <BookOpen className="w-6 h-6" />
-                      <h4 className="font-bold text-lg">총 용어</h4>
-                    </div>
-                    <div className="text-3xl font-bold mb-2">{userProgress?.total_terms || 0}개</div>
-                    <div className="text-sm opacity-90">전문 용어 마스터!</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 학습 진행률 */}
-              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
-                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
-                  학습 진행률
-                </h3>
-                <div className="space-y-6">
-                  {/* AI 정보 진행률 */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-white font-semibold">AI 정보 학습</span>
-                      <span className="text-white/70">{learnedAIInfo} / {totalAIInfo}</span>
-                    </div>
-                    <div className="w-full bg-white/10 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-500"
-                        style={{ width: `${aiInfoProgress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* 용어 학습 진행률 */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-white font-semibold">용어 학습</span>
-                      <span className="text-white/70">{learnedTerms} / {totalTerms}</span>
-                    </div>
-                    <div className="w-full bg-white/10 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
-                        style={{ width: `${termsProgress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* 퀴즈 진행률 */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-white font-semibold">퀴즈 점수</span>
-                      <span className="text-white/70">{quizScore} / 100점</span>
-                    </div>
-                    <div className="w-full bg-white/10 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500"
-                        style={{ width: `${quizProgress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* 연속 학습 진행률 */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-white font-semibold">연속 학습</span>
-                      <span className="text-white/70">{streakDays} / {maxStreak}일</span>
-                    </div>
-                    <div className="w-full bg-white/10 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-orange-500 to-red-500 h-3 rounded-full transition-all duration-500"
-                        style={{ width: `${streakProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* 주간 학습 통계 */}
-              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
+              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
                     <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
-                    주간 학습 통계
+                    주간 학습 현황
                   </h3>
                   <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg font-semibold shadow backdrop-blur-xl border border-white/10">
                     최고 연속: {maxStreak}일
                   </span>
                 </div>
                 <ProgressSection sessionId={sessionId} />
+              </div>
+
+              {/* 성취 배지 섹션 */}
+              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Trophy className="w-5 h-5 md:w-6 md:h-6" />
+                  성취 배지
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  {/* AI 정보 학습 성취 */}
+                  <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">🌟</div>
+                    <h4 className="font-bold text-lg mb-1">첫 학습</h4>
+                    <p className="text-sm opacity-90">첫 번째 AI 정보 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">📚</div>
+                    <h4 className="font-bold text-lg mb-1">초보 학습자</h4>
+                    <p className="text-sm opacity-90">3개 AI 정보 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">🎯</div>
+                    <h4 className="font-bold text-lg mb-1">열심히 학습자</h4>
+                    <p className="text-sm opacity-90">5개 AI 정보 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">🏆</div>
+                    <h4 className="font-bold text-lg mb-1">학습 마스터</h4>
+                    <p className="text-sm opacity-90">10개 AI 정보 학습</p>
+                  </div>
+
+                  {/* 용어 학습 성취 */}
+                  <div className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">📖</div>
+                    <h4 className="font-bold text-lg mb-1">첫 용어</h4>
+                    <p className="text-sm opacity-90">첫 번째 용어 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">📝</div>
+                    <h4 className="font-bold text-lg mb-1">용어 수집가</h4>
+                    <p className="text-sm opacity-90">5개 용어 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">📚</div>
+                    <h4 className="font-bold text-lg mb-1">용어 마스터</h4>
+                    <p className="text-sm opacity-90">10개 용어 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">👑</div>
+                    <h4 className="font-bold text-lg mb-1">전문가</h4>
+                    <p className="text-sm opacity-90">20개 용어 학습</p>
+                  </div>
+
+                  {/* 연속 학습 성취 */}
+                  <div className="bg-gradient-to-r from-red-500 to-pink-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">🔥</div>
+                    <h4 className="font-bold text-lg mb-1">3일 연속</h4>
+                    <p className="text-sm opacity-90">3일 연속 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">⚡</div>
+                    <h4 className="font-bold text-lg mb-1">일주일 연속</h4>
+                    <p className="text-sm opacity-90">7일 연속 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">🚀</div>
+                    <h4 className="font-bold text-lg mb-1">2주 연속</h4>
+                    <p className="text-sm opacity-90">14일 연속 학습</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-4 text-white text-center">
+                    <div className="text-3xl mb-2">💎</div>
+                    <h4 className="font-bold text-lg mb-1">완벽한 퀴즈</h4>
+                    <p className="text-sm opacity-90">퀴즈 100점</p>
+                  </div>
+                </div>
               </div>
             </section>
           )}
