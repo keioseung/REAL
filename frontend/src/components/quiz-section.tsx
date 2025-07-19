@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { HelpCircle, CheckCircle, XCircle, RotateCcw } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
-import { quizAPI } from '@/lib/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { quizAPI, userProgressAPI } from '@/lib/api'
 import type { Quiz } from '@/types'
 
 interface QuizSectionProps {
@@ -17,6 +17,18 @@ function QuizSection({ sessionId }: QuizSectionProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
+  const [quizCompleted, setQuizCompleted] = useState(false)
+
+  // 퀴즈 점수 업데이트 뮤테이션
+  const updateQuizScoreMutation = useMutation({
+    mutationFn: async ({ score, totalQuestions }: { score: number; totalQuestions: number }) => {
+      const response = await userProgressAPI.updateQuizScore(sessionId, {
+        score,
+        total_questions: totalQuestions
+      })
+      return response.data
+    }
+  })
 
   const { data: topics } = useQuery({
     queryKey: ['quiz-topics'],
@@ -58,6 +70,13 @@ function QuizSection({ sessionId }: QuizSectionProps) {
       setCurrentQuizIndex(currentQuizIndex + 1)
       setSelectedAnswer(null)
       setShowResult(false)
+    } else if (quizzes && currentQuizIndex === quizzes.length - 1) {
+      // 퀴즈 완료 시 점수 업데이트
+      setQuizCompleted(true)
+      updateQuizScoreMutation.mutate({
+        score,
+        totalQuestions: quizzes.length
+      })
     }
   }
 
@@ -208,6 +227,11 @@ function QuizSection({ sessionId }: QuizSectionProps) {
                       <p className="text-white/70">
                         최종 점수: {score} / {quizzes?.length}
                       </p>
+                      {quizCompleted && (
+                        <p className="text-green-400 text-sm mt-2">
+                          점수가 저장되었습니다! 🎉
+                        </p>
+                      )}
                     </div>
                   )}
                   <button

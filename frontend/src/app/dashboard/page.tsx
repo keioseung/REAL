@@ -113,7 +113,7 @@ export default function DashboardPage() {
   const learnedTerms = Array.isArray(userProgress?.total_terms_learned) ? userProgress.total_terms_learned.length : (userProgress?.total_terms_learned ?? 0)
   const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
 
-  // 퀴즈 점수 계산 - 맞은 문제 수 / 총 푼 문제 수
+  // 퀴즈 점수 계산 - 당일 푼 전체 문제수가 분모, 정답 맞춘 총 개수가 분자
   const quizScore = (() => {
     if (typeof userProgress?.quiz_score === 'number') {
       return Math.min(userProgress.quiz_score, 100)
@@ -605,13 +605,21 @@ export default function DashboardPage() {
                 <button
                   onClick={() => {
                     // 모든 AI 정보 학습 상태 초기화
-                    if (userProgress?.[selectedDate]) {
-                      // 로컬 스토리지에서 해당 날짜의 학습 기록 삭제
-                      const updatedProgress = { ...userProgress }
-                      delete updatedProgress[selectedDate]
-                      localStorage.setItem('userProgress', JSON.stringify(updatedProgress))
+                    const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}')
+                    if (currentProgress[sessionId] && currentProgress[sessionId][selectedDate]) {
+                      // 해당 날짜의 학습 기록 삭제
+                      delete currentProgress[sessionId][selectedDate]
+                      localStorage.setItem('userProgress', JSON.stringify(currentProgress))
+                      
+                      // 진행률 업데이트
                       handleProgressUpdate()
-                      showToast('success', '모든 학습 상태가 초기화되었습니다!')
+                      
+                      // 성공 메시지 표시
+                      if (typeof window !== 'undefined' && window.showToast) {
+                        window.showToast('success', '모든 학습 상태가 초기화되었습니다!')
+                      } else {
+                        alert('모든 학습 상태가 초기화되었습니다!')
+                      }
                     }
                   }}
                   className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"

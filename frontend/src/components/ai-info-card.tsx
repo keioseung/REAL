@@ -97,6 +97,11 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
           }
           localStorage.setItem('userProgress', JSON.stringify(currentProgress))
         }
+        
+        // 진행률 업데이트 콜백 호출
+        if (onProgressUpdate) {
+          onProgressUpdate()
+        }
       } else {
         // 학습 전 상태에서 학습 완료 상태로 변경
         await updateProgressMutation.mutateAsync({
@@ -108,15 +113,13 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
         // 학습 완료 알림
         setShowLearnComplete(true)
         setTimeout(() => setShowLearnComplete(false), 3000)
-      }
-      
-      // 진행률 업데이트 콜백 호출
-      if (onProgressUpdate) {
-        onProgressUpdate()
-      }
-      
-      // 성취 확인 (학습 완료 시에만)
-      if (!isLearned) {
+        
+        // 진행률 업데이트 콜백 호출
+        if (onProgressUpdate) {
+          onProgressUpdate()
+        }
+        
+        // 성취 확인
         const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
         if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
           setShowAchievement(true)
