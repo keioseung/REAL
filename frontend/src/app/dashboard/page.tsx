@@ -522,12 +522,12 @@ export default function DashboardPage() {
                 <div className="text-xs text-white/60">총 AI 정보</div>
               </div>
               <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg p-3">
-                <div className="text-lg font-bold text-purple-400">{weeklyData.reduce((sum, day) => sum + day.terms, 0)}</div>
+                <div className="text-lg font-bold text-purple-400">60</div>
                 <div className="text-xs text-white/60">총 용어</div>
               </div>
               <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-3">
-                <div className="text-lg font-bold text-green-400">{Math.round(weeklyData.reduce((sum, day) => sum + day.quiz, 0) / 7)}</div>
-                <div className="text-xs text-white/60">평균 퀴즈</div>
+                <div className="text-lg font-bold text-green-400">{weeklyData.reduce((sum, day) => sum + day.quiz, 0)}</div>
+                <div className="text-xs text-white/60">총 퀴즈 수</div>
               </div>
             </div>
           </div>
@@ -636,224 +636,144 @@ export default function DashboardPage() {
                 나의 학습 성장도
               </h2>
               
-              {/* 메인 진행률 대시보드 */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 mb-8">
-                {/* 왼쪽: 오늘의 성과 */}
-                <div className="lg:col-span-2">
-                  <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                      <Calendar className="w-5 h-5 md:w-6 md:h-6" />
-                      오늘의 학습 성과
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* AI 정보 학습 */}
-                      <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl p-6 border border-blue-500/30">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-                            <FaRobot className="w-6 h-6 text-white" />
+              {/* 진행률 그래프 대시보드 */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
+                {/* 전체 학습 진행률 */}
+                <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <TrendingUp className="w-5 h-5 md:w-6 md:h-6" />
+                    전체 학습 진행률
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    {/* AI 정보 진행률 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                            <FaRobot className="w-4 h-4 text-white" />
                           </div>
-                          <div>
-                            <h4 className="font-bold text-lg text-white">AI 정보</h4>
-                            <p className="text-white/60 text-sm">학습 완료율</p>
-                          </div>
+                          <span className="text-white font-semibold">AI 정보</span>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-3">{learnedAIInfo}/{totalAIInfo}</div>
-                        <div className="relative">
-                          <div className="w-full bg-white/10 rounded-full h-3 mb-2">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${aiInfoProgress}%` }}
-                              transition={{ duration: 1, delay: 0.2 }}
-                              className="h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full relative overflow-hidden"
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
-                            </motion.div>
-                          </div>
-                          <div className="text-sm text-white/80 font-semibold">{Math.round(aiInfoProgress)}% 완료</div>
-                        </div>
+                        <span className="text-white/80 font-bold">{Math.round(aiInfoProgress)}%</span>
                       </div>
-
-                      {/* 용어 학습 */}
-                      <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-purple-500/30">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                            <FaBookOpen className="w-6 h-6 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-lg text-white">용어 학습</h4>
-                            <p className="text-white/60 text-sm">전체 진행률</p>
-                          </div>
+                      <div className="relative">
+                        <div className="w-full bg-white/10 rounded-full h-4">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${aiInfoProgress}%` }}
+                            transition={{ duration: 1.5, delay: 0.2 }}
+                            className="h-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                          </motion.div>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-3">{learnedTerms}/{totalTerms}</div>
-                        <div className="relative">
-                          <div className="w-full bg-white/10 rounded-full h-3 mb-2">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${termsProgress}%` }}
-                              transition={{ duration: 1, delay: 0.3 }}
-                              className="h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full relative overflow-hidden"
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
-                            </motion.div>
-                          </div>
-                          <div className="text-sm text-white/80 font-semibold">{Math.round(termsProgress)}% 완료</div>
-                        </div>
+                        <div className="text-sm text-white/60 mt-2">{learnedAIInfo}/{totalAIInfo} 완료</div>
                       </div>
+                    </div>
 
-                      {/* 퀴즈 점수 */}
-                      <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl p-6 border border-green-500/30">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                            <FaBrain className="w-6 h-6 text-white" />
+                    {/* 용어 학습 진행률 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                            <FaBookOpen className="w-4 h-4 text-white" />
                           </div>
-                          <div>
-                            <h4 className="font-bold text-lg text-white">퀴즈 점수</h4>
-                            <p className="text-white/60 text-sm">현재 점수</p>
-                          </div>
+                          <span className="text-white font-semibold">용어 학습</span>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-3">{quizScore}/100</div>
-                        <div className="relative">
-                          <div className="w-full bg-white/10 rounded-full h-3 mb-2">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${quizProgress}%` }}
-                              transition={{ duration: 1, delay: 0.4 }}
-                              className="h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full relative overflow-hidden"
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
-                            </motion.div>
-                          </div>
-                          <div className="text-sm text-white/80 font-semibold">{Math.round(quizProgress)}% 달성</div>
-                        </div>
+                        <span className="text-white/80 font-bold">{Math.round(termsProgress)}%</span>
                       </div>
+                      <div className="relative">
+                        <div className="w-full bg-white/10 rounded-full h-4">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${termsProgress}%` }}
+                            transition={{ duration: 1.5, delay: 0.4 }}
+                            className="h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                          </motion.div>
+                        </div>
+                        <div className="text-sm text-white/60 mt-2">{learnedTerms}/{totalTerms} 완료</div>
+                      </div>
+                    </div>
 
-                      {/* 연속 학습 */}
-                      <div className="bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl p-6 border border-orange-500/30">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
-                            <FaFire className="w-6 h-6 text-white" />
+                    {/* 퀴즈 점수 진행률 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                            <FaBrain className="w-4 h-4 text-white" />
                           </div>
-                          <div>
-                            <h4 className="font-bold text-lg text-white">연속 학습</h4>
-                            <p className="text-white/60 text-sm">현재 기록</p>
-                          </div>
+                          <span className="text-white font-semibold">퀴즈 점수</span>
                         </div>
-                        <div className="text-3xl font-bold text-white mb-3">{streakDays}일</div>
-                        <div className="relative">
-                          <div className="w-full bg-white/10 rounded-full h-3 mb-2">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${streakProgress}%` }}
-                              transition={{ duration: 1, delay: 0.5 }}
-                              className="h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full relative overflow-hidden"
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
-                            </motion.div>
-                          </div>
-                          <div className="text-sm text-white/80 font-semibold">연속 학습 중!</div>
+                        <span className="text-white/80 font-bold">{Math.round(quizProgress)}%</span>
+                      </div>
+                      <div className="relative">
+                        <div className="w-full bg-white/10 rounded-full h-4">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${quizProgress}%` }}
+                            transition={{ duration: 1.5, delay: 0.6 }}
+                            className="h-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                          </motion.div>
                         </div>
+                        <div className="text-sm text-white/60 mt-2">{quizScore}/100점</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 오른쪽: 성취 배지 */}
-                <div className="lg:col-span-1">
-                  <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10 h-full">
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                      <Trophy className="w-5 h-5 md:w-6 md:h-6" />
-                      성취 배지
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      {/* AI 정보 성취 */}
-                      <div className={`p-4 rounded-xl border-2 transition-all ${
-                        aiInfoProgress >= 100 
-                          ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-blue-500/50' 
-                          : 'bg-white/5 border-white/10'
-                      }`}>
-                        <div className="flex items-center gap-3">
-                          <div className={`text-2xl ${aiInfoProgress >= 100 ? 'animate-bounce' : ''}`}>
-                            {aiInfoProgress >= 100 ? '🏆' : '🎯'}
-                          </div>
-                          <div>
-                            <div className="font-bold text-white">AI 마스터</div>
-                            <div className="text-sm text-white/60">
-                              {aiInfoProgress >= 100 ? '완료!' : `${Math.round(aiInfoProgress)}% 진행`}
-                            </div>
-                          </div>
+                {/* 학습 활동 통계 */}
+                <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
+                    학습 활동 통계
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    {/* 연속 학습 */}
+                    <div className="bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl p-6 border border-orange-500/30">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+                          <FaFire className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-lg text-white">연속 학습</h4>
+                          <p className="text-white/60 text-sm">현재 기록</p>
                         </div>
                       </div>
-
-                      {/* 용어 학습 성취 */}
-                      <div className={`p-4 rounded-xl border-2 transition-all ${
-                        termsProgress >= 50 
-                          ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50' 
-                          : 'bg-white/5 border-white/10'
-                      }`}>
-                        <div className="flex items-center gap-3">
-                          <div className={`text-2xl ${termsProgress >= 50 ? 'animate-bounce' : ''}`}>
-                            {termsProgress >= 50 ? '📚' : '📖'}
-                          </div>
-                          <div>
-                            <div className="font-bold text-white">용어 수집가</div>
-                            <div className="text-sm text-white/60">
-                              {termsProgress >= 50 ? '완료!' : `${Math.round(termsProgress)}% 진행`}
-                            </div>
-                          </div>
+                      <div className="text-3xl font-bold text-white mb-3">{streakDays}일</div>
+                      <div className="relative">
+                        <div className="w-full bg-white/10 rounded-full h-3 mb-2">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${streakProgress}%` }}
+                            transition={{ duration: 1, delay: 0.8 }}
+                            className="h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-full relative overflow-hidden"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                          </motion.div>
                         </div>
+                        <div className="text-sm text-white/80 font-semibold">연속 학습 중!</div>
                       </div>
+                    </div>
 
-                      {/* 퀴즈 성취 */}
-                      <div className={`p-4 rounded-xl border-2 transition-all ${
-                        quizProgress >= 80 
-                          ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/50' 
-                          : 'bg-white/5 border-white/10'
-                      }`}>
-                        <div className="flex items-center gap-3">
-                          <div className={`text-2xl ${quizProgress >= 80 ? 'animate-bounce' : ''}`}>
-                            {quizProgress >= 80 ? '🧠' : '💡'}
-                          </div>
-                          <div>
-                            <div className="font-bold text-white">퀴즈 전문가</div>
-                            <div className="text-sm text-white/60">
-                              {quizProgress >= 80 ? '완료!' : `${Math.round(quizProgress)}% 진행`}
-                            </div>
-                          </div>
-                        </div>
+                    {/* 학습 요약 */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg p-4 border border-blue-500/30">
+                        <div className="text-2xl font-bold text-blue-400 mb-1">{learnedAIInfo}</div>
+                        <div className="text-sm text-white/60">학습한 AI 정보</div>
                       </div>
-
-                      {/* 연속 학습 성취 */}
-                      <div className={`p-4 rounded-xl border-2 transition-all ${
-                        streakDays >= 7 
-                          ? 'bg-gradient-to-r from-orange-500/20 to-red-500/20 border-orange-500/50' 
-                          : 'bg-white/5 border-white/10'
-                      }`}>
-                        <div className="flex items-center gap-3">
-                          <div className={`text-2xl ${streakDays >= 7 ? 'animate-bounce' : ''}`}>
-                            {streakDays >= 7 ? '🔥' : '⚡'}
-                          </div>
-                          <div>
-                            <div className="font-bold text-white">열정의 불꽃</div>
-                            <div className="text-sm text-white/60">
-                              {streakDays >= 7 ? '완료!' : `${streakDays}/7일`}
-                            </div>
-                          </div>
-                        </div>
+                      <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-4 border border-purple-500/30">
+                        <div className="text-2xl font-bold text-purple-400 mb-1">{learnedTerms}</div>
+                        <div className="text-sm text-white/60">학습한 용어</div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* 주간 학습 현황 */}
-              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
-                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
-                  주간 학습 현황
-                </h3>
-                <ProgressSection sessionId={sessionId} />
               </div>
             </section>
           )}
