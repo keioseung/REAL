@@ -40,7 +40,11 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
             date,
             infoIndex: index
           })
-          setLearnedTerms(prev => new Set([...prev, currentTerm.term]))
+          setLearnedTerms(prev => {
+            const newSet = new Set(prev)
+            newSet.add(currentTerm.term)
+            return newSet
+          })
           
           // 성취 확인
           const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
