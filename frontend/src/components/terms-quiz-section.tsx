@@ -8,6 +8,7 @@ import { aiInfoAPI } from '@/lib/api'
 
 interface TermsQuizSectionProps {
   sessionId: string
+  selectedDate: string
 }
 
 interface TermsQuiz {
@@ -27,19 +28,19 @@ interface TermsQuizResponse {
   message?: string
 }
 
-function TermsQuizSection({ sessionId }: TermsQuizSectionProps) {
+function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
 
   const { data: quizData, isLoading, refetch } = useQuery<TermsQuizResponse>({
-    queryKey: ['terms-quiz', sessionId],
+    queryKey: ['terms-quiz', selectedDate],
     queryFn: async () => {
-      const response = await aiInfoAPI.getTermsQuiz(sessionId)
+      const response = await aiInfoAPI.getTermsQuizByDate(selectedDate)
       return response.data
     },
-    enabled: !!sessionId,
+    enabled: !!selectedDate,
   })
 
   const currentQuiz = quizData?.quizzes?.[currentQuizIndex]
@@ -105,12 +106,12 @@ function TermsQuizSection({ sessionId }: TermsQuizSectionProps) {
       <div className="glass rounded-2xl p-8">
         <div className="text-center text-white">
           <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-60" />
-          <h3 className="text-xl font-semibold mb-2">학습한 용어가 없습니다</h3>
+          <h3 className="text-xl font-semibold mb-2">등록된 용어가 없습니다</h3>
           <p className="text-white/70 mb-4">
-            {quizData?.message || "AI 정보를 학습하고 용어를 등록한 후 퀴즈를 풀어보세요!"}
+            {quizData?.message || `${selectedDate} 날짜에 등록된 용어가 없습니다. 관리자가 용어를 등록한 후 퀴즈를 풀어보세요!`}
           </p>
           <div className="text-sm text-white/50">
-            총 학습 가능한 용어: {quizData?.total_terms || 0}개
+            선택한 날짜: {selectedDate}
           </div>
         </div>
       </div>
@@ -122,7 +123,7 @@ function TermsQuizSection({ sessionId }: TermsQuizSectionProps) {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold text-white flex items-center gap-3">
           <Target className="w-8 h-8" />
-          용어 학습 퀴즈
+          {selectedDate} 용어 퀴즈
         </h2>
         <div className="text-white/70 text-sm">
           총 {quizData.total_terms}개 용어 중 {quizData.quizzes.length}개 출제

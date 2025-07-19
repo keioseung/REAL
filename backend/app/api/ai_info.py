@@ -275,6 +275,86 @@ def get_terms_quiz(session_id: str, db: Session = Depends(get_db)):
         print(f"Error in get_terms_quiz: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate terms quiz: {str(e)}")
 
+@router.get("/terms-quiz-by-date/{date}")
+def get_terms_quiz_by_date(date: str, db: Session = Depends(get_db)):
+    """선택한 날짜의 모든 용어로 퀴즈를 생성합니다 (학습 여부와 상관없이)."""
+    try:
+        # 선택한 날짜의 AI 정보 가져오기
+        ai_info = db.query(AIInfo).filter(AIInfo.date == date).first()
+        
+        if not ai_info:
+            return {"quizzes": [], "message": f"{date} 날짜의 AI 정보가 없습니다."}
+        
+        # 모든 용어 수집
+        all_terms = []
+        
+        # info1의 용어들
+        if ai_info.info1_terms:
+            try:
+                terms1 = json.loads(ai_info.info1_terms)
+                all_terms.extend(terms1)
+            except json.JSONDecodeError:
+                pass
+        
+        # info2의 용어들
+        if ai_info.info2_terms:
+            try:
+                terms2 = json.loads(ai_info.info2_terms)
+                all_terms.extend(terms2)
+            except json.JSONDecodeError:
+                pass
+        
+        # info3의 용어들
+        if ai_info.info3_terms:
+            try:
+                terms3 = json.loads(ai_info.info3_terms)
+                all_terms.extend(terms3)
+            except json.JSONDecodeError:
+                pass
+        
+        if not all_terms:
+            return {"quizzes": [], "message": f"{date} 날짜에 등록된 용어가 없습니다."}
+        
+        # 중복 제거
+        unique_terms = []
+        seen_terms = set()
+        for term in all_terms:
+            if term.get('term') and term.get('term') not in seen_terms:
+                unique_terms.append(term)
+                seen_terms.add(term.get('term'))
+        
+        # 퀴즈 생성 (최대 20개)
+        import random
+        random.shuffle(unique_terms)
+        quiz_terms = unique_terms[:20]
+        
+        quizzes = []
+        for i, term in enumerate(quiz_terms):
+            # 정답이 아닌 다른 용어들 중에서 3개 선택
+            other_terms = [t for t in unique_terms if t != term]
+            if len(other_terms) >= 3:
+                wrong_answers = random.sample(other_terms, 3)
+                options = [term['description']] + [t['description'] for t in wrong_answers]
+                random.shuffle(options)
+                correct_index = options.index(term['description'])
+                
+                quizzes.append({
+                    "id": i + 1,
+                    "question": f"'{term['term']}'의 올바른 뜻은?",
+                    "option1": options[0],
+                    "option2": options[1],
+                    "option3": options[2],
+                    "option4": options[3],
+                    "correct": correct_index,
+                    "explanation": f"'{term['term']}'는 '{term['description']}'을 의미합니다."
+                })
+        
+        return {"quizzes": quizzes, "total_terms": len(unique_terms)}
+        
+    except Exception as e:
+        print(f"Error in get_terms_quiz_by_date: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate terms quiz: {str(e)}")
+
 @router.get("/news/fetch")
 def fetch_ai_news():
     """AI 뉴스를 가져와서 번역하고 정리합니다."""

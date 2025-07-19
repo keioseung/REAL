@@ -17,6 +17,7 @@ export const aiInfoAPI = {
   getAllDates: () => api.get('/api/ai-info/dates/all'),
   fetchNews: () => api.get('/api/ai-info/news/fetch'),
   getTermsQuiz: (sessionId: string) => api.get(`/api/ai-info/terms-quiz/${sessionId}`),
+  getTermsQuizByDate: (date: string) => api.get(`/api/ai-info/terms-quiz-by-date/${date}`),
 }
 
 // Quiz API

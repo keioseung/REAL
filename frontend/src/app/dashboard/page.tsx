@@ -291,7 +291,7 @@ export default function DashboardPage() {
           )}
           {activeTab === 'quiz' && (
             <section className="mb-8 md:mb-16">
-              <TermsQuizSection sessionId={sessionId} />
+              <TermsQuizSection sessionId={sessionId} selectedDate={selectedDate} />
             </section>
           )}
           {activeTab === 'progress' && (
