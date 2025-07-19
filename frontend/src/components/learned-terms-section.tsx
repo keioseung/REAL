@@ -43,6 +43,39 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
     enabled: !!sessionId,
   })
 
+  // 필터링 및 정렬된 용어 목록
+  const filteredTerms = (() => {
+    if (!learnedData?.terms) return []
+    
+    let terms = selectedDate 
+      ? learnedData.terms.filter(term => term.learned_date === selectedDate)
+      : learnedData.terms
+
+    // 검색 필터
+    if (searchQuery) {
+      terms = terms.filter(term => 
+        term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        term.description.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    // 즐겨찾기 필터
+    if (showFavoritesOnly) {
+      terms = terms.filter(term => favoriteTerms.has(term.term))
+    }
+
+    // 정렬
+    switch (sortBy) {
+      case 'length':
+        return terms.sort((a, b) => a.term.length - b.term.length)
+      case 'alphabet':
+        return terms.sort((a, b) => a.term.localeCompare(b.term))
+      case 'date':
+      default:
+        return terms.sort((a, b) => new Date(b.learned_date).getTime() - new Date(a.learned_date).getTime())
+    }
+  })()
+
   // 로컬 스토리지에서 즐겨찾기 불러오기
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -116,39 +149,6 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
       setCurrentTermIndex(Math.floor(Math.random() * filteredTerms.length))
     }
   }
-
-  // 필터링 및 정렬된 용어 목록
-  const filteredTerms = (() => {
-    if (!learnedData?.terms) return []
-    
-    let terms = selectedDate 
-      ? learnedData.terms.filter(term => term.learned_date === selectedDate)
-      : learnedData.terms
-
-    // 검색 필터
-    if (searchQuery) {
-      terms = terms.filter(term => 
-        term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        term.description.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    }
-
-    // 즐겨찾기 필터
-    if (showFavoritesOnly) {
-      terms = terms.filter(term => favoriteTerms.has(term.term))
-    }
-
-    // 정렬
-    switch (sortBy) {
-      case 'length':
-        return terms.sort((a, b) => a.term.length - b.term.length)
-      case 'alphabet':
-        return terms.sort((a, b) => a.term.localeCompare(b.term))
-      case 'date':
-      default:
-        return terms.sort((a, b) => new Date(b.learned_date).getTime() - new Date(a.learned_date).getTime())
-    }
-  })()
 
   // 용어 난이도 계산 (용어 길이 기반)
   const getDifficulty = (term: string) => {
