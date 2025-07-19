@@ -116,52 +116,52 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
                 })
             return infos
 
-    if existing_info:
-        # 기존 데이터 업데이트 (비어있는 info2, info3에 순차적으로 채움)
-        infos_to_add = [i for i in ai_info_data.infos if i.title and i.content]
-        fields = [
-            ("info1_title", "info1_content", "info1_terms"),
-            ("info2_title", "info2_content", "info2_terms"),
-            ("info3_title", "info3_content", "info3_terms"),
-        ]
-        for i, (title_field, content_field, terms_field) in enumerate(fields):
-            if getattr(existing_info, title_field) == '' or getattr(existing_info, content_field) == '':
-                if infos_to_add:
-                    info = infos_to_add.pop(0)
-                    setattr(existing_info, title_field, info.title)
-                    setattr(existing_info, content_field, info.content)
-                    setattr(existing_info, terms_field, json.dumps(info.terms or []))
-        db.commit()
-        db.refresh(existing_info)
-        return {
-            "id": existing_info.id,
-            "date": existing_info.date,
-            "infos": build_infos(existing_info),
-            "created_at": str(existing_info.created_at) if existing_info.created_at else None
-        }
-    else:
-        # 새 데이터 생성
-        db_ai_info = AIInfo(
-            date=ai_info_data.date,
-            info1_title=ai_info_data.infos[0].title if len(ai_info_data.infos) >= 1 else "",
-            info1_content=ai_info_data.infos[0].content if len(ai_info_data.infos) >= 1 else "",
-            info1_terms=json.dumps(ai_info_data.infos[0].terms or []) if len(ai_info_data.infos) >= 1 else "[]",
-            info2_title=ai_info_data.infos[1].title if len(ai_info_data.infos) >= 2 else "",
-            info2_content=ai_info_data.infos[1].content if len(ai_info_data.infos) >= 2 else "",
-            info2_terms=json.dumps(ai_info_data.infos[1].terms or []) if len(ai_info_data.infos) >= 2 else "[]",
-            info3_title=ai_info_data.infos[2].title if len(ai_info_data.infos) >= 3 else "",
-            info3_content=ai_info_data.infos[2].content if len(ai_info_data.infos) >= 3 else "",
-            info3_terms=json.dumps(ai_info_data.infos[2].terms or []) if len(ai_info_data.infos) >= 3 else "[]"
-        )
-        db.add(db_ai_info)
-        db.commit()
-        db.refresh(db_ai_info)
-        return {
-            "id": db_ai_info.id,
-            "date": db_ai_info.date,
-            "infos": build_infos(db_ai_info),
-            "created_at": str(db_ai_info.created_at) if db_ai_info.created_at else None
-        }
+        if existing_info:
+            # 기존 데이터 업데이트 (비어있는 info2, info3에 순차적으로 채움)
+            infos_to_add = [i for i in ai_info_data.infos if i.title and i.content]
+            fields = [
+                ("info1_title", "info1_content", "info1_terms"),
+                ("info2_title", "info2_content", "info2_terms"),
+                ("info3_title", "info3_content", "info3_terms"),
+            ]
+            for i, (title_field, content_field, terms_field) in enumerate(fields):
+                if getattr(existing_info, title_field) == '' or getattr(existing_info, content_field) == '':
+                    if infos_to_add:
+                        info = infos_to_add.pop(0)
+                        setattr(existing_info, title_field, info.title)
+                        setattr(existing_info, content_field, info.content)
+                        setattr(existing_info, terms_field, json.dumps(info.terms or []))
+            db.commit()
+            db.refresh(existing_info)
+            return {
+                "id": existing_info.id,
+                "date": existing_info.date,
+                "infos": build_infos(existing_info),
+                "created_at": str(existing_info.created_at) if existing_info.created_at else None
+            }
+        else:
+            # 새 데이터 생성
+            db_ai_info = AIInfo(
+                date=ai_info_data.date,
+                info1_title=ai_info_data.infos[0].title if len(ai_info_data.infos) >= 1 else "",
+                info1_content=ai_info_data.infos[0].content if len(ai_info_data.infos) >= 1 else "",
+                info1_terms=json.dumps(ai_info_data.infos[0].terms or []) if len(ai_info_data.infos) >= 1 else "[]",
+                info2_title=ai_info_data.infos[1].title if len(ai_info_data.infos) >= 2 else "",
+                info2_content=ai_info_data.infos[1].content if len(ai_info_data.infos) >= 2 else "",
+                info2_terms=json.dumps(ai_info_data.infos[1].terms or []) if len(ai_info_data.infos) >= 2 else "[]",
+                info3_title=ai_info_data.infos[2].title if len(ai_info_data.infos) >= 3 else "",
+                info3_content=ai_info_data.infos[2].content if len(ai_info_data.infos) >= 3 else "",
+                info3_terms=json.dumps(ai_info_data.infos[2].terms or []) if len(ai_info_data.infos) >= 3 else "[]"
+            )
+            db.add(db_ai_info)
+            db.commit()
+            db.refresh(db_ai_info)
+            return {
+                "id": db_ai_info.id,
+                "date": db_ai_info.date,
+                "infos": build_infos(db_ai_info),
+                "created_at": str(db_ai_info.created_at) if db_ai_info.created_at else None
+            }
     except Exception as e:
         print(f"Error in add_ai_info: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to add AI info: {str(e)}")
