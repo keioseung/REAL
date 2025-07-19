@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { HelpCircle, CheckCircle, XCircle, RotateCcw, BookOpen, Target, Trophy } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { HelpCircle, CheckCircle, XCircle, RotateCcw, BookOpen, Target, Trophy, Star, Sparkles, Award } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { aiInfoAPI } from '@/lib/api'
-import { useUpdateQuizScore } from '@/hooks/use-user-progress'
+import { useUpdateQuizScore, useCheckAchievements } from '@/hooks/use-user-progress'
 
 interface TermsQuizSectionProps {
   sessionId: string
@@ -35,7 +35,11 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
   const [quizCompleted, setQuizCompleted] = useState(false)
+  const [showQuizComplete, setShowQuizComplete] = useState(false)
+  const [showAchievement, setShowAchievement] = useState(false)
+  const [finalScore, setFinalScore] = useState<{score: number, total: number, percentage: number} | null>(null)
   const updateQuizScoreMutation = useUpdateQuizScore()
+  const checkAchievementsMutation = useCheckAchievements()
 
   const { data: quizData, isLoading, refetch } = useQuery<TermsQuizResponse>({
     queryKey: ['terms-quiz', selectedDate],
@@ -64,19 +68,43 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
     setShowResult(true)
   }
 
-  const handleNextQuiz = () => {
+  const handleNextQuiz = async () => {
     if (quizData?.quizzes && currentQuizIndex < quizData.quizzes.length - 1) {
       setCurrentQuizIndex(currentQuizIndex + 1)
       setSelectedAnswer(null)
       setShowResult(false)
     } else if (quizData?.quizzes && currentQuizIndex === quizData.quizzes.length - 1) {
-      // 퀴즈 완료 시 점수 저장
+      // 퀴즈 완료 시 점수 저장 및 성취 확인
+      const finalScoreData = {
+        score: score + (selectedAnswer === currentQuiz?.correct ? 1 : 0),
+        total: quizData.quizzes.length,
+        percentage: Math.round(((score + (selectedAnswer === currentQuiz?.correct ? 1 : 0)) / quizData.quizzes.length) * 100)
+      }
+      
+      setFinalScore(finalScoreData)
       setQuizCompleted(true)
-      updateQuizScoreMutation.mutate({
-        sessionId,
-        score,
-        totalQuestions: quizData.quizzes.length
-      })
+      
+      try {
+        // 퀴즈 점수 저장
+        await updateQuizScoreMutation.mutateAsync({
+          sessionId,
+          score: finalScoreData.score,
+          totalQuestions: finalScoreData.total
+        })
+        
+        // 퀴즈 완료 알림
+        setShowQuizComplete(true)
+        setTimeout(() => setShowQuizComplete(false), 4000)
+        
+        // 성취 확인
+        const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
+        if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
+          setShowAchievement(true)
+          setTimeout(() => setShowAchievement(false), 4000)
+        }
+      } catch (error) {
+        console.error('Failed to save quiz score:', error)
+      }
     }
   }
 
@@ -85,6 +113,8 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
     setSelectedAnswer(null)
     setShowResult(false)
     setScore(0)
+    setQuizCompleted(false)
+    setFinalScore(null)
     refetch()
   }
 
@@ -102,6 +132,14 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
       return 'bg-red-500 border-red-500 text-white'
     }
     return 'bg-white/10 border-white/20 text-white/50'
+  }
+
+  const getScoreMessage = (percentage: number) => {
+    if (percentage >= 90) return "🎉 완벽합니다! 훌륭한 실력이네요!"
+    if (percentage >= 80) return "🌟 아주 잘했어요! 거의 다 맞췄네요!"
+    if (percentage >= 70) return "👍 좋아요! 꽤 잘 알고 있네요!"
+    if (percentage >= 60) return "💪 괜찮아요! 조금만 더 노력하면 됩니다!"
+    return "📚 더 공부해보세요! 다음엔 더 잘할 수 있을 거예요!"
   }
 
   if (isLoading) {
@@ -130,7 +168,7 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
   }
 
   return (
-    <section className="mb-8">
+    <section className="mb-8 relative">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold text-white flex items-center gap-3">
           <Target className="w-8 h-8" />
@@ -161,7 +199,7 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
         </div>
 
         {/* 퀴즈 내용 */}
-        {currentQuiz && (
+        {currentQuiz && !quizCompleted && (
           <div className="space-y-6">
             <div>
               <h3 className="text-xl font-semibold text-white mb-4">
@@ -225,15 +263,12 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
                       다음 문제
                     </button>
                   ) : (
-                    <div className="flex-1 text-center">
-                      <h3 className="text-xl font-bold text-white mb-2">퀴즈 완료!</h3>
-                      <p className="text-white/70">
-                        최종 점수: {score} / {quizData.quizzes.length}
-                      </p>
-                      <p className="text-white/50 text-sm mt-1">
-                        정답률: {Math.round((score / quizData.quizzes.length) * 100)}%
-                      </p>
-                    </div>
+                    <button
+                      onClick={handleNextQuiz}
+                      className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-3 rounded-lg font-semibold hover:from-yellow-600 hover:to-orange-600"
+                    >
+                      퀴즈 완료하기
+                    </button>
                   )}
                   <button
                     onClick={handleResetQuiz}
@@ -247,7 +282,91 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
             </div>
           </div>
         )}
+
+        {/* 퀴즈 완료 결과 */}
+        {quizCompleted && finalScore && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-6"
+          >
+            <div className="space-y-4">
+              <div className="text-6xl mb-4">
+                {finalScore.percentage >= 90 ? '🏆' : 
+                 finalScore.percentage >= 80 ? '🥇' : 
+                 finalScore.percentage >= 70 ? '🥈' : 
+                 finalScore.percentage >= 60 ? '🥉' : '📚'}
+              </div>
+              
+              <h3 className="text-3xl font-bold text-white mb-2">
+                퀴즈 완료!
+              </h3>
+              
+              <div className="text-2xl font-bold text-white mb-2">
+                {finalScore.score} / {finalScore.total}
+              </div>
+              
+              <div className="text-xl text-white/80 mb-4">
+                정답률: {finalScore.percentage}%
+              </div>
+              
+              <div className="text-lg text-white/70 mb-6">
+                {getScoreMessage(finalScore.percentage)}
+              </div>
+            </div>
+            
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={handleResetQuiz}
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 flex items-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                다시 도전
+              </button>
+            </div>
+          </motion.div>
+        )}
       </div>
+
+      {/* 퀴즈 완료 알림 */}
+      <AnimatePresence>
+        {showQuizComplete && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-4 rounded-xl shadow-2xl border border-green-300"
+          >
+            <div className="flex items-center gap-3">
+              <Award className="w-6 h-6 animate-bounce" />
+              <div>
+                <div className="font-bold text-lg">🎉 퀴즈 완료!</div>
+                <div className="text-sm opacity-90">성적이 저장되었습니다!</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 성취 알림 */}
+      <AnimatePresence>
+        {showAchievement && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.8 }}
+            className="fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 rounded-xl shadow-2xl border border-yellow-300"
+          >
+            <div className="flex items-center gap-3">
+              <Trophy className="w-6 h-6 animate-bounce" />
+              <div>
+                <div className="font-bold text-lg">🎉 성취 달성!</div>
+                <div className="text-sm opacity-90">새로운 성취를 획득했습니다!</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
