@@ -113,7 +113,16 @@ export default function DashboardPage() {
   const learnedTerms = Array.isArray(userProgress?.total_terms_learned) ? userProgress.total_terms_learned.length : (userProgress?.total_terms_learned ?? 0)
   const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
 
-  const quizScore = typeof userProgress?.quiz_score === 'number' ? userProgress.quiz_score : 0
+  // 퀴즈 점수 계산 - 실제 점수 또는 기본값 0
+  const quizScore = (() => {
+    if (typeof userProgress?.quiz_score === 'number') {
+      return Math.min(userProgress.quiz_score, 100)
+    }
+    if (Array.isArray(userProgress?.quiz_score)) {
+      return Math.min(userProgress.quiz_score.length, 100)
+    }
+    return 0
+  })()
   const maxQuizScore = 100
   const quizProgress = (quizScore / maxQuizScore) * 100
 
@@ -365,82 +374,161 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        {/* 주간 학습 차트 */}
+        {/* 주간 학습 현황 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 mb-6 md:mb-8 w-full max-w-6xl border border-white/10"
+          className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-6 md:mb-8 w-full max-w-6xl border border-white/10"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-              <FaChartBar className="text-white text-sm md:text-base" />
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+              <FaChartBar className="text-white text-lg" />
             </div>
-            <h3 className="text-white font-bold text-lg md:text-xl">주간 학습 현황</h3>
+            <h3 className="text-white font-bold text-xl md:text-2xl">주간 학습 현황</h3>
           </div>
-          <div className="grid grid-cols-7 gap-2 md:gap-4">
+          
+          {/* 요일 헤더 */}
+          <div className="grid grid-cols-7 gap-3 mb-6">
             {weeklyData.map((day, index) => (
               <div key={day.day} className="text-center">
-                <div className={`text-xs md:text-sm mb-2 font-semibold ${
-                  day.isToday ? 'text-blue-400' : 'text-white/60'
+                <div className={`text-sm md:text-base font-bold mb-2 ${
+                  day.isToday ? 'text-blue-400' : 'text-white/70'
                 }`}>
                   {day.day}
-                  {day.isToday && (
-                    <div className="text-xs mt-1 bg-blue-500/20 px-2 py-1 rounded-full text-blue-300">
-                      오늘
-                    </div>
-                  )}
                 </div>
-                <div className="space-y-1">
-                  <div className="h-8 md:h-12 bg-gradient-to-b from-blue-500/20 to-blue-500/40 rounded-t-sm relative overflow-hidden">
-                    {day.ai > 0 && (
-                      <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${Math.min((day.ai / 3) * 100, 100)}%` }}
-                        transition={{ duration: 0.8, delay: index * 0.1 }}
-                        className="absolute bottom-0 w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t-sm"
-                      />
-                    )}
+                {day.isToday && (
+                  <div className="text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-full font-semibold shadow-lg">
+                    오늘
                   </div>
-                  <div className="h-8 md:h-12 bg-gradient-to-b from-purple-500/20 to-purple-500/40 rounded-t-sm relative overflow-hidden">
-                    {day.terms > 0 && (
-                      <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${Math.min((day.terms / 20) * 100, 100)}%` }}
-                        transition={{ duration: 0.8, delay: index * 0.1 + 0.2 }}
-                        className="absolute bottom-0 w-full bg-gradient-to-t from-purple-500 to-pink-500 rounded-t-sm"
-                      />
-                    )}
-                  </div>
-                  <div className="h-8 md:h-12 bg-gradient-to-b from-green-500/20 to-green-500/40 rounded-t-sm relative overflow-hidden">
-                    {day.quiz > 0 && (
-                      <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${Math.min(day.quiz, 100)}%` }}
-                        transition={{ duration: 0.8, delay: index * 0.1 + 0.4 }}
-                        className="absolute bottom-0 w-full bg-gradient-to-t from-green-500 to-emerald-500 rounded-t-sm"
-                      />
-                    )}
-                  </div>
-                </div>
-                <div className="text-white/40 text-xs mt-1">
-                  {day.ai + day.terms > 0 ? `${day.ai + day.terms}개` : '-'}
-                </div>
+                )}
               </div>
             ))}
           </div>
-          <div className="flex justify-center gap-4 md:gap-8 mt-4 text-xs md:text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded"></div>
-              <span className="text-white/60">AI 정보</span>
+
+          {/* 학습 활동 그래프 */}
+          <div className="space-y-6">
+            {/* AI 정보 학습 */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
+                <span className="text-white/80 font-semibold">AI 정보 학습</span>
+              </div>
+              <div className="grid grid-cols-7 gap-3">
+                {weeklyData.map((day, index) => (
+                  <div key={index} className="relative">
+                    <div className="h-16 md:h-20 bg-white/5 rounded-lg border border-white/10 relative overflow-hidden">
+                      {day.ai > 0 && (
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${Math.min((day.ai / 3) * 100, 100)}%` }}
+                          transition={{ duration: 0.8, delay: index * 0.1 }}
+                          className={`absolute bottom-0 w-full rounded-lg ${
+                            day.isToday 
+                              ? 'bg-gradient-to-t from-blue-500 to-cyan-500 shadow-lg' 
+                              : 'bg-gradient-to-t from-blue-400/60 to-cyan-400/60'
+                          }`}
+                        />
+                      )}
+                    </div>
+                    <div className="text-center mt-2">
+                      <span className={`text-xs font-bold ${
+                        day.isToday ? 'text-blue-400' : 'text-white/50'
+                      }`}>
+                        {day.ai > 0 ? day.ai : '-'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded"></div>
-              <span className="text-white/60">용어 학습</span>
+
+            {/* 용어 학습 */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                <span className="text-white/80 font-semibold">용어 학습</span>
+              </div>
+              <div className="grid grid-cols-7 gap-3">
+                {weeklyData.map((day, index) => (
+                  <div key={index} className="relative">
+                    <div className="h-16 md:h-20 bg-white/5 rounded-lg border border-white/10 relative overflow-hidden">
+                      {day.terms > 0 && (
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${Math.min((day.terms / 20) * 100, 100)}%` }}
+                          transition={{ duration: 0.8, delay: index * 0.1 + 0.2 }}
+                          className={`absolute bottom-0 w-full rounded-lg ${
+                            day.isToday 
+                              ? 'bg-gradient-to-t from-purple-500 to-pink-500 shadow-lg' 
+                              : 'bg-gradient-to-t from-purple-400/60 to-pink-400/60'
+                          }`}
+                        />
+                      )}
+                    </div>
+                    <div className="text-center mt-2">
+                      <span className={`text-xs font-bold ${
+                        day.isToday ? 'text-purple-400' : 'text-white/50'
+                      }`}>
+                        {day.terms > 0 ? day.terms : '-'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded"></div>
-              <span className="text-white/60">퀴즈 점수</span>
+
+            {/* 퀴즈 점수 */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
+                <span className="text-white/80 font-semibold">퀴즈 점수</span>
+              </div>
+              <div className="grid grid-cols-7 gap-3">
+                {weeklyData.map((day, index) => (
+                  <div key={index} className="relative">
+                    <div className="h-16 md:h-20 bg-white/5 rounded-lg border border-white/10 relative overflow-hidden">
+                      {day.quiz > 0 && (
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${Math.min(day.quiz, 100)}%` }}
+                          transition={{ duration: 0.8, delay: index * 0.1 + 0.4 }}
+                          className={`absolute bottom-0 w-full rounded-lg ${
+                            day.isToday 
+                              ? 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg' 
+                              : 'bg-gradient-to-t from-green-400/60 to-emerald-400/60'
+                          }`}
+                        />
+                      )}
+                    </div>
+                    <div className="text-center mt-2">
+                      <span className={`text-xs font-bold ${
+                        day.isToday ? 'text-green-400' : 'text-white/50'
+                      }`}>
+                        {day.quiz > 0 ? day.quiz : '-'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 요약 정보 */}
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg p-3">
+                <div className="text-lg font-bold text-blue-400">{weeklyData.reduce((sum, day) => sum + day.ai, 0)}</div>
+                <div className="text-xs text-white/60">총 AI 정보</div>
+              </div>
+              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg p-3">
+                <div className="text-lg font-bold text-purple-400">{weeklyData.reduce((sum, day) => sum + day.terms, 0)}</div>
+                <div className="text-xs text-white/60">총 용어</div>
+              </div>
+              <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-3">
+                <div className="text-lg font-bold text-green-400">{Math.round(weeklyData.reduce((sum, day) => sum + day.quiz, 0) / 7)}</div>
+                <div className="text-xs text-white/60">평균 퀴즈</div>
+              </div>
             </div>
           </div>
         </motion.div>
