@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye } from 'react-icons/fa'
 import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
-import QuizSection from '@/components/quiz-section'
+import TermsQuizSection from '@/components/terms-quiz-section'
 import ProgressSection from '@/components/progress-section'
 import useAIInfo from '@/hooks/use-ai-info'
 import useUserProgress from '@/hooks/use-user-progress'
@@ -209,7 +209,7 @@ export default function DashboardPage() {
         <div className="flex flex-wrap gap-2 md:gap-4 bg-white/10 backdrop-blur-xl rounded-2xl p-2 md:p-3 shadow-lg border border-white/10">
           {[
             { id: 'ai', label: 'AI 정보', gradient: 'from-blue-500 to-purple-500' },
-            { id: 'quiz', label: '퀴즈', gradient: 'from-purple-500 to-pink-500' },
+            { id: 'quiz', label: '용어 퀴즈', gradient: 'from-purple-500 to-pink-500' },
             { id: 'progress', label: '진행률', gradient: 'from-pink-500 to-blue-500' },
             { id: 'news', label: 'AI 뉴스', gradient: 'from-blue-500 to-pink-500' },
             { id: 'term', label: '용어 학습', gradient: 'from-purple-500 to-blue-500' }
@@ -291,15 +291,7 @@ export default function DashboardPage() {
           )}
           {activeTab === 'quiz' && (
             <section className="mb-8 md:mb-16">
-              <div className="flex justify-end mb-4">
-                <button 
-                  onClick={handleRefresh} 
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all font-semibold shadow backdrop-blur-xl border border-white/10"
-                >
-                  랜덤 퀴즈 풀기
-                </button>
-              </div>
-              <QuizSection sessionId={sessionId} />
+              <TermsQuizSection sessionId={sessionId} />
             </section>
           )}
           {activeTab === 'progress' && (

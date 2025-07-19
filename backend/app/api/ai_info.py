@@ -187,6 +187,94 @@ def get_all_ai_info_dates(db: Session = Depends(get_db)):
     dates = [row.date for row in db.query(AIInfo).order_by(AIInfo.date).all()]
     return dates
 
+@router.get("/terms-quiz/{session_id}")
+def get_terms_quiz(session_id: str, db: Session = Depends(get_db)):
+    """사용자가 학습한 날짜의 모든 용어로 퀴즈를 생성합니다."""
+    try:
+        # 사용자의 학습 진행상황 가져오기
+        from ..models import UserProgress
+        user_progress = db.query(UserProgress).filter(
+            UserProgress.session_id == session_id,
+            UserProgress.date != '__stats__'
+        ).all()
+        
+        if not user_progress:
+            return {"quizzes": [], "message": "학습한 내용이 없습니다."}
+        
+        # 학습한 날짜들의 모든 용어 수집
+        all_terms = []
+        for progress in user_progress:
+            if progress.learned_info:
+                try:
+                    learned_indices = json.loads(progress.learned_info)
+                    ai_info = db.query(AIInfo).filter(AIInfo.date == progress.date).first()
+                    if ai_info:
+                        # 각 학습한 info의 용어들 가져오기
+                        for info_idx in learned_indices:
+                            if info_idx == 0 and ai_info.info1_terms:
+                                try:
+                                    terms = json.loads(ai_info.info1_terms)
+                                    all_terms.extend(terms)
+                                except json.JSONDecodeError:
+                                    pass
+                            elif info_idx == 1 and ai_info.info2_terms:
+                                try:
+                                    terms = json.loads(ai_info.info2_terms)
+                                    all_terms.extend(terms)
+                                except json.JSONDecodeError:
+                                    pass
+                            elif info_idx == 2 and ai_info.info3_terms:
+                                try:
+                                    terms = json.loads(ai_info.info3_terms)
+                                    all_terms.extend(terms)
+                                except json.JSONDecodeError:
+                                    pass
+                except json.JSONDecodeError:
+                    continue
+        
+        if not all_terms:
+            return {"quizzes": [], "message": "학습한 용어가 없습니다."}
+        
+        # 중복 제거
+        unique_terms = []
+        seen_terms = set()
+        for term in all_terms:
+            if term.get('term') and term.get('term') not in seen_terms:
+                unique_terms.append(term)
+                seen_terms.add(term.get('term'))
+        
+        # 퀴즈 생성 (최대 20개)
+        import random
+        random.shuffle(unique_terms)
+        quiz_terms = unique_terms[:20]
+        
+        quizzes = []
+        for i, term in enumerate(quiz_terms):
+            # 정답이 아닌 다른 용어들 중에서 3개 선택
+            other_terms = [t for t in unique_terms if t != term]
+            if len(other_terms) >= 3:
+                wrong_answers = random.sample(other_terms, 3)
+                options = [term['description']] + [t['description'] for t in wrong_answers]
+                random.shuffle(options)
+                correct_index = options.index(term['description'])
+                
+                quizzes.append({
+                    "id": i + 1,
+                    "question": f"'{term['term']}'의 올바른 뜻은?",
+                    "option1": options[0],
+                    "option2": options[1],
+                    "option3": options[2],
+                    "option4": options[3],
+                    "correct": correct_index,
+                    "explanation": f"'{term['term']}'는 '{term['description']}'을 의미합니다."
+                })
+        
+        return {"quizzes": quizzes, "total_terms": len(unique_terms)}
+        
+    except Exception as e:
+        print(f"Error in get_terms_quiz: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate terms quiz: {str(e)}")
+
 @router.get("/news/fetch")
 def fetch_ai_news():
     """AI 뉴스를 가져와서 번역하고 정리합니다."""

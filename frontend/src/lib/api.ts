@@ -16,6 +16,7 @@ export const aiInfoAPI = {
   delete: (date: string) => api.delete(`/api/ai-info/${date}`),
   getAllDates: () => api.get('/api/ai-info/dates/all'),
   fetchNews: () => api.get('/api/ai-info/news/fetch'),
+  getTermsQuiz: (sessionId: string) => api.get(`/api/ai-info/terms-quiz/${sessionId}`),
 }
 
 // Quiz API
