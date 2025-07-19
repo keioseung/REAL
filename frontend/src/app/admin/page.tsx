@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaTarget, FaTrendingUp, FaCog, FaChartBar, FaComments, FaDatabase } from 'react-icons/fa'
+import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaCog, FaChartBar, FaComments, FaDatabase } from 'react-icons/fa'
 
 const adminMenus = [
   { href: '/admin/ai-info', label: 'AI 정보 관리', icon: FaBrain, desc: 'AI 정보 등록, 수정, 삭제 등', color: 'from-blue-500 to-cyan-500' },
-  { href: '/admin/quiz', label: '퀴즈 관리', icon: FaTarget, desc: '퀴즈 문제 추가, 수정, 삭제 등', color: 'from-purple-500 to-pink-500' },
+  { href: '/admin/quiz', label: '퀴즈 관리', icon: FaBullseye, desc: '퀴즈 문제 추가, 수정, 삭제 등', color: 'from-purple-500 to-pink-500' },
   { href: '/admin/prompt', label: '프롬프트 관리', icon: FaComments, desc: 'AI 프롬프트 관리', color: 'from-green-500 to-emerald-500' },
   { href: '/admin/stats', label: '사용자 통계', icon: FaChartBar, desc: '전체 사용자 학습/퀴즈 통계', color: 'from-yellow-500 to-orange-500' },
 ]
