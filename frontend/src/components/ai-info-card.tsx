@@ -262,10 +262,25 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
                 {info.terms?.map((term, idx) => (
                   <button
                     key={term.term}
-                    onClick={() => {
+                    onClick={async () => {
                       setCurrentTermIndex(idx);
                       // 클릭한 용어를 학습완료로 표시
-                      setLearnedTerms(prev => new Set([...prev, term.term]));
+                      if (!learnedTerms.has(term.term)) {
+                        try {
+                          await updateTermProgressMutation.mutateAsync({
+                            sessionId,
+                            term: term.term,
+                            date,
+                            infoIndex: index
+                          })
+                          // 진행률 업데이트 콜백 호출
+                          if (onProgressUpdate) {
+                            onProgressUpdate()
+                          }
+                        } catch (error) {
+                          console.error('Failed to update term progress:', error)
+                        }
+                      }
                     }}
                     className={`px-2 py-1 rounded text-xs font-bold border transition-all ${idx === currentTermIndex ? 'bg-green-500 text-white border-green-600' : learnedTerms.has(term.term) ? 'bg-green-400/80 text-white border-green-500' : 'bg-white/20 text-white/70 border-white/30 hover:bg-blue-400/40'}`}
                   >
