@@ -6,7 +6,6 @@ import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine,
 
 const adminMenus = [
   { href: '/admin/ai-info', label: 'AI 정보 관리', icon: FaBrain, desc: 'AI 정보 등록, 수정, 삭제 등', color: 'from-blue-500 to-cyan-500' },
-  { href: '/admin/quiz', label: '퀴즈 관리', icon: FaBullseye, desc: '퀴즈 문제 추가, 수정, 삭제 등', color: 'from-purple-500 to-pink-500' },
   { href: '/admin/prompt', label: '프롬프트 관리', icon: FaComments, desc: 'AI 프롬프트 관리', color: 'from-green-500 to-emerald-500' },
   { href: '/admin/stats', label: '사용자 통계', icon: FaChartBar, desc: '전체 사용자 학습/퀴즈 통계', color: 'from-yellow-500 to-orange-500' },
 ]
@@ -101,12 +100,12 @@ export default function AdminPage() {
             <button
               key={menu.href}
               onClick={() => router.push(menu.href)}
-              className="group bg-white/10 backdrop-blur-xl rounded-xl md:rounded-2xl p-6 md:p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 hover:bg-white/15 text-left"
+              className="group glass card-hover p-8 md:p-10 border border-white/10 text-left flex flex-col gap-4 md:gap-6 shadow-lg"
             >
               <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-r ${menu.color} flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300`}>
                 <menu.icon className="text-white text-xl md:text-2xl" />
               </div>
-              <h3 className="text-white font-bold text-xl md:text-2xl mb-2 md:mb-3">{menu.label}</h3>
+              <h3 className="gradient-text font-bold text-xl md:text-2xl mb-2 md:mb-3">{menu.label}</h3>
               <p className="text-gray-300 text-sm md:text-base leading-relaxed">{menu.desc}</p>
               <div className="flex items-center gap-2 mt-4 md:mt-6 text-purple-300 group-hover:text-purple-200 transition-colors">
                 <span className="text-sm md:text-base font-semibold">관리하기</span>

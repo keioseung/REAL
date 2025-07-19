@@ -152,12 +152,12 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="glass rounded-2xl p-6 card-hover relative"
+      className="glass card-hover p-8 md:p-10 flex flex-col gap-6 relative shadow-lg border border-white/10"
     >
       {/* 헤더 */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-full ${isLearned ? 'bg-green-500' : 'bg-blue-500'}`}>
+          <div className={`p-2 rounded-full ${isLearned ? 'bg-green-500' : 'bg-blue-500'} shadow-md`}>
             {isLearned ? (
               <CheckCircle className="w-5 h-5 text-white" />
             ) : (
@@ -165,7 +165,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
             )}
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white line-clamp-2">
+            <h3 className="text-lg font-semibold gradient-text line-clamp-2">
               {info.title}
             </h3>
             <p className="text-white/60 text-sm">
@@ -174,25 +174,20 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           </div>
         </div>
       </div>
-
       {/* 내용 */}
-      <div className="mb-4">
-        <p className={`text-white/80 leading-relaxed whitespace-pre-line ${
-          isExpanded ? '' : 'line-clamp-3'
-        }`}>
+      <div className="mb-4 text-white/90 text-base leading-relaxed whitespace-pre-line">
+        <p className={isExpanded ? '' : 'line-clamp-3'}>
           {info.content}
         </p>
-        
         {info.content.length > 150 && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-300 hover:text-blue-200 text-sm mt-2"
+            className="btn mt-2 text-xs px-3 py-1"
           >
             {isExpanded ? '접기' : '더보기'}
           </button>
         )}
       </div>
-
       {/* 용어 학습 섹션 */}
       {hasTerms && (
         <div className="mb-4">
