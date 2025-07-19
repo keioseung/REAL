@@ -16,10 +16,7 @@ app = FastAPI(
 # CORS 설정 (운영 도메인으로 수정)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://real-production-e24a.up.railway.app",
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
