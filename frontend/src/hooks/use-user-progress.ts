@@ -176,7 +176,7 @@ export function useLearnedTerms(sessionId: string, date: string, infoIndex: numb
     },
     enabled: !!sessionId && !!date,
     staleTime: Infinity, // 캐시를 무한정 유지
-    cacheTime: Infinity, // 캐시를 무한정 유지
+    gcTime: Infinity, // 캐시를 무한정 유지 (React Query v4에서 cacheTime -> gcTime으로 변경)
     refetchOnWindowFocus: false, // 창 포커스 시 새로고침 비활성화
     refetchOnMount: false, // 컴포넌트 마운트 시 새로고침 비활성화
     refetchOnReconnect: false, // 네트워크 재연결 시 새로고침 비활성화
