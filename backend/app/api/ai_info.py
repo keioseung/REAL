@@ -36,12 +36,12 @@ def normalize_text(text):
 @router.get("/{date}", response_model=List[AIInfoItem])
 def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
     try:
-    ai_info = db.query(AIInfo).filter(AIInfo.date == date).first()
-    if not ai_info:
-        return []
-    
-    infos = []
-    if ai_info.info1_title and ai_info.info1_content:
+        ai_info = db.query(AIInfo).filter(AIInfo.date == date).first()
+        if not ai_info:
+            return []
+        
+        infos = []
+        if ai_info.info1_title and ai_info.info1_content:
             try:
                 terms1 = json.loads(ai_info.info1_terms) if ai_info.info1_terms else []
             except json.JSONDecodeError:
@@ -51,7 +51,7 @@ def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
                 "content": ai_info.info1_content,
                 "terms": terms1
             })
-    if ai_info.info2_title and ai_info.info2_content:
+        if ai_info.info2_title and ai_info.info2_content:
             try:
                 terms2 = json.loads(ai_info.info2_terms) if ai_info.info2_terms else []
             except json.JSONDecodeError:
@@ -61,7 +61,7 @@ def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
                 "content": ai_info.info2_content,
                 "terms": terms2
             })
-    if ai_info.info3_title and ai_info.info3_content:
+        if ai_info.info3_title and ai_info.info3_content:
             try:
                 terms3 = json.loads(ai_info.info3_terms) if ai_info.info3_terms else []
             except json.JSONDecodeError:
@@ -71,8 +71,8 @@ def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
                 "content": ai_info.info3_content,
                 "terms": terms3
             })
-    
-    return infos
+        
+        return infos
     except Exception as e:
         print(f"Error in get_ai_info_by_date: {e}")
         return []
