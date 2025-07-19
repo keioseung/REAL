@@ -163,14 +163,14 @@ function Sidebar({ selectedDate, onDateChange, sessionId }: SidebarProps) {
                     placeholder="제목"
                     value={newInfoTitle}
                     onChange={(e) => setNewInfoTitle(e.target.value)}
-                    className="w-full p-2 bg-white/10 border border-white/20 rounded text-black placeholder-black/50 text-sm"
+                    className="w-full p-2 bg-white border border-white/20 rounded text-black placeholder-black/50 text-sm"
                   />
                   <textarea
                     placeholder="내용"
                     value={newInfoContent}
                     onChange={(e) => setNewInfoContent(e.target.value)}
                     rows={3}
-                    className="w-full p-2 bg-white/10 border border-white/20 rounded text-black placeholder-black/50 text-sm resize-none"
+                    className="w-full p-2 bg-white border border-white/20 rounded text-black placeholder-black/50 text-sm resize-none"
                   />
                   <div className="flex gap-2">
                     <button
