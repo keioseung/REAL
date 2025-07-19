@@ -13,9 +13,11 @@ interface AIInfoCardProps {
   sessionId: string
   isLearned: boolean
   onProgressUpdate?: () => void
+  forceUpdate?: number
+  setForceUpdate?: (fn: (prev: number) => number) => void
 }
 
-function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate }: AIInfoCardProps) {
+function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate, forceUpdate, setForceUpdate }: AIInfoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
   const [currentTermIndex, setCurrentTermIndex] = useState(0)
@@ -97,7 +99,8 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
           }
           localStorage.setItem('userProgress', JSON.stringify(currentProgress))
         }
-        
+        // 강제 리렌더링
+        if (setForceUpdate) setForceUpdate(prev => prev + 1)
         // 진행률 업데이트 콜백 호출
         if (onProgressUpdate) {
           onProgressUpdate()
@@ -109,16 +112,13 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
           date,
           infoIndex: index
         })
-        
         // 학습 완료 알림
         setShowLearnComplete(true)
         setTimeout(() => setShowLearnComplete(false), 3000)
-        
         // 진행률 업데이트 콜백 호출
         if (onProgressUpdate) {
           onProgressUpdate()
         }
-        
         // 성취 확인
         const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
         if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {

@@ -29,6 +29,46 @@ const TERMS = [
   { term: '컨볼루션', desc: '합성곱 신경망(CNN)에서 특징을 추출하는 연산.' },
 ]
 
+// 1. 주간 학습 현황 막대 그래프 컴포넌트 추가 (탭 위에)
+function WeeklyBarGraph({ weeklyData }: { weeklyData: any[] }) {
+  const maxAI = 3;
+  const maxTerms = 20;
+  const maxQuiz = 100;
+  return (
+    <div className="w-full max-w-3xl mx-auto mb-8">
+      <div className="flex justify-between mb-2 px-2">
+        {weeklyData.map((day, idx) => (
+          <div key={idx} className={`text-xs font-bold text-center ${day.isToday ? 'text-yellow-400' : 'text-white/60'}`}>{day.day}</div>
+        ))}
+      </div>
+      <div className="flex gap-2 h-32 items-end">
+        {weeklyData.map((day, idx) => {
+          const aiHeight = Math.round((day.ai / maxAI) * 80);
+          const termsHeight = Math.round((day.terms / maxTerms) * 80);
+          const quizHeight = Math.round((day.quiz / maxQuiz) * 80);
+          return (
+            <div key={idx} className="flex-1 flex flex-col items-center">
+              <div className="flex flex-col-reverse h-28 w-6 relative">
+                {/* 퀴즈 */}
+                <div style={{ height: `${quizHeight}px` }} className="w-full bg-gradient-to-t from-green-500 to-emerald-400 rounded-t-md" />
+                {/* 용어 */}
+                <div style={{ height: `${termsHeight}px` }} className="w-full bg-gradient-to-t from-purple-500 to-pink-400" />
+                {/* AI 정보 */}
+                <div style={{ height: `${aiHeight}px` }} className="w-full bg-gradient-to-t from-blue-500 to-cyan-400 rounded-b-md" />
+                {day.isToday && <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-xs text-yellow-400 font-bold">오늘</div>}
+              </div>
+              <div className="mt-1 text-xs text-white/70">{day.ai + day.terms + Math.round(day.quiz/10)}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between mt-2 px-2 text-[10px] text-white/40">
+        <div>AI</div><div>용어</div><div>퀴즈</div>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date()
@@ -610,21 +650,14 @@ export default function DashboardPage() {
                 </h2>
                 <button
                   onClick={() => {
-                    // 모든 AI 정보 학습 상태 초기화
-                    const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}')
+                    // 오늘 날짜의 학습 데이터만 삭제
+                    const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
                     if (currentProgress[sessionId] && currentProgress[sessionId][selectedDate]) {
-                      // 해당 날짜의 학습 기록 삭제
-                      delete currentProgress[sessionId][selectedDate]
-                      localStorage.setItem('userProgress', JSON.stringify(currentProgress))
-                      
-                      // 강제 리렌더링
-                      setForceUpdate(prev => prev + 1)
-                      
-                      // 진행률 업데이트
-                      handleProgressUpdate()
-                      
-                      // 성공 메시지 표시
-                      alert('모든 학습 상태가 초기화되었습니다!')
+                      delete currentProgress[sessionId][selectedDate];
+                      localStorage.setItem('userProgress', JSON.stringify(currentProgress));
+                      setForceUpdate(prev => prev + 1);
+                      handleProgressUpdate();
+                      alert('오늘 학습 상태가 초기화되었습니다!');
                     }
                   }}
                   className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
@@ -654,6 +687,8 @@ export default function DashboardPage() {
                       sessionId={sessionId}
                       isLearned={isLearned}
                       onProgressUpdate={handleProgressUpdate}
+                      forceUpdate={forceUpdate}
+                      setForceUpdate={setForceUpdate}
                     />
                   )
                 })}
