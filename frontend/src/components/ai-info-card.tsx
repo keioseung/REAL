@@ -91,7 +91,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
     setIsLearning(true)
     try {
       if (isLearned) {
-        // 학습 이력 삭제 후 즉시 학습완료(파란색)로 전환
+        // 학습 이력 삭제
         const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}')
         if (currentProgress[sessionId] && currentProgress[sessionId][date]) {
           const learnedIndices = currentProgress[sessionId][date].filter((i: number) => i !== index)
@@ -102,11 +102,16 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           }
           localStorage.setItem('userProgress', JSON.stringify(currentProgress))
         }
-        setIsLearned(false)
-        if (setForceUpdate) setForceUpdate(prev => prev + 1)
-        if (onProgressUpdate) onProgressUpdate()
-        // 바로 학습완료(파란색)로 전환
-        setTimeout(() => setIsLearned(true), 0)
+        // 즉시 학습완료 인덱스 추가 (학습완료 처리)
+        if (!currentProgress[sessionId]) currentProgress[sessionId] = {};
+        if (!currentProgress[sessionId][date]) currentProgress[sessionId][date] = [];
+        if (!currentProgress[sessionId][date].includes(index)) {
+          currentProgress[sessionId][date].push(index);
+          localStorage.setItem('userProgress', JSON.stringify(currentProgress));
+        }
+        setIsLearned(true);
+        if (setForceUpdate) setForceUpdate(prev => prev + 1);
+        if (onProgressUpdate) onProgressUpdate();
       } else {
         // 학습 전 상태에서 학습 완료 상태로 변경
         await updateProgressMutation.mutateAsync({
