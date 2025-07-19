@@ -379,6 +379,37 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* 탭 메뉴 */}
+      <div className="flex justify-center mb-6 md:mb-8">
+        <div className="flex flex-wrap gap-2 md:gap-4 bg-white/10 backdrop-blur-xl rounded-2xl p-2 md:p-3 shadow-lg border border-white/10">
+          {[
+            { id: 'ai', label: 'AI 정보', gradient: 'from-blue-500 to-purple-500' },
+            { id: 'quiz', label: '용어 퀴즈', gradient: 'from-purple-500 to-pink-500' },
+            { id: 'progress', label: '진행률', gradient: 'from-pink-500 to-blue-500' },
+            { id: 'news', label: 'AI 뉴스', gradient: 'from-blue-500 to-pink-500' },
+            { id: 'term', label: '용어 학습', gradient: 'from-purple-500 to-blue-500' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              className={`px-4 md:px-6 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all ${
+                activeTab === tab.id 
+                  ? `bg-gradient-to-r ${tab.gradient} text-white shadow-lg` 
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+              }`}
+              onClick={() => setActiveTab(tab.id as any)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <button 
+          onClick={handleRefresh} 
+          className="ml-3 md:ml-6 px-3 md:px-4 py-2 bg-white/20 backdrop-blur-xl text-white rounded-lg hover:bg-white/30 transition-all font-semibold shadow border border-white/10"
+        >
+          새로고침
+        </button>
+      </div>
+
       {/* 메인 컨텐츠 */}
       <main className="flex-1 pb-8 md:pb-12">
         <motion.div 
