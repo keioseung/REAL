@@ -143,6 +143,23 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
     }
   }
 
+  // 키보드 단축키로 이전/다음 용어 이동
+  useEffect(() => {
+    if (!showTerms) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') handleNextTerm();
+      if (e.key === 'ArrowLeft') handlePrevTerm();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showTerms, currentTermIndex, info.terms]);
+
+  const handlePrevTerm = () => {
+    if (hasTerms && info.terms) {
+      setCurrentTermIndex((prev: number) => (prev - 1 + info.terms!.length) % info.terms!.length);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -207,34 +224,57 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
               animate={{ opacity: 1, y: 0 }}
               className="bg-white/10 backdrop-blur-xl rounded-xl p-4 border border-white/20"
             >
+              {/* 진행률 바 */}
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-white/60">{currentTermIndex + 1} / {info.terms?.length || 0}</span>
+                  <span className="text-xs text-green-400 font-bold">{learnedTerms.size}개 학습완료</span>
+                </div>
+                <div className="w-full bg-white/20 rounded-full h-2">
+                  <div
+                    className="h-2 bg-gradient-to-r from-blue-500 to-green-400 rounded-full"
+                    style={{ width: `${((currentTermIndex + 1) / (info.terms?.length || 1)) * 100}%` }}
+                  />
+                </div>
+              </div>
+              {/* 현재 용어 강조 */}
               <div className="text-center mb-3">
-                <div className="text-lg font-bold text-white mb-2">{currentTerm.term}</div>
-                <div className="text-white/80 text-sm">{currentTerm.description}</div>
+                <div className="text-2xl font-extrabold text-blue-200 mb-2 animate-pulse">{currentTerm.term}</div>
+                <div className="text-white/80 text-base">{currentTerm.description}</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white/60 text-xs">
-                  {currentTermIndex + 1} / {info.terms?.length || 0}
-                </span>
-                {showRelearnButton ? (
-                  <button
-                    onClick={() => {
-                      setCurrentTermIndex(0)
-                      setLearnedTerms(new Set())
-                      setShowRelearnButton(false)
-                    }}
-                    className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm font-medium"
-                  >
-                    재학습
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleNextTerm}
-                    className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
-                  >
-                    다음 용어
-                  </button>
-                )}
+              {/* 이전/다음 버튼 */}
+              <div className="flex justify-between gap-2 mb-3">
+                <button
+                  onClick={handlePrevTerm}
+                  className="px-3 py-1 bg-blue-400/80 text-white rounded-lg hover:bg-blue-500 transition text-sm font-medium"
+                >
+                  이전 용어
+                </button>
+                <button
+                  onClick={handleNextTerm}
+                  className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
+                >
+                  다음 용어
+                </button>
               </div>
+              {/* 전체 용어 목록 점프 */}
+              <div className="flex flex-wrap gap-2 justify-center mt-2">
+                {info.terms?.map((term, idx) => (
+                  <button
+                    key={term.term}
+                    onClick={() => setCurrentTermIndex(idx)}
+                    className={`px-2 py-1 rounded text-xs font-bold border transition-all ${idx === currentTermIndex ? 'bg-green-500 text-white border-green-600' : 'bg-white/20 text-white/70 border-white/30 hover:bg-blue-400/40'}`}
+                  >
+                    {term.term}
+                  </button>
+                ))}
+              </div>
+              {/* 학습 완료 축하 메시지 */}
+              {learnedTerms.size === info.terms?.length && info.terms.length > 0 && (
+                <div className="mt-4 text-center animate-bounce">
+                  <span className="inline-block bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow">🎉 모든 용어 학습 완료! 재학습하려면 재시작하세요.</span>
+                </div>
+              )}
             </motion.div>
           )}
         </div>
