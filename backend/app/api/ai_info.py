@@ -80,41 +80,41 @@ def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
 @router.post("/", response_model=AIInfoResponse)
 def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
     try:
-    existing_info = db.query(AIInfo).filter(AIInfo.date == ai_info_data.date).first()
-    
-    def build_infos(obj):
-        infos = []
-        if obj.info1_title and obj.info1_content:
+        existing_info = db.query(AIInfo).filter(AIInfo.date == ai_info_data.date).first()
+
+        def build_infos(obj):
+            infos = []
+            if obj.info1_title and obj.info1_content:
                 try:
                     terms1 = json.loads(obj.info1_terms) if obj.info1_terms else []
                 except json.JSONDecodeError:
                     terms1 = []
                 infos.append({
-                    "title": obj.info1_title, 
+                    "title": obj.info1_title,
                     "content": obj.info1_content,
                     "terms": terms1
                 })
-        if obj.info2_title and obj.info2_content:
+            if obj.info2_title and obj.info2_content:
                 try:
                     terms2 = json.loads(obj.info2_terms) if obj.info2_terms else []
                 except json.JSONDecodeError:
                     terms2 = []
                 infos.append({
-                    "title": obj.info2_title, 
+                    "title": obj.info2_title,
                     "content": obj.info2_content,
                     "terms": terms2
                 })
-        if obj.info3_title and obj.info3_content:
+            if obj.info3_title and obj.info3_content:
                 try:
                     terms3 = json.loads(obj.info3_terms) if obj.info3_terms else []
                 except json.JSONDecodeError:
                     terms3 = []
                 infos.append({
-                    "title": obj.info3_title, 
+                    "title": obj.info3_title,
                     "content": obj.info3_content,
                     "terms": terms3
                 })
-        return infos
+            return infos
 
         def terms_to_dict(terms):
             """TermItem 객체들을 딕셔너리 리스트로 변환"""
@@ -122,52 +122,52 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
                 return []
             return [{"term": term.term, "description": term.description} for term in terms]
 
-    if existing_info:
-        # 기존 데이터 업데이트 (비어있는 info2, info3에 순차적으로 채움)
-        infos_to_add = [i for i in ai_info_data.infos if i.title and i.content]
-        fields = [
+        if existing_info:
+            # 기존 데이터 업데이트 (비어있는 info2, info3에 순차적으로 채움)
+            infos_to_add = [i for i in ai_info_data.infos if i.title and i.content]
+            fields = [
                 ("info1_title", "info1_content", "info1_terms"),
                 ("info2_title", "info2_content", "info2_terms"),
                 ("info3_title", "info3_content", "info3_terms"),
-        ]
+            ]
             for i, (title_field, content_field, terms_field) in enumerate(fields):
-            if getattr(existing_info, title_field) == '' or getattr(existing_info, content_field) == '':
-                if infos_to_add:
-                    info = infos_to_add.pop(0)
-                    setattr(existing_info, title_field, info.title)
-                    setattr(existing_info, content_field, info.content)
+                if getattr(existing_info, title_field) == '' or getattr(existing_info, content_field) == '':
+                    if infos_to_add:
+                        info = infos_to_add.pop(0)
+                        setattr(existing_info, title_field, info.title)
+                        setattr(existing_info, content_field, info.content)
                         setattr(existing_info, terms_field, json.dumps(terms_to_dict(info.terms or [])))
-        db.commit()
-        db.refresh(existing_info)
-        return {
-            "id": existing_info.id,
-            "date": existing_info.date,
-            "infos": build_infos(existing_info),
-            "created_at": str(existing_info.created_at) if existing_info.created_at else None
-        }
-    else:
-        # 새 데이터 생성
-        db_ai_info = AIInfo(
-            date=ai_info_data.date,
-            info1_title=ai_info_data.infos[0].title if len(ai_info_data.infos) >= 1 else "",
-            info1_content=ai_info_data.infos[0].content if len(ai_info_data.infos) >= 1 else "",
+            db.commit()
+            db.refresh(existing_info)
+            return {
+                "id": existing_info.id,
+                "date": existing_info.date,
+                "infos": build_infos(existing_info),
+                "created_at": str(existing_info.created_at) if existing_info.created_at else None
+            }
+        else:
+            # 새 데이터 생성
+            db_ai_info = AIInfo(
+                date=ai_info_data.date,
+                info1_title=ai_info_data.infos[0].title if len(ai_info_data.infos) >= 1 else "",
+                info1_content=ai_info_data.infos[0].content if len(ai_info_data.infos) >= 1 else "",
                 info1_terms=json.dumps(terms_to_dict(ai_info_data.infos[0].terms or [])) if len(ai_info_data.infos) >= 1 else "[]",
-            info2_title=ai_info_data.infos[1].title if len(ai_info_data.infos) >= 2 else "",
-            info2_content=ai_info_data.infos[1].content if len(ai_info_data.infos) >= 2 else "",
+                info2_title=ai_info_data.infos[1].title if len(ai_info_data.infos) >= 2 else "",
+                info2_content=ai_info_data.infos[1].content if len(ai_info_data.infos) >= 2 else "",
                 info2_terms=json.dumps(terms_to_dict(ai_info_data.infos[1].terms or [])) if len(ai_info_data.infos) >= 2 else "[]",
-            info3_title=ai_info_data.infos[2].title if len(ai_info_data.infos) >= 3 else "",
+                info3_title=ai_info_data.infos[2].title if len(ai_info_data.infos) >= 3 else "",
                 info3_content=ai_info_data.infos[2].content if len(ai_info_data.infos) >= 3 else "",
                 info3_terms=json.dumps(terms_to_dict(ai_info_data.infos[2].terms or [])) if len(ai_info_data.infos) >= 3 else "[]"
-        )
-        db.add(db_ai_info)
-        db.commit()
-        db.refresh(db_ai_info)
-        return {
-            "id": db_ai_info.id,
-            "date": db_ai_info.date,
-            "infos": build_infos(db_ai_info),
-            "created_at": str(db_ai_info.created_at) if db_ai_info.created_at else None
-        }
+            )
+            db.add(db_ai_info)
+            db.commit()
+            db.refresh(db_ai_info)
+            return {
+                "id": db_ai_info.id,
+                "date": db_ai_info.date,
+                "infos": build_infos(db_ai_info),
+                "created_at": str(db_ai_info.created_at) if db_ai_info.created_at else None
+            }
     except Exception as e:
         print(f"Error in add_ai_info: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to add AI info: {str(e)}")
