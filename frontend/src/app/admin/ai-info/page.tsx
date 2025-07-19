@@ -152,6 +152,71 @@ export default function AdminAIInfoPage() {
     ))
   }
 
+  // 전문용어 일괄 입력 파싱 함수
+  const parseTermsFromText = (text: string): TermItem[] => {
+    const lines = text.trim().split('\n')
+    const terms: TermItem[] = []
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim()
+      if (!trimmedLine) continue
+      
+      // 탭으로 구분된 경우
+      if (trimmedLine.includes('\t')) {
+        const [term, description] = trimmedLine.split('\t').map(s => s.trim())
+        if (term && description) {
+          terms.push({ term, description })
+        }
+      }
+      // 공백으로 구분된 경우 (탭이 없는 경우)
+      else {
+        const parts = trimmedLine.split(/\s{2,}/) // 2개 이상의 공백으로 구분
+        if (parts.length >= 2) {
+          const term = parts[0].trim()
+          const description = parts.slice(1).join(' ').trim()
+          if (term && description) {
+            terms.push({ term, description })
+          }
+        }
+      }
+    }
+    
+    return terms
+  }
+
+  // 전문용어 일괄 입력 상태
+  const [bulkTermsText, setBulkTermsText] = useState('')
+  const [showBulkInput, setShowBulkInput] = useState<number | null>(null)
+
+  // 전문용어 일괄 입력 핸들러
+  const handleBulkTermsInput = (infoIdx: number) => {
+    setShowBulkInput(infoIdx)
+    setBulkTermsText('')
+  }
+
+  const handleBulkTermsSubmit = (infoIdx: number) => {
+    if (bulkTermsText.trim()) {
+      const parsedTerms = parseTermsFromText(bulkTermsText)
+      if (parsedTerms.length > 0) {
+        setInputs(inputs => inputs.map((input, i) => 
+          i === infoIdx 
+            ? { ...input, terms: [...input.terms, ...parsedTerms] }
+            : input
+        ))
+        alert(`${parsedTerms.length}개의 용어가 추가되었습니다!`)
+      } else {
+        alert('파싱할 수 있는 용어가 없습니다. 형식을 확인해주세요.')
+      }
+    }
+    setShowBulkInput(null)
+    setBulkTermsText('')
+  }
+
+  const handleBulkTermsCancel = () => {
+    setShowBulkInput(null)
+    setBulkTermsText('')
+  }
+
   const handleRemoveTerm = (infoIdx: number, termIdx: number) => {
     setInputs(inputs => inputs.map((input, i) => 
       i === infoIdx 
@@ -324,14 +389,75 @@ export default function AdminAIInfoPage() {
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <label className="font-semibold text-blue-700">관련 용어</label>
-                    <button 
-                      type="button" 
-                      onClick={() => handleAddTerm(idx)} 
-                      className="px-3 py-1 bg-green-200 text-green-700 rounded-lg font-bold hover:bg-green-300 transition text-sm"
-                    >
-                      + 용어 추가
-                    </button>
+                    <div className="flex gap-2">
+                      <button 
+                        type="button" 
+                        onClick={() => handleBulkTermsInput(idx)} 
+                        className="px-3 py-1 bg-purple-200 text-purple-700 rounded-lg font-bold hover:bg-purple-300 transition text-sm"
+                        title="전문용어를 복사해서 붙여넣기"
+                      >
+                        📋 일괄 입력
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => handleAddTerm(idx)} 
+                        className="px-3 py-1 bg-green-200 text-green-700 rounded-lg font-bold hover:bg-green-300 transition text-sm"
+                      >
+                        + 용어 추가
+                      </button>
+                    </div>
                   </div>
+                  
+                  {/* 일괄 입력 모달 */}
+                  {showBulkInput === idx && (
+                    <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mb-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-bold text-yellow-800">📋 전문용어 일괄 입력</h4>
+                        <button 
+                          type="button" 
+                          onClick={handleBulkTermsCancel}
+                          className="text-yellow-600 hover:text-yellow-800"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <div className="mb-3">
+                        <p className="text-sm text-yellow-700 mb-2">
+                          전문용어를 복사해서 붙여넣으세요. 탭(→) 또는 공백으로 구분됩니다.
+                        </p>
+                        <div className="text-xs text-yellow-600 bg-yellow-100 p-2 rounded mb-2">
+                          <strong>예시:</strong><br/>
+                          LLM	GPT 같은 대형 언어 모델<br/>
+                          자연어	우리가 일상에서 쓰는 언어<br/>
+                          DSL	특정 분야 전용 프로그래밍 언어
+                        </div>
+                      </div>
+                      <textarea
+                        value={bulkTermsText}
+                        onChange={(e) => setBulkTermsText(e.target.value)}
+                        placeholder="용어	뜻&#10;LLM	GPT 같은 대형 언어 모델&#10;자연어	우리가 일상에서 쓰는 언어"
+                        className="w-full p-3 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-300 text-sm"
+                        rows={6}
+                      />
+                      <div className="flex gap-2 mt-3">
+                        <button 
+                          type="button" 
+                          onClick={() => handleBulkTermsSubmit(idx)}
+                          className="px-4 py-2 bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition text-sm"
+                        >
+                          용어 추가
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={handleBulkTermsCancel}
+                          className="px-4 py-2 bg-gray-400 text-white rounded-lg font-bold hover:bg-gray-500 transition text-sm"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
                   {input.terms.map((term, termIdx) => (
                     <div key={termIdx} className="flex gap-2 items-start">
                       <div className="flex-1 flex gap-2">
