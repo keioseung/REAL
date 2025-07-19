@@ -109,7 +109,7 @@ export default function DashboardPage() {
   const learnedAIInfo = userProgress?.[selectedDate]?.length || 0
   const aiInfoProgress = totalAIInfo > 0 ? (learnedAIInfo / totalAIInfo) * 100 : 0
 
-  const totalTerms = Array.isArray(userProgress?.total_terms_available) ? userProgress.total_terms_available.length : (userProgress?.total_terms_available ?? 0)
+  const totalTerms = 60 // 3개 AI 정보 × 20개 용어씩
   const learnedTerms = Array.isArray(userProgress?.total_terms_learned) ? userProgress.total_terms_learned.length : (userProgress?.total_terms_learned ?? 0)
   const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
 
@@ -121,16 +121,26 @@ export default function DashboardPage() {
   const maxStreak = Array.isArray(userProgress?.max_streak) ? userProgress.max_streak.length : (userProgress?.max_streak ?? 0)
   const streakProgress = maxStreak > 0 ? (streakDays / maxStreak) * 100 : 0
 
+  // 오늘 날짜 확인
+  const today = new Date()
+  const todayDay = today.getDay() // 0: 일요일, 1: 월요일, ..., 6: 토요일
+
   // 주간 학습 데이터 - 실제 사용자 데이터 기반
   const weeklyData = [
-    { day: '월', ai: 0, terms: 0, quiz: 0 },
-    { day: '화', ai: 0, terms: 0, quiz: 0 },
-    { day: '수', ai: 0, terms: 0, quiz: 0 },
-    { day: '목', ai: 0, terms: 0, quiz: 0 },
-    { day: '금', ai: 0, terms: 0, quiz: 0 },
-    { day: '토', ai: 0, terms: 0, quiz: 0 },
-    { day: '일', ai: 0, terms: 0, quiz: 0 },
+    { day: '월', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 1 },
+    { day: '화', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 2 },
+    { day: '수', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 3 },
+    { day: '목', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 4 },
+    { day: '금', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 5 },
+    { day: '토', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 6 },
+    { day: '일', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 0 },
   ]
+
+  // 오늘 학습 데이터 반영
+  const todayIndex = todayDay === 0 ? 6 : todayDay - 1 // 일요일은 인덱스 6
+  weeklyData[todayIndex].ai = learnedAIInfo
+  weeklyData[todayIndex].terms = learnedTerms
+  weeklyData[todayIndex].quiz = quizScore
 
   // AI 정보 3개만 정확히 보여줌
   const aiInfoFixed = aiInfo && aiInfo.length > 0 ? aiInfo.slice(0, 3) : []
@@ -371,7 +381,16 @@ export default function DashboardPage() {
           <div className="grid grid-cols-7 gap-2 md:gap-4">
             {weeklyData.map((day, index) => (
               <div key={day.day} className="text-center">
-                <div className="text-white/60 text-xs md:text-sm mb-2">{day.day}</div>
+                <div className={`text-xs md:text-sm mb-2 font-semibold ${
+                  day.isToday ? 'text-blue-400' : 'text-white/60'
+                }`}>
+                  {day.day}
+                  {day.isToday && (
+                    <div className="text-xs mt-1 bg-blue-500/20 px-2 py-1 rounded-full text-blue-300">
+                      오늘
+                    </div>
+                  )}
+                </div>
                 <div className="space-y-1">
                   <div className="h-8 md:h-12 bg-gradient-to-b from-blue-500/20 to-blue-500/40 rounded-t-sm relative">
                     {day.ai > 0 && (
