@@ -251,34 +251,54 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
       {/* 액션 버튼 */}
       <div className="flex gap-3">
         <button
-          onClick={handleLearnToggle}
-          disabled={isLearning}
+          disabled={isLearned || isLearning}
           className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg text-sm font-medium transition-all ${
-            isLearning
-              ? 'bg-blue-600 text-white cursor-not-allowed'
-              : isLearned
-                ? 'bg-green-500 text-white hover:bg-green-600'
+            isLearned
+              ? 'bg-green-500 text-white cursor-default'
+              : isLearning
+                ? 'bg-blue-600 text-white cursor-not-allowed'
                 : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600'
           }`}
         >
-          {isLearning ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              처리 중...
-            </>
-          ) : isLearned ? (
-            <>
-              <BookOpen className="w-4 h-4" />
-              학습완료
-            </>
-          ) : (
-            <>
-              <BookOpen className="w-4 h-4" />
-              학습하기
-            </>
-          )}
+          <BookOpen className="w-4 h-4" />
+          학습완료
         </button>
-        
+        {/* 부분 초기화 버튼: 학습완료 상태일 때만 노출 */}
+        {isLearned && (
+          <button
+            onClick={async () => {
+              setIsLearning(true);
+              try {
+                // localStorage 삭제
+                const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}')
+                if (currentProgress[sessionId] && currentProgress[sessionId][date]) {
+                  const learnedIndices = currentProgress[sessionId][date].filter((i: number) => i !== index)
+                  if (learnedIndices.length === 0) {
+                    delete currentProgress[sessionId][date]
+                  } else {
+                    currentProgress[sessionId][date] = learnedIndices
+                  }
+                  localStorage.setItem('userProgress', JSON.stringify(currentProgress))
+                }
+                // 백엔드 기록도 삭제
+                try {
+                  await userProgressAPI.deleteInfoIndex(sessionId, date, index)
+                } catch (e) { /* 무시 */ }
+                setIsLearned(false)
+                if (setForceUpdate) setForceUpdate(prev => prev + 1)
+                if (onProgressUpdate) onProgressUpdate()
+              } catch (error) {
+                console.error('Failed to reset progress:', error)
+              } finally {
+                setIsLearning(false)
+              }
+            }}
+            disabled={isLearning}
+            className="p-3 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
+          >
+            부분 초기화
+          </button>
+        )}
         <button className="p-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all">
           <ExternalLink className="w-4 h-4" />
         </button>
