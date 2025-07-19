@@ -113,7 +113,7 @@ export default function DashboardPage() {
   const learnedTerms = Array.isArray(userProgress?.total_terms_learned) ? userProgress.total_terms_learned.length : (userProgress?.total_terms_learned ?? 0)
   const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
 
-  const quizScore = Array.isArray(userProgress?.quiz_score) ? userProgress.quiz_score.length : (userProgress?.quiz_score ?? 0)
+  const quizScore = typeof userProgress?.quiz_score === 'number' ? userProgress.quiz_score : 0
   const maxQuizScore = 100
   const quizProgress = (quizScore / maxQuizScore) * 100
 
@@ -140,7 +140,7 @@ export default function DashboardPage() {
   const todayIndex = todayDay === 0 ? 6 : todayDay - 1 // 일요일은 인덱스 6
   weeklyData[todayIndex].ai = learnedAIInfo
   weeklyData[todayIndex].terms = learnedTerms
-  weeklyData[todayIndex].quiz = quizScore
+  weeklyData[todayIndex].quiz = Math.min(quizScore, 100) // 퀴즈 점수는 최대 100점
 
   // AI 정보 3개만 정확히 보여줌
   const aiInfoFixed = aiInfo && aiInfo.length > 0 ? aiInfo.slice(0, 3) : []
@@ -392,31 +392,31 @@ export default function DashboardPage() {
                   )}
                 </div>
                 <div className="space-y-1">
-                  <div className="h-8 md:h-12 bg-gradient-to-b from-blue-500/20 to-blue-500/40 rounded-t-sm relative">
+                  <div className="h-8 md:h-12 bg-gradient-to-b from-blue-500/20 to-blue-500/40 rounded-t-sm relative overflow-hidden">
                     {day.ai > 0 && (
                       <motion.div
                         initial={{ height: 0 }}
-                        animate={{ height: `${(day.ai / 3) * 100}%` }}
+                        animate={{ height: `${Math.min((day.ai / 3) * 100, 100)}%` }}
                         transition={{ duration: 0.8, delay: index * 0.1 }}
                         className="absolute bottom-0 w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t-sm"
                       />
                     )}
                   </div>
-                  <div className="h-8 md:h-12 bg-gradient-to-b from-purple-500/20 to-purple-500/40 rounded-t-sm relative">
+                  <div className="h-8 md:h-12 bg-gradient-to-b from-purple-500/20 to-purple-500/40 rounded-t-sm relative overflow-hidden">
                     {day.terms > 0 && (
                       <motion.div
                         initial={{ height: 0 }}
-                        animate={{ height: `${(day.terms / 4) * 100}%` }}
+                        animate={{ height: `${Math.min((day.terms / 20) * 100, 100)}%` }}
                         transition={{ duration: 0.8, delay: index * 0.1 + 0.2 }}
                         className="absolute bottom-0 w-full bg-gradient-to-t from-purple-500 to-pink-500 rounded-t-sm"
                       />
                     )}
                   </div>
-                  <div className="h-8 md:h-12 bg-gradient-to-b from-green-500/20 to-green-500/40 rounded-t-sm relative">
+                  <div className="h-8 md:h-12 bg-gradient-to-b from-green-500/20 to-green-500/40 rounded-t-sm relative overflow-hidden">
                     {day.quiz > 0 && (
                       <motion.div
                         initial={{ height: 0 }}
-                        animate={{ height: `${day.quiz}%` }}
+                        animate={{ height: `${Math.min(day.quiz, 100)}%` }}
                         transition={{ duration: 0.8, delay: index * 0.1 + 0.4 }}
                         className="absolute bottom-0 w-full bg-gradient-to-t from-green-500 to-emerald-500 rounded-t-sm"
                       />
