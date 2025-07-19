@@ -81,19 +81,30 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
   }
 
   const handleLearnComplete = async () => {
-    if (isLearned || isLearning) return
+    if (isLearning) return
 
     setIsLearning(true)
     try {
-      await updateProgressMutation.mutateAsync({
-        sessionId,
-        date,
-        infoIndex: index
-      })
-      
-      // 학습 완료 알림
-      setShowLearnComplete(true)
-      setTimeout(() => setShowLearnComplete(false), 3000)
+      if (isLearned) {
+        // 학습 완료 상태에서 학습 전 상태로 되돌리기
+        await updateProgressMutation.mutateAsync({
+          sessionId,
+          date,
+          infoIndex: index,
+          action: 'unlearn'
+        })
+      } else {
+        // 학습 전 상태에서 학습 완료 상태로 변경
+        await updateProgressMutation.mutateAsync({
+          sessionId,
+          date,
+          infoIndex: index
+        })
+        
+        // 학습 완료 알림
+        setShowLearnComplete(true)
+        setTimeout(() => setShowLearnComplete(false), 3000)
+      }
       
       // 진행률 업데이트 콜백 호출
       if (onProgressUpdate) {
@@ -218,12 +229,12 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
       <div className="flex gap-3">
         <button
           onClick={handleLearnComplete}
-          disabled={isLearned || isLearning}
+          disabled={isLearning}
           className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg text-sm font-medium transition-all ${
-            isLearned
-              ? 'bg-green-500 text-white cursor-not-allowed'
-              : isLearning
-                ? 'bg-blue-600 text-white cursor-not-allowed'
+            isLearning
+              ? 'bg-blue-600 text-white cursor-not-allowed'
+              : isLearned
+                ? 'bg-green-500 text-white hover:bg-green-600'
                 : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600'
           }`}
         >
@@ -234,8 +245,8 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
             </>
           ) : isLearned ? (
             <>
-              <CheckCircle className="w-4 h-4" />
-              학습 완료
+              <BookOpen className="w-4 h-4" />
+              다시 학습하기
             </>
           ) : (
             <>

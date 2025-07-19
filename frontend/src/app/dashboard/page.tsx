@@ -113,13 +113,15 @@ export default function DashboardPage() {
   const learnedTerms = Array.isArray(userProgress?.total_terms_learned) ? userProgress.total_terms_learned.length : (userProgress?.total_terms_learned ?? 0)
   const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
 
-  // 퀴즈 점수 계산 - 실제 점수 또는 기본값 0
+  // 퀴즈 점수 계산 - 맞은 문제 수 / 총 푼 문제 수
   const quizScore = (() => {
     if (typeof userProgress?.quiz_score === 'number') {
       return Math.min(userProgress.quiz_score, 100)
     }
     if (Array.isArray(userProgress?.quiz_score)) {
-      return Math.min(userProgress.quiz_score.length, 100)
+      const totalQuestions = userProgress.quiz_score.length
+      const correctAnswers = userProgress.quiz_score.filter(score => score > 0).length
+      return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0
     }
     return 0
   })()
@@ -526,8 +528,8 @@ export default function DashboardPage() {
                 <div className="text-xs text-white/60">총 용어</div>
               </div>
               <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-3">
-                <div className="text-lg font-bold text-green-400">{weeklyData.reduce((sum, day) => sum + day.quiz, 0)}</div>
-                <div className="text-xs text-white/60">총 퀴즈 수</div>
+                <div className="text-lg font-bold text-green-400">{quizScore}%</div>
+                <div className="text-xs text-white/60">퀴즈 점수</div>
               </div>
             </div>
           </div>
@@ -595,10 +597,28 @@ export default function DashboardPage() {
           {/* 탭별 컨텐츠 */}
           {activeTab === 'ai' && (
             <section className="mb-8 md:mb-16">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
-                <FaBrain className="w-6 h-6 md:w-8 md:h-8" />
-                오늘의 AI 정보
-              </h2>
+              <div className="flex justify-between items-center mb-6 md:mb-8">
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-3 md:gap-4 drop-shadow">
+                  <FaBrain className="w-6 h-6 md:w-8 md:h-8" />
+                  오늘의 AI 정보
+                </h2>
+                <button
+                  onClick={() => {
+                    // 모든 AI 정보 학습 상태 초기화
+                    if (userProgress?.[selectedDate]) {
+                      // 로컬 스토리지에서 해당 날짜의 학습 기록 삭제
+                      const updatedProgress = { ...userProgress }
+                      delete updatedProgress[selectedDate]
+                      localStorage.setItem('userProgress', JSON.stringify(updatedProgress))
+                      handleProgressUpdate()
+                      showToast('success', '모든 학습 상태가 초기화되었습니다!')
+                    }
+                  }}
+                  className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
+                >
+                  모두 초기화
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 {aiInfoFixed.length === 0 && (
                   <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center text-white/70 shadow-xl min-h-[180px] border border-white/10">
@@ -762,7 +782,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* 학습 요약 */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg p-4 border border-blue-500/30">
                         <div className="text-2xl font-bold text-blue-400 mb-1">{learnedAIInfo}</div>
                         <div className="text-sm text-white/60">학습한 AI 정보</div>
@@ -770,6 +790,10 @@ export default function DashboardPage() {
                       <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-4 border border-purple-500/30">
                         <div className="text-2xl font-bold text-purple-400 mb-1">{learnedTerms}</div>
                         <div className="text-sm text-white/60">학습한 용어</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-lg p-4 border border-green-500/30">
+                        <div className="text-2xl font-bold text-green-400 mb-1">{quizScore}%</div>
+                        <div className="text-sm text-white/60">퀴즈 점수</div>
                       </div>
                     </div>
                   </div>
