@@ -341,44 +341,6 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        {/* 오늘기록 초기화 버튼 - 전역(상단) 위치 */}
-        <button
-          onClick={async () => {
-            // 오늘 날짜의 모든 학습 정보 완전 초기화 (localStorage)
-            const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
-            if (currentProgress[sessionId] && currentProgress[sessionId][selectedDate]) {
-              delete currentProgress[sessionId][selectedDate];
-              localStorage.setItem('userProgress', JSON.stringify(currentProgress));
-            }
-            // terms_by_date, quiz_score_by_date 등도 초기화
-            const userStats = JSON.parse(localStorage.getItem('userStats') || '{}');
-            if (userStats[sessionId]) {
-              if (userStats[sessionId].terms_by_date && userStats[sessionId].terms_by_date[selectedDate]) {
-                delete userStats[sessionId].terms_by_date[selectedDate];
-              }
-              if (userStats[sessionId].quiz_score_by_date && userStats[sessionId].quiz_score_by_date[selectedDate]) {
-                delete userStats[sessionId].quiz_score_by_date[selectedDate];
-              }
-              localStorage.setItem('userStats', JSON.stringify(userStats));
-            }
-            // 백엔드 기록도 삭제
-            try {
-              await userProgressAPI.deleteByDate(sessionId, selectedDate);
-            } catch (e) { /* 무시 */ }
-            // 모든 관련 쿼리 invalidate
-            queryClient.invalidateQueries({ queryKey: ['user-progress', sessionId] });
-            queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] });
-            queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] });
-            queryClient.invalidateQueries({ queryKey: ['ai-info', selectedDate] });
-            setForceUpdate(prev => prev + 1);
-            showToast('success', '오늘의 모든 학습 정보가 초기화되었습니다!');
-            // 완전 새로고침(임시방편, 필요시)
-            // window.location.reload();
-          }}
-          className="mt-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
-        >
-          오늘기록 초기화
-        </button>
       </div>
 
       {/* 날짜 선택 (AI 정보 탭에서만 표시) */}
