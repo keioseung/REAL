@@ -12,6 +12,7 @@ import useAIInfo from '@/hooks/use-ai-info'
 import useUserProgress from '@/hooks/use-user-progress'
 import { useRouter } from 'next/navigation'
 import { useFetchAINews } from '@/hooks/use-ai-info'
+import { useQueryClient } from '@tanstack/react-query'
 
 // 예시 용어 데이터
 const TERMS = [
@@ -46,6 +47,7 @@ export default function DashboardPage() {
   const { data: aiInfo, isLoading: aiInfoLoading } = useAIInfo(selectedDate)
   const { data: userProgress, isLoading: progressLoading } = useUserProgress(sessionId)
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<'ai' | 'quiz' | 'progress' | 'news' | 'term'>('ai')
   const { data: news, isLoading: newsLoading } = useFetchAINews()
   const [randomTerm, setRandomTerm] = useState(() => TERMS[Math.floor(Math.random() * TERMS.length)])
@@ -131,6 +133,13 @@ export default function DashboardPage() {
 
   // AI 정보 3개만 정확히 보여줌
   const aiInfoFixed = aiInfo && aiInfo.length > 0 ? aiInfo.slice(0, 3) : []
+
+  // 진행률 업데이트 핸들러
+  const handleProgressUpdate = () => {
+    queryClient.invalidateQueries({ queryKey: ['user-progress', sessionId] })
+    queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] })
+    queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] })
+  }
 
   // 새로고침 핸들러(탭별)
   const handleRefresh = () => window.location.reload()
@@ -497,10 +506,7 @@ export default function DashboardPage() {
                     date={selectedDate}
                     sessionId={sessionId}
                     isLearned={userProgress?.[selectedDate]?.includes(index) || false}
-                    onProgressUpdate={() => {
-                      // 진행률 데이터 새로고침
-                      window.location.reload()
-                    }}
+                    onProgressUpdate={handleProgressUpdate}
                   />
                 ))}
               </div>
@@ -511,10 +517,7 @@ export default function DashboardPage() {
               <TermsQuizSection 
                 sessionId={sessionId} 
                 selectedDate={selectedDate} 
-                onProgressUpdate={() => {
-                  // 진행률 데이터 새로고침
-                  window.location.reload()
-                }}
+                onProgressUpdate={handleProgressUpdate}
               />
             </section>
           )}
