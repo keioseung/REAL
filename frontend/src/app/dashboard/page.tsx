@@ -224,15 +224,20 @@ export default function DashboardPage() {
         : undefined;
     const terms = Array.isArray(termsArr) ? termsArr.length : 0;
     let quiz = 0;
-    if (userProgress?.quiz_score_by_date && userProgress.quiz_score_by_date[dateStr]) {
-      const arr = userProgress.quiz_score_by_date[dateStr];
-      if (Array.isArray(arr)) {
-        const totalQuestions = arr.length;
-        const correctAnswers = arr.filter((score: number) => score > 0).length;
-        quiz = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-      } else if (typeof arr === 'number') {
-        quiz = arr;
-      }
+    const quizScoreArr =
+      userProgress &&
+      typeof userProgress.quiz_score_by_date === 'object' &&
+      userProgress.quiz_score_by_date !== null &&
+      !Array.isArray(userProgress.quiz_score_by_date) &&
+      Object.prototype.hasOwnProperty.call(userProgress.quiz_score_by_date, dateStr)
+        ? (userProgress.quiz_score_by_date as Record<string, any[]>)[dateStr]
+        : undefined;
+    if (Array.isArray(quizScoreArr)) {
+      const totalQuestions = quizScoreArr.length;
+      const correctAnswers = quizScoreArr.filter((score: number) => score > 0).length;
+      quiz = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    } else if (typeof quizScoreArr === 'number') {
+      quiz = quizScoreArr;
     }
     // 오늘 여부
     const isToday = dateStr === selectedDate;
