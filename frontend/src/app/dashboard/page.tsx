@@ -343,16 +343,27 @@ export default function DashboardPage() {
         {/* 오늘기록 초기화 버튼 - 전역(상단) 위치 */}
         <button
           onClick={() => {
+            // 오늘 날짜의 모든 학습 정보 완전 초기화
             const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
             if (currentProgress[sessionId] && currentProgress[sessionId][selectedDate]) {
               delete currentProgress[sessionId][selectedDate];
               localStorage.setItem('userProgress', JSON.stringify(currentProgress));
-              setForceUpdate(prev => prev + 1);
-              handleProgressUpdate();
-              showToast('success', '오늘 학습 상태가 초기화되었습니다!');
-            } else {
-              showToast('error', '오늘 기록이 없습니다.');
             }
+            // terms_by_date, quiz_score_by_date 등도 초기화
+            const userStats = JSON.parse(localStorage.getItem('userStats') || '{}');
+            if (userStats[sessionId]) {
+              if (userStats[sessionId].terms_by_date && userStats[sessionId].terms_by_date[selectedDate]) {
+                delete userStats[sessionId].terms_by_date[selectedDate];
+              }
+              if (userStats[sessionId].quiz_score_by_date && userStats[sessionId].quiz_score_by_date[selectedDate]) {
+                delete userStats[sessionId].quiz_score_by_date[selectedDate];
+              }
+              localStorage.setItem('userStats', JSON.stringify(userStats));
+            }
+            // 강제 리렌더 및 진행률/통계 갱신
+            setForceUpdate(prev => prev + 1);
+            handleProgressUpdate();
+            showToast('success', '오늘의 모든 학습 정보가 초기화되었습니다!');
           }}
           className="mt-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
         >

@@ -85,13 +85,12 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
     }
   }
 
-  const handleLearnComplete = async () => {
+  const handleLearnToggle = async () => {
     if (isLearning) return
-
     setIsLearning(true)
     try {
       if (isLearned) {
-        // 학습 이력 삭제
+        // 학습 이력 삭제 (학습완료 해제)
         const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}')
         if (currentProgress[sessionId] && currentProgress[sessionId][date]) {
           const learnedIndices = currentProgress[sessionId][date].filter((i: number) => i !== index)
@@ -102,16 +101,9 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           }
           localStorage.setItem('userProgress', JSON.stringify(currentProgress))
         }
-        // 즉시 학습완료 인덱스 추가 (학습완료 처리)
-        if (!currentProgress[sessionId]) currentProgress[sessionId] = {};
-        if (!currentProgress[sessionId][date]) currentProgress[sessionId][date] = [];
-        if (!currentProgress[sessionId][date].includes(index)) {
-          currentProgress[sessionId][date].push(index);
-          localStorage.setItem('userProgress', JSON.stringify(currentProgress));
-        }
-        setIsLearned(true);
-        if (setForceUpdate) setForceUpdate(prev => prev + 1);
-        if (onProgressUpdate) onProgressUpdate();
+        setIsLearned(false)
+        if (setForceUpdate) setForceUpdate(prev => prev + 1)
+        if (onProgressUpdate) onProgressUpdate()
       } else {
         // 학습 전 상태에서 학습 완료 상태로 변경
         await updateProgressMutation.mutateAsync({
@@ -119,15 +111,10 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           date,
           infoIndex: index
         })
-        setIsLearned(true) // 즉시 파란색으로
-        // 학습 완료 알림
+        setIsLearned(true)
         setShowLearnComplete(true)
         setTimeout(() => setShowLearnComplete(false), 3000)
-        // 진행률 업데이트 콜백 호출
-        if (onProgressUpdate) {
-          onProgressUpdate()
-        }
-        // 성취 확인
+        if (onProgressUpdate) onProgressUpdate()
         const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
         if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
           setShowAchievement(true)
@@ -244,7 +231,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
       {/* 액션 버튼 */}
       <div className="flex gap-3">
         <button
-          onClick={handleLearnComplete}
+          onClick={handleLearnToggle}
           disabled={isLearning}
           className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg text-sm font-medium transition-all ${
             isLearning
@@ -262,12 +249,12 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           ) : isLearned ? (
             <>
               <BookOpen className="w-4 h-4" />
-              다시 학습하기
+              학습완료
             </>
           ) : (
             <>
               <BookOpen className="w-4 h-4" />
-              학습 완료
+              학습하기
             </>
           )}
         </button>
