@@ -77,9 +77,9 @@ function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate }: TermsQu
     } else if (quizData?.quizzes && currentQuizIndex === quizData.quizzes.length - 1) {
       // 퀴즈 완료 시 점수 저장 및 성취 확인
       const finalScoreData = {
-        score: score + (selectedAnswer === currentQuiz?.correct ? 1 : 0),
+        score: score,
         total: quizData.quizzes.length,
-        percentage: Math.round(((score + (selectedAnswer === currentQuiz?.correct ? 1 : 0)) / quizData.quizzes.length) * 100)
+        percentage: Math.round((score / quizData.quizzes.length) * 100)
       }
       
       setFinalScore(finalScoreData)
