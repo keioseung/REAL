@@ -416,42 +416,52 @@ def get_learned_terms(session_id: str, db: Session = Depends(get_db)):
                     # 개별 용어 학습 기록 처리
                     elif progress.date.startswith('__terms__'):
                         # __terms__{date}_{info_index} 형식에서 날짜와 info_index 추출
-                        parts = progress.date.split('_')
-                        if len(parts) >= 3:
-                            date_part = parts[1]
-                            info_index = int(parts[2])
-                            
-                            ai_info = db.query(AIInfo).filter(AIInfo.date == date_part).first()
-                            if ai_info:
-                                learned_dates.append(date_part)
-                                learned_terms = json.loads(progress.learned_info) if progress.learned_info else []
+                        # 예: __terms__2024-01-15_0 -> date: 2024-01-15, info_index: 0
+                        date_part = progress.date.replace('__terms__', '')
+                        if '_' in date_part:
+                            date_str, info_str = date_part.rsplit('_', 1)
+                            try:
+                                info_index = int(info_str)
+                                date_part = date_str
                                 
-                                # 해당 info의 모든 용어에서 학습한 용어만 필터링
-                                info_terms = []
-                                if info_index == 0 and ai_info.info1_terms:
-                                    try:
-                                        info_terms = json.loads(ai_info.info1_terms)
-                                    except json.JSONDecodeError:
-                                        pass
-                                elif info_index == 1 and ai_info.info2_terms:
-                                    try:
-                                        info_terms = json.loads(ai_info.info2_terms)
-                                    except json.JSONDecodeError:
-                                        pass
-                                elif info_index == 2 and ai_info.info3_terms:
-                                    try:
-                                        info_terms = json.loads(ai_info.info3_terms)
-                                    except json.JSONDecodeError:
-                                        pass
-                                
-                                # 학습한 용어만 필터링
-                                for term in info_terms:
-                                    if term.get('term') in learned_terms:
-                                        term['learned_date'] = date_part
-                                        term['info_index'] = info_index
-                                        all_terms.append(term)
+                                ai_info = db.query(AIInfo).filter(AIInfo.date == date_part).first()
+                                if ai_info:
+                                    if date_part not in learned_dates:
+                                        learned_dates.append(date_part)
+                                    learned_terms = json.loads(progress.learned_info) if progress.learned_info else []
+                                    
+                                    # 해당 info의 모든 용어에서 학습한 용어만 필터링
+                                    info_terms = []
+                                    if info_index == 0 and ai_info.info1_terms:
+                                        try:
+                                            info_terms = json.loads(ai_info.info1_terms)
+                                        except json.JSONDecodeError:
+                                            pass
+                                    elif info_index == 1 and ai_info.info2_terms:
+                                        try:
+                                            info_terms = json.loads(ai_info.info2_terms)
+                                        except json.JSONDecodeError:
+                                            pass
+                                    elif info_index == 2 and ai_info.info3_terms:
+                                        try:
+                                            info_terms = json.loads(ai_info.info3_terms)
+                                        except json.JSONDecodeError:
+                                            pass
+                                    
+                                    # 학습한 용어만 필터링
+                                    for term in info_terms:
+                                        if term.get('term') in learned_terms:
+                                            term['learned_date'] = date_part
+                                            term['info_index'] = info_index
+                                            all_terms.append(term)
+                            except (ValueError, IndexError) as e:
+                                print(f"Error parsing date from {progress.date}: {e}")
+                                continue
                 except json.JSONDecodeError:
                     continue
+        
+        print(f"Debug - Total terms found: {len(all_terms)}")
+        print(f"Debug - Learned dates: {learned_dates}")
         
         if not all_terms:
             return {"terms": [], "message": "학습한 용어가 없습니다."}
