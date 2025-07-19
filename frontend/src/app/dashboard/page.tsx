@@ -195,16 +195,49 @@ export default function DashboardPage() {
   const today = new Date()
   const todayDay = today.getDay() // 0: 일요일, 1: 월요일, ..., 6: 토요일
 
-  // 주간 학습 데이터 - 실제 사용자 데이터 기반
-  const weeklyData = [
-    { day: '월', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 1 },
-    { day: '화', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 2 },
-    { day: '수', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 3 },
-    { day: '목', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 4 },
-    { day: '금', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 5 },
-    { day: '토', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 6 },
-    { day: '일', ai: 0, terms: 0, quiz: 0, isToday: todayDay === 0 },
-  ]
+  // 주간 학습 데이터 - 실제 사용자 데이터 기반 (월~일 7일 모두)
+  const getWeeklyDates = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0: 일, 1: 월, ...
+    // 이번주 월요일 구하기
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+    // 7일치 날짜 배열 생성
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d;
+    });
+  };
+  const weeklyDates = getWeeklyDates();
+  const weeklyData = weeklyDates.map((dateObj, idx) => {
+    const dateStr = dateObj.toISOString().split('T')[0];
+    // AI 정보, 용어, 퀴즈 데이터 추출 (userProgress 기준)
+    const ai = Array.isArray(userProgress?.[dateStr]) ? userProgress[dateStr].length : 0;
+    const terms = Array.isArray(userProgress?.terms_by_date?.[dateStr]) ? userProgress.terms_by_date[dateStr].length : 0;
+    let quiz = 0;
+    if (userProgress?.quiz_score_by_date && userProgress.quiz_score_by_date[dateStr]) {
+      const arr = userProgress.quiz_score_by_date[dateStr];
+      if (Array.isArray(arr)) {
+        const totalQuestions = arr.length;
+        const correctAnswers = arr.filter((score: number) => score > 0).length;
+        quiz = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+      } else if (typeof arr === 'number') {
+        quiz = arr;
+      }
+    }
+    // 오늘 여부
+    const isToday = dateStr === selectedDate;
+    // 요일명
+    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    return {
+      day: days[idx],
+      ai,
+      terms,
+      quiz,
+      isToday,
+    };
+  });
 
   // 오늘 학습 데이터 반영
   const todayIndex = todayDay === 0 ? 6 : todayDay - 1 // 일요일은 인덱스 6
@@ -662,7 +695,7 @@ export default function DashboardPage() {
                   }}
                   className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
                 >
-                  모두 초기화
+                  오늘기록 초기화
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">

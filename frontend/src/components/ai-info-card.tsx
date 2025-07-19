@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, Circle, BookOpen, ExternalLink, Brain, Trophy, Star, Sparkles } from 'lucide-react'
 import { useUpdateUserProgress, useCheckAchievements, useUpdateTermProgress } from '@/hooks/use-user-progress'
@@ -17,7 +17,7 @@ interface AIInfoCardProps {
   setForceUpdate?: (fn: (prev: number) => number) => void
 }
 
-function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate, forceUpdate, setForceUpdate }: AIInfoCardProps) {
+function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, onProgressUpdate, forceUpdate, setForceUpdate }: AIInfoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
   const [currentTermIndex, setCurrentTermIndex] = useState(0)
@@ -31,6 +31,9 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate,
   const updateProgressMutation = useUpdateUserProgress()
   const checkAchievementsMutation = useCheckAchievements()
   const updateTermProgressMutation = useUpdateTermProgress()
+  const [isLearned, setIsLearned] = useState(isLearnedProp)
+  // prop이 바뀌면 동기화
+  useEffect(() => { setIsLearned(isLearnedProp) }, [isLearnedProp, forceUpdate])
 
   // 용어가 있는지 확인
   const hasTerms = info.terms && info.terms.length > 0
@@ -99,6 +102,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate,
           }
           localStorage.setItem('userProgress', JSON.stringify(currentProgress))
         }
+        setIsLearned(false)
         // 강제 리렌더링
         if (setForceUpdate) setForceUpdate(prev => prev + 1)
         // 진행률 업데이트 콜백 호출
@@ -112,6 +116,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate,
           date,
           infoIndex: index
         })
+        setIsLearned(true) // 즉시 파란색으로
         // 학습 완료 알림
         setShowLearnComplete(true)
         setTimeout(() => setShowLearnComplete(false), 3000)
