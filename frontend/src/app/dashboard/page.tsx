@@ -104,9 +104,28 @@ export default function DashboardPage() {
     }
   }, [router])
 
-  // 학습 진행률 계산
+  // 학습 진행률 계산 (로컬 스토리지와 백엔드 데이터 통합)
   const totalAIInfo = aiInfo?.length || 0
-  const learnedAIInfo = userProgress?.[selectedDate]?.length || 0
+  
+  // 로컬 스토리지에서 학습 상태 확인
+  const localProgress = (() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('userProgress')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          return parsed[sessionId]?.[selectedDate] || []
+        }
+      } catch (error) {
+        console.error('Failed to parse local progress:', error)
+      }
+    }
+    return []
+  })()
+  
+  // 백엔드 데이터와 로컬 데이터 통합
+  const backendProgress = userProgress?.[selectedDate] || []
+  const learnedAIInfo = Math.max(localProgress.length, backendProgress.length)
   const aiInfoProgress = totalAIInfo > 0 ? (learnedAIInfo / totalAIInfo) * 100 : 0
 
   const totalTerms = 60 // 3개 AI 정보 × 20개 용어씩
@@ -381,156 +400,66 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-6 md:mb-8 w-full max-w-6xl border border-white/10"
+          className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 mb-6 md:mb-8 w-full max-w-4xl border border-white/10"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-              <FaChartBar className="text-white text-lg" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                <FaChartBar className="text-white text-sm" />
+              </div>
+              <h3 className="text-white font-bold text-lg md:text-xl">이번 주 학습 현황</h3>
             </div>
-            <h3 className="text-white font-bold text-xl md:text-2xl">주간 학습 현황</h3>
+            
+            {/* 간단한 요약 */}
+            <div className="flex gap-4 text-sm">
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-400">{weeklyData.reduce((sum, day) => sum + day.ai, 0)}</div>
+                <div className="text-xs text-white/60">AI 정보</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-purple-400">{weeklyData.reduce((sum, day) => sum + day.terms, 0)}</div>
+                <div className="text-xs text-white/60">용어</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-400">{quizScore}%</div>
+                <div className="text-xs text-white/60">퀴즈</div>
+              </div>
+            </div>
           </div>
           
-          {/* 요일 헤더 */}
-          <div className="grid grid-cols-7 gap-3 mb-6">
-            {weeklyData.map((day, index) => (
-              <div key={day.day} className="text-center">
-                <div className={`text-sm md:text-base font-bold mb-2 ${
-                  day.isToday ? 'text-blue-400' : 'text-white/70'
-                }`}>
-                  {day.day}
-                </div>
-                {day.isToday && (
-                  <div className="text-xs bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-full font-semibold shadow-lg">
-                    오늘
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* 학습 활동 그래프 */}
-          <div className="space-y-6">
-            {/* AI 정보 학습 */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
-                <span className="text-white/80 font-semibold">AI 정보 학습</span>
-              </div>
-              <div className="grid grid-cols-7 gap-3">
-                {weeklyData.map((day, index) => (
-                  <div key={index} className="relative">
-                    <div className="h-16 md:h-20 bg-white/5 rounded-lg border border-white/10 relative overflow-hidden">
-                      {day.ai > 0 && (
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${Math.min((day.ai / 3) * 100, 100)}%` }}
-                          transition={{ duration: 0.8, delay: index * 0.1 }}
-                          className={`absolute bottom-0 w-full rounded-lg ${
-                            day.isToday 
-                              ? 'bg-gradient-to-t from-blue-500 to-cyan-500 shadow-lg' 
-                              : 'bg-gradient-to-t from-blue-400/60 to-cyan-400/60'
-                          }`}
-                        />
-                      )}
-                    </div>
-                    <div className="text-center mt-2">
-                      <span className={`text-xs font-bold ${
-                        day.isToday ? 'text-blue-400' : 'text-white/50'
-                      }`}>
-                        {day.ai > 0 ? day.ai : '-'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* 간단한 주간 그래프 */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-white">일별 학습량</span>
+              <span className="text-xs text-white/60">이번 주</span>
             </div>
-
-            {/* 용어 학습 */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
-                <span className="text-white/80 font-semibold">용어 학습</span>
-              </div>
-              <div className="grid grid-cols-7 gap-3">
-                {weeklyData.map((day, index) => (
-                  <div key={index} className="relative">
-                    <div className="h-16 md:h-20 bg-white/5 rounded-lg border border-white/10 relative overflow-hidden">
-                      {day.terms > 0 && (
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${Math.min((day.terms / 60) * 100, 100)}%` }}
-                          transition={{ duration: 0.8, delay: index * 0.1 + 0.2 }}
-                          className={`absolute bottom-0 w-full rounded-lg ${
-                            day.isToday 
-                              ? 'bg-gradient-to-t from-purple-500 to-pink-500 shadow-lg' 
-                              : 'bg-gradient-to-t from-purple-400/60 to-pink-400/60'
-                          }`}
-                        />
-                      )}
+            <div className="flex gap-2 h-20">
+              {weeklyData.map((day, dayIndex) => {
+                const today = new Date().toISOString().split('T')[0]
+                const isToday = day.date === today
+                const totalValue = day.ai + day.terms + (day.quiz / 10) // 퀴즈는 10으로 나누어 정규화
+                const maxValue = 25 // AI(3) + 용어(20) + 퀴즈(2) = 25
+                const height = Math.min((totalValue / maxValue) * 100, 100)
+                
+                return (
+                  <div key={dayIndex} className="flex-1 flex flex-col items-center">
+                    <div className="text-xs text-white/60 mb-1">{day.day}</div>
+                    <div className="relative w-full bg-white/5 rounded-t overflow-hidden">
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${height}%` }}
+                        transition={{ duration: 0.5, delay: dayIndex * 0.1 }}
+                        className={`w-full bg-gradient-to-t from-blue-500 via-purple-500 to-green-500 ${
+                          isToday ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
+                        }`}
+                      />
                     </div>
-                    <div className="text-center mt-2">
-                      <span className={`text-xs font-bold ${
-                        day.isToday ? 'text-purple-400' : 'text-white/50'
-                      }`}>
-                        {day.terms > 0 ? day.terms : '-'}
-                      </span>
+                    <div className="text-xs text-white/40 mt-1">
+                      {totalValue > 0 ? Math.round(totalValue) : '-'}
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 퀴즈 점수 */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"></div>
-                <span className="text-white/80 font-semibold">퀴즈 점수</span>
-              </div>
-              <div className="grid grid-cols-7 gap-3">
-                {weeklyData.map((day, index) => (
-                  <div key={index} className="relative">
-                    <div className="h-16 md:h-20 bg-white/5 rounded-lg border border-white/10 relative overflow-hidden">
-                      {day.quiz > 0 && (
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${Math.min(day.quiz, 100)}%` }}
-                          transition={{ duration: 0.8, delay: index * 0.1 + 0.4 }}
-                          className={`absolute bottom-0 w-full rounded-lg ${
-                            day.isToday 
-                              ? 'bg-gradient-to-t from-green-500 to-emerald-500 shadow-lg' 
-                              : 'bg-gradient-to-t from-green-400/60 to-emerald-400/60'
-                          }`}
-                        />
-                      )}
-                    </div>
-                    <div className="text-center mt-2">
-                      <span className={`text-xs font-bold ${
-                        day.isToday ? 'text-green-400' : 'text-white/50'
-                      }`}>
-                        {day.quiz > 0 ? day.quiz : '-'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* 요약 정보 */}
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg p-3">
-                <div className="text-lg font-bold text-blue-400">{weeklyData.reduce((sum, day) => sum + day.ai, 0)}</div>
-                <div className="text-xs text-white/60">총 AI 정보</div>
-              </div>
-              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg p-3">
-                <div className="text-lg font-bold text-purple-400">60</div>
-                <div className="text-xs text-white/60">총 용어</div>
-              </div>
-              <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-3">
-                <div className="text-lg font-bold text-green-400">{quizScore}%</div>
-                <div className="text-xs text-white/60">퀴즈 점수</div>
-              </div>
+                )
+              })}
             </div>
           </div>
         </motion.div>
@@ -630,17 +559,24 @@ export default function DashboardPage() {
                     <span className="text-base md:text-lg font-semibold">AI 정보가 없습니다</span>
                   </div>
                 )}
-                {aiInfoFixed.map((info, index) => (
-                  <AIInfoCard
-                    key={index}
-                    info={info}
-                    index={index}
-                    date={selectedDate}
-                    sessionId={sessionId}
-                    isLearned={userProgress?.[selectedDate]?.includes(index) || false}
-                    onProgressUpdate={handleProgressUpdate}
-                  />
-                ))}
+                {aiInfoFixed.map((info, index) => {
+                  // 로컬 스토리지와 백엔드 데이터를 모두 확인하여 학습 상태 결정
+                  const isLearnedLocally = localProgress.includes(index)
+                  const isLearnedBackend = backendProgress.includes(index)
+                  const isLearned = isLearnedLocally || isLearnedBackend
+                  
+                  return (
+                    <AIInfoCard
+                      key={index}
+                      info={info}
+                      index={index}
+                      date={selectedDate}
+                      sessionId={sessionId}
+                      isLearned={isLearned}
+                      onProgressUpdate={handleProgressUpdate}
+                    />
+                  )
+                })}
               </div>
             </section>
           )}
