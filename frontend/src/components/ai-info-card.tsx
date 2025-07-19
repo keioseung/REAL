@@ -72,19 +72,16 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
             newSet.add(currentTerm.term)
             return newSet
           })
-          
-          // 모든 용어 학습 완료 시에만 알림 표시
-          if (learnedTerms.size + 1 === info.terms!.length) {
-            setShowAllTermsComplete(true)
-            setShowRelearnButton(true)
-            setTimeout(() => setShowAllTermsComplete(false), 3000)
-          }
-          
+
+          // N개 학습완료 알림 매번 표시
+          setShowAllTermsComplete(true)
+          setTimeout(() => setShowAllTermsComplete(false), 3000)
+
           // 진행률 업데이트 콜백 호출
           if (onProgressUpdate) {
             onProgressUpdate()
           }
-          
+
           // 성취 확인
           const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
           if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
@@ -95,7 +92,6 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           console.error('Failed to update term progress:', error)
         }
       }
-      
       // 다음 용어로 이동
       setCurrentTermIndex((prev: number) => (prev + 1) % info.terms!.length)
     }
@@ -292,7 +288,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           >
             <div className="flex items-center gap-2">
               <Star className="w-5 h-5 animate-bounce" />
-              <span className="font-bold text-sm">🎉 모든 용어 학습 완료!</span>
+              <span className="font-bold text-sm">🎉 {learnedTerms.size}개 학습완료!</span>
             </div>
           </motion.div>
         )}
