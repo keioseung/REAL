@@ -197,7 +197,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           >
             <Brain className="w-4 h-4" />
             {showTerms ? '용어 학습 숨기기' : '관련 용어 학습하기'}
-            {learnedTerms.size === (info.terms?.length || 0) && (
+            {learnedTerms.size === (info.terms?.length || 0) && showAllTermsComplete && (
               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                 {learnedTerms.size}개 학습완료
               </span>
