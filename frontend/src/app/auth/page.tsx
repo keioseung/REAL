@@ -49,6 +49,7 @@ export default function AuthPage() {
     }
     localStorage.setItem('isAdminLoggedIn', user.role === 'admin' ? 'true' : 'false')
     localStorage.setItem('currentUser', JSON.stringify(user))
+    localStorage.setItem('sessionId', user.username) // 계정별로 분리된 sessionId 저장
     setError('')
     if (user.role === 'admin') {
       router.replace('/admin')
