@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaFire, FaStar, FaTarget, FaTrendingUp } from 'react-icons/fa'
+import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaFire, FaStar, FaCrosshairs, FaChartBar } from 'react-icons/fa'
 import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
 import TermsQuizSection from '@/components/terms-quiz-section'
@@ -249,7 +249,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                  <FaTarget className="text-white text-lg md:text-xl" />
+                  <FaCrosshairs className="text-white text-lg md:text-xl" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-lg">용어 학습</h3>
@@ -354,7 +354,7 @@ export default function DashboardPage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-              <FaTrendingUp className="text-white text-sm md:text-base" />
+              <FaChartBar className="text-white text-sm md:text-base" />
             </div>
             <h3 className="text-white font-bold text-lg md:text-xl">주간 학습 현황</h3>
           </div>
