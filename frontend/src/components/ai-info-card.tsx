@@ -36,6 +36,24 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   // 용어 학습 상태를 React Query로 관리
   const { data: learnedTerms = new Set<string>(), refetch: refetchLearnedTerms } = useLearnedTerms(sessionId, date, index)
   
+  // localStorage에서 용어 학습 상태 백업
+  const [localLearnedTerms, setLocalLearnedTerms] = useState<Set<string>>(new Set())
+  
+  // localStorage에서 용어 학습 상태 불러오기
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(`learnedTerms_${sessionId}_${date}_${index}`)
+        if (stored) {
+          setLocalLearnedTerms(new Set(JSON.parse(stored)))
+        }
+      } catch {}
+    }
+  }, [sessionId, date, index])
+  
+  // 실제 학습된 용어는 React Query 데이터와 localStorage 데이터를 합침
+  const actualLearnedTerms = new Set([...learnedTerms, ...localLearnedTerms])
+  
   // prop이 바뀌거나 forceUpdate, selectedDate가 바뀌면 동기화
   useEffect(() => {
     // localStorage와 백엔드 모두 확인해서 학습 상태 동기화
@@ -64,7 +82,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
     if (hasTerms && info.terms) {
       // 현재 용어를 학습 완료로 표시
       const currentTerm = info.terms[currentTermIndex]
-      if (currentTerm && !learnedTerms.has(currentTerm.term)) {
+      if (currentTerm && !actualLearnedTerms.has(currentTerm.term)) {
         try {
           await updateTermProgressMutation.mutateAsync({
             sessionId,
@@ -72,6 +90,11 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
             date,
             infoIndex: index
           })
+
+          // localStorage에 저장
+          const newLocalTerms = new Set([...localLearnedTerms, currentTerm.term])
+          setLocalLearnedTerms(newLocalTerms)
+          localStorage.setItem(`learnedTerms_${sessionId}_${date}_${index}`, JSON.stringify([...newLocalTerms]))
 
           // 즉시 데이터 새로고침
           await refetchLearnedTerms()
@@ -216,7 +239,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
             {/* 항상 완료 개수 표시 */}
             {hasTerms && (
               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full ml-2">
-                {learnedTerms.size}개 학습완료
+                {actualLearnedTerms.size}개 학습완료
               </span>
             )}
           </button>
@@ -231,7 +254,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
               <div className="mb-3">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-white/60">{currentTermIndex + 1} / {info.terms?.length || 0}</span>
-                  <span className="text-xs text-green-400 font-bold">{learnedTerms.size}개 학습완료</span>
+                  <span className="text-xs text-green-400 font-bold">{actualLearnedTerms.size}개 학습완료</span>
                 </div>
                 <div className="w-full bg-white/20 rounded-full h-2">
                   <div
@@ -268,7 +291,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
                     onClick={async () => {
                       setCurrentTermIndex(idx);
                       // 클릭한 용어를 학습완료로 표시
-                      if (!learnedTerms.has(term.term)) {
+                      if (!actualLearnedTerms.has(term.term)) {
                         try {
                           await updateTermProgressMutation.mutateAsync({
                             sessionId,
@@ -276,6 +299,11 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
                             date,
                             infoIndex: index
                           })
+                          
+                          // localStorage에 저장
+                          const newLocalTerms = new Set([...localLearnedTerms, term.term])
+                          setLocalLearnedTerms(newLocalTerms)
+                          localStorage.setItem(`learnedTerms_${sessionId}_${date}_${index}`, JSON.stringify([...newLocalTerms]))
                           
                           // 즉시 데이터 새로고침
                           await refetchLearnedTerms()
@@ -289,14 +317,14 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
                         }
                       }
                     }}
-                    className={`px-2 py-1 rounded text-xs font-bold border transition-all ${idx === currentTermIndex ? 'bg-green-500 text-white border-green-600' : learnedTerms.has(term.term) ? 'bg-green-400/80 text-white border-green-500' : 'bg-white/20 text-white/70 border-white/30 hover:bg-blue-400/40'}`}
+                    className={`px-2 py-1 rounded text-xs font-bold border transition-all ${idx === currentTermIndex ? 'bg-green-500 text-white border-green-600' : actualLearnedTerms.has(term.term) ? 'bg-green-400/80 text-white border-green-500' : 'bg-white/20 text-white/70 border-white/30 hover:bg-blue-400/40'}`}
                   >
                     {term.term}
                   </button>
                 ))}
               </div>
               {/* 학습 완료 축하 메시지 */}
-              {learnedTerms.size === info.terms?.length && info.terms.length > 0 && (
+              {actualLearnedTerms.size === info.terms?.length && info.terms.length > 0 && (
                 <div className="mt-4 text-center animate-bounce">
                   <span className="inline-block bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow">🎉 모든 용어 학습 완료! 재학습하려면 재시작하세요.</span>
                 </div>
