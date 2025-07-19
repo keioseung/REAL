@@ -94,6 +94,35 @@ export function useUpdateQuizScore() {
   })
 }
 
+export function useUpdateTermProgress() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ 
+      sessionId, 
+      term, 
+      date, 
+      infoIndex 
+    }: { 
+      sessionId: string
+      term: string
+      date: string
+      infoIndex: number 
+    }) => {
+      const response = await userProgressAPI.updateTermProgress(sessionId, {
+        term,
+        date,
+        info_index: infoIndex
+      })
+      return response.data
+    },
+    onSuccess: (data, { sessionId }) => {
+      queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] })
+      queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] })
+    },
+  })
+}
+
 export function useCheckAchievements() {
   const queryClient = useQueryClient()
   

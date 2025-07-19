@@ -12,33 +12,114 @@ function ProgressSection({ sessionId }: ProgressSectionProps) {
   const { data: stats } = useUserStats(sessionId)
 
   const achievements = [
+    // AI 정보 학습 성취
+    {
+      id: 'first_learn',
+      name: '첫 학습',
+      description: '첫 번째 AI 정보를 학습했습니다',
+      icon: '🌟',
+      unlocked: stats?.achievements?.includes('first_learn') || false,
+    },
+    {
+      id: 'beginner',
+      name: '초보 학습자',
+      description: '3개의 AI 정보를 학습했습니다',
+      icon: '📚',
+      unlocked: stats?.achievements?.includes('beginner') || false,
+    },
+    {
+      id: 'learner',
+      name: '열심히 학습자',
+      description: '5개의 AI 정보를 학습했습니다',
+      icon: '🎯',
+      unlocked: stats?.achievements?.includes('learner') || false,
+    },
     {
       id: 'first_10',
       name: '첫 10개 학습',
       description: '10개의 AI 정보를 학습했습니다',
-      icon: '🎯',
+      icon: '🏆',
       unlocked: stats?.achievements?.includes('first_10') || false,
+    },
+    {
+      id: 'knowledge_seeker',
+      name: '지식 탐구자',
+      description: '20개의 AI 정보를 학습했습니다',
+      icon: '🔍',
+      unlocked: stats?.achievements?.includes('knowledge_seeker') || false,
     },
     {
       id: 'first_50',
       name: '학습 마스터',
       description: '50개의 AI 정보를 학습했습니다',
-      icon: '🏆',
+      icon: '👑',
       unlocked: stats?.achievements?.includes('first_50') || false,
+    },
+    // 용어 학습 성취
+    {
+      id: 'first_term',
+      name: '첫 용어',
+      description: '첫 번째 용어를 학습했습니다',
+      icon: '📖',
+      unlocked: stats?.achievements?.includes('first_term') || false,
+    },
+    {
+      id: 'term_collector',
+      name: '용어 수집가',
+      description: '5개의 용어를 학습했습니다',
+      icon: '📝',
+      unlocked: stats?.achievements?.includes('term_collector') || false,
+    },
+    {
+      id: 'term_master',
+      name: '용어 마스터',
+      description: '10개의 용어를 학습했습니다',
+      icon: '📚',
+      unlocked: stats?.achievements?.includes('term_master') || false,
+    },
+    // 연속 학습 성취
+    {
+      id: 'three_day_streak',
+      name: '3일 연속',
+      description: '3일 연속으로 학습했습니다',
+      icon: '🔥',
+      unlocked: stats?.achievements?.includes('three_day_streak') || false,
     },
     {
       id: 'week_streak',
       name: '일주일 연속',
       description: '7일 연속으로 학습했습니다',
-      icon: '🔥',
+      icon: '⚡',
       unlocked: stats?.achievements?.includes('week_streak') || false,
+    },
+    {
+      id: 'two_week_streak',
+      name: '2주 연속',
+      description: '14일 연속으로 학습했습니다',
+      icon: '🚀',
+      unlocked: stats?.achievements?.includes('two_week_streak') || false,
+    },
+    // 퀴즈 성취
+    {
+      id: 'quiz_beginner',
+      name: '퀴즈 초보',
+      description: '퀴즈 점수가 60점 이상입니다',
+      icon: '🧠',
+      unlocked: stats?.achievements?.includes('quiz_beginner') || false,
     },
     {
       id: 'quiz_master',
       name: '퀴즈 마스터',
       description: '퀴즈 점수가 80점 이상입니다',
-      icon: '🧠',
+      icon: '🎯',
       unlocked: stats?.achievements?.includes('quiz_master') || false,
+    },
+    {
+      id: 'perfect_quiz',
+      name: '완벽한 퀴즈',
+      description: '퀴즈 점수가 100점입니다',
+      icon: '💎',
+      unlocked: stats?.achievements?.includes('perfect_quiz') || false,
     },
   ]
 

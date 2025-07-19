@@ -103,8 +103,9 @@ export default function DashboardPage() {
 
   const stats = [
     { label: '총 학습', value: userProgress?.total_learned || 0, icon: FaBookOpen, color: 'from-blue-500 to-cyan-500' },
+    { label: '용어 학습', value: userProgress?.total_terms_learned || 0, icon: FaBrain, color: 'from-purple-500 to-pink-500' },
     { label: '연속 학습', value: userProgress?.streak_days || 0, icon: FaChartLine, color: 'from-green-500 to-emerald-500' },
-    { label: '퀴즈 점수', value: userProgress?.quiz_score || 0, icon: FaBullseye, color: 'from-purple-500 to-pink-500' },
+    { label: '퀴즈 점수', value: userProgress?.quiz_score || 0, icon: FaBullseye, color: 'from-orange-500 to-red-500' },
     { label: '성취', value: userProgress?.achievements?.length || 0, icon: FaTrophy, color: 'from-yellow-500 to-orange-500' },
   ]
 

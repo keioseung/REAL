@@ -243,10 +243,10 @@ def get_terms_quiz(session_id: str, db: Session = Depends(get_db)):
                 unique_terms.append(term)
                 seen_terms.add(term.get('term'))
         
-        # 퀴즈 생성 (최대 20개)
+        # 퀴즈 생성 (최대 5개)
         import random
         random.shuffle(unique_terms)
-        quiz_terms = unique_terms[:20]
+        quiz_terms = unique_terms[:5]
         
         quizzes = []
         for i, term in enumerate(quiz_terms):
@@ -323,10 +323,10 @@ def get_terms_quiz_by_date(date: str, db: Session = Depends(get_db)):
                 unique_terms.append(term)
                 seen_terms.add(term.get('term'))
         
-        # 퀴즈 생성 (최대 20개)
+        # 퀴즈 생성 (최대 5개)
         import random
         random.shuffle(unique_terms)
-        quiz_terms = unique_terms[:20]
+        quiz_terms = unique_terms[:5]
         
         quizzes = []
         for i, term in enumerate(quiz_terms):

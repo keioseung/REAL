@@ -36,6 +36,8 @@ export const userProgressAPI = {
   get: (sessionId: string) => api.get(`/api/user-progress/${sessionId}`),
   update: (sessionId: string, date: string, infoIndex: number) => 
     api.post(`/api/user-progress/${sessionId}/${date}/${infoIndex}`),
+  updateTermProgress: (sessionId: string, termData: any) => 
+    api.post(`/api/user-progress/term-progress/${sessionId}`, termData),
   getStats: (sessionId: string) => api.get(`/api/user-progress/stats/${sessionId}`),
   updateStats: (sessionId: string, stats: any) => 
     api.post(`/api/user-progress/stats/${sessionId}`, stats),

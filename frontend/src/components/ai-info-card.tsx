@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { CheckCircle, Circle, BookOpen, ExternalLink, Brain, Trophy } from 'lucide-react'
-import { useUpdateUserProgress, useCheckAchievements } from '@/hooks/use-user-progress'
+import { useUpdateUserProgress, useCheckAchievements, useUpdateTermProgress } from '@/hooks/use-user-progress'
 import type { AIInfoItem, TermItem } from '@/types'
 
 interface AIInfoCardProps {
@@ -19,15 +19,41 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
   const [showTerms, setShowTerms] = useState(false)
   const [currentTermIndex, setCurrentTermIndex] = useState(0)
   const [showAchievement, setShowAchievement] = useState(false)
+  const [learnedTerms, setLearnedTerms] = useState<Set<string>>(new Set())
   const updateProgressMutation = useUpdateUserProgress()
   const checkAchievementsMutation = useCheckAchievements()
+  const updateTermProgressMutation = useUpdateTermProgress()
 
   // 용어가 있는지 확인
   const hasTerms = info.terms && info.terms.length > 0
   const currentTerm = hasTerms && info.terms ? info.terms[currentTermIndex] : null
 
-  const handleNextTerm = () => {
+  const handleNextTerm = async () => {
     if (hasTerms && info.terms) {
+      // 현재 용어를 학습 완료로 표시
+      const currentTerm = info.terms[currentTermIndex]
+      if (currentTerm && !learnedTerms.has(currentTerm.term)) {
+        try {
+          await updateTermProgressMutation.mutateAsync({
+            sessionId,
+            term: currentTerm.term,
+            date,
+            infoIndex: index
+          })
+          setLearnedTerms(prev => new Set([...prev, currentTerm.term]))
+          
+          // 성취 확인
+          const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
+          if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
+            setShowAchievement(true)
+            setTimeout(() => setShowAchievement(false), 3000)
+          }
+        } catch (error) {
+          console.error('Failed to update term progress:', error)
+        }
+      }
+      
+      // 다음 용어로 이동
       setCurrentTermIndex((prev: number) => (prev + 1) % info.terms!.length)
     }
   }
@@ -171,6 +197,24 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
           <div className="flex items-center gap-2 text-green-300">
             <CheckCircle className="w-4 h-4" />
             <span className="text-sm font-medium">학습 완료!</span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* 성취 알림 */}
+      {showAchievement && (
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.8 }}
+          className="fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 rounded-xl shadow-2xl border border-yellow-300"
+        >
+          <div className="flex items-center gap-3">
+            <Trophy className="w-6 h-6 animate-bounce" />
+            <div>
+              <div className="font-bold text-lg">🎉 성취 달성!</div>
+              <div className="text-sm opacity-90">새로운 성취를 획득했습니다!</div>
+            </div>
           </div>
         </motion.div>
       )}
