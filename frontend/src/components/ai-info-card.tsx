@@ -33,6 +33,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   const checkAchievementsMutation = useCheckAchievements()
   const updateTermProgressMutation = useUpdateTermProgress()
   const [isLearned, setIsLearned] = useState(isLearnedProp)
+  
   // prop이 바뀌거나 forceUpdate, selectedDate가 바뀌면 동기화
   useEffect(() => {
     // localStorage와 백엔드 모두 확인해서 학습 상태 동기화
@@ -54,6 +55,33 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   // 용어가 있는지 확인
   const hasTerms = info.terms && info.terms.length > 0
   const currentTerm = hasTerms && info.terms ? info.terms[currentTermIndex] : null
+
+  // 용어 학습 상태 불러오기
+  useEffect(() => {
+    const loadLearnedTerms = async () => {
+      if (!hasTerms || !info.terms) return;
+      
+      try {
+        // 백엔드에서 해당 info의 학습된 용어들 가져오기
+        const response = await userProgressAPI.get(sessionId);
+        const data = response.data;
+        
+        // __terms__{date}_{info_index} 형식의 키 찾기
+        const termKey = `__terms__${date}_${index}`;
+        if (data[termKey]) {
+          const learnedTermsList = data[termKey];
+          setLearnedTerms(new Set(learnedTermsList));
+        } else {
+          setLearnedTerms(new Set());
+        }
+      } catch (error) {
+        console.error('Failed to load learned terms:', error);
+        setLearnedTerms(new Set());
+      }
+    };
+
+    loadLearnedTerms();
+  }, [sessionId, date, index, hasTerms, info.terms, forceUpdate]);
 
   const handleNextTerm = async () => {
     if (hasTerms && info.terms) {
