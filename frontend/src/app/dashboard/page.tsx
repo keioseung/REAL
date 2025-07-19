@@ -435,8 +435,6 @@ export default function DashboardPage() {
             </div>
             <div className="flex gap-2 h-20">
               {weeklyData.map((day, dayIndex) => {
-                const today = new Date().toISOString().split('T')[0]
-                const isToday = day.date === today
                 const totalValue = day.ai + day.terms + (day.quiz / 10) // 퀴즈는 10으로 나누어 정규화
                 const maxValue = 25 // AI(3) + 용어(20) + 퀴즈(2) = 25
                 const height = Math.min((totalValue / maxValue) * 100, 100)
@@ -450,7 +448,7 @@ export default function DashboardPage() {
                         animate={{ height: `${height}%` }}
                         transition={{ duration: 0.5, delay: dayIndex * 0.1 }}
                         className={`w-full bg-gradient-to-t from-blue-500 via-purple-500 to-green-500 ${
-                          isToday ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
+                          day.isToday ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
                         }`}
                       />
                     </div>
