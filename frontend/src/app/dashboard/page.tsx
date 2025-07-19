@@ -365,10 +365,15 @@ export default function DashboardPage() {
             try {
               await userProgressAPI.deleteByDate(sessionId, selectedDate);
             } catch (e) { /* 무시 */ }
-            // 강제 리렌더 및 진행률/통계 갱신
+            // 모든 관련 쿼리 invalidate
+            queryClient.invalidateQueries({ queryKey: ['user-progress', sessionId] });
+            queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] });
+            queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] });
+            queryClient.invalidateQueries({ queryKey: ['ai-info', selectedDate] });
             setForceUpdate(prev => prev + 1);
-            handleProgressUpdate();
             showToast('success', '오늘의 모든 학습 정보가 초기화되었습니다!');
+            // 완전 새로고침(임시방편, 필요시)
+            // window.location.reload();
           }}
           className="mt-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
         >

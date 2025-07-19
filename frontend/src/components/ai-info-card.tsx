@@ -33,8 +33,23 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   const checkAchievementsMutation = useCheckAchievements()
   const updateTermProgressMutation = useUpdateTermProgress()
   const [isLearned, setIsLearned] = useState(isLearnedProp)
-  // prop이 바뀌면 동기화
-  useEffect(() => { setIsLearned(isLearnedProp) }, [isLearnedProp, forceUpdate])
+  // prop이 바뀌거나 forceUpdate, selectedDate가 바뀌면 동기화
+  useEffect(() => {
+    // localStorage와 백엔드 모두 확인해서 학습 상태 동기화
+    let learned = false;
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('userProgress');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed[sessionId] && parsed[sessionId][date]) {
+            learned = parsed[sessionId][date].includes(index);
+          }
+        }
+      } catch {}
+    }
+    setIsLearned(isLearnedProp || learned);
+  }, [isLearnedProp, forceUpdate, date, sessionId, index]);
 
   // 용어가 있는지 확인
   const hasTerms = info.terms && info.terms.length > 0
