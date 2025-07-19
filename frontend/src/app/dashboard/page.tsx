@@ -214,7 +214,10 @@ export default function DashboardPage() {
     const dateStr = dateObj.toISOString().split('T')[0];
     // AI 정보, 용어, 퀴즈 데이터 추출 (userProgress 기준)
     const ai = Array.isArray(userProgress?.[dateStr]) ? userProgress[dateStr].length : 0;
-    const terms = Array.isArray(userProgress?.terms_by_date?.[dateStr]) ? userProgress.terms_by_date[dateStr].length : 0;
+    const termsArr = (userProgress?.terms_by_date && typeof userProgress.terms_by_date === 'object')
+      ? (userProgress.terms_by_date as Record<string, any[]>)[dateStr]
+      : undefined;
+    const terms = Array.isArray(termsArr) ? termsArr.length : 0;
     let quiz = 0;
     if (userProgress?.quiz_score_by_date && userProgress.quiz_score_by_date[dateStr]) {
       const arr = userProgress.quiz_score_by_date[dateStr];

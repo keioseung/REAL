@@ -42,7 +42,14 @@ export interface QuizCreate {
 
 // User Progress Types
 export interface UserProgress {
-  [date: string]: number[]
+  [date: string]: number[];
+  // terms_by_date, quiz_score_by_date 등은 별도 타입(UserProgressExtra)으로 확장해 사용하세요.
+}
+
+// UserProgress의 확장 속성 타입 예시
+export interface UserProgressExtra {
+  terms_by_date?: { [date: string]: any[] };
+  quiz_score_by_date?: { [date: string]: any[] };
 }
 
 export interface UserStats {
