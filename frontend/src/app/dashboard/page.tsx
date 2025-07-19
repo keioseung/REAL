@@ -114,8 +114,8 @@ export default function DashboardPage() {
   const maxQuizScore = 100
   const quizProgress = (quizScore / maxQuizScore) * 100
 
-  const streakDays = userProgress?.streak_days || 0
-  const maxStreak = userProgress?.max_streak || 0
+  const streakDays = Array.isArray(userProgress?.streak_days) ? userProgress.streak_days.length : (userProgress?.streak_days ?? 0)
+  const maxStreak = Array.isArray(userProgress?.max_streak) ? userProgress.max_streak.length : (userProgress?.max_streak ?? 0)
   const streakProgress = maxStreak > 0 ? (streakDays / maxStreak) * 100 : 0
 
   // 주간 학습 데이터 (예시)
