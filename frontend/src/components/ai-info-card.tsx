@@ -22,11 +22,11 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
 
   // 용어가 있는지 확인
   const hasTerms = info.terms && info.terms.length > 0
-  const currentTerm = hasTerms ? info.terms[currentTermIndex] : null
+  const currentTerm = hasTerms && info.terms ? info.terms[currentTermIndex] : null
 
   const handleNextTerm = () => {
-    if (hasTerms) {
-      setCurrentTermIndex((prev) => (prev + 1) % info.terms.length)
+    if (hasTerms && info.terms) {
+      setCurrentTermIndex((prev: number) => (prev + 1) % info.terms!.length)
     }
   }
 
@@ -113,7 +113,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-white/60 text-xs">
-                  {currentTermIndex + 1} / {info.terms.length}
+                  {currentTermIndex + 1} / {info.terms?.length || 0}
                 </span>
                 <button
                   onClick={handleNextTerm}
