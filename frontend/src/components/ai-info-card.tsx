@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CheckCircle, Circle, BookOpen, ExternalLink, Brain } from 'lucide-react'
-import { useUpdateUserProgress } from '@/hooks/use-user-progress'
+import { CheckCircle, Circle, BookOpen, ExternalLink, Brain, Trophy } from 'lucide-react'
+import { useUpdateUserProgress, useCheckAchievements } from '@/hooks/use-user-progress'
 import type { AIInfoItem, TermItem } from '@/types'
 
 interface AIInfoCardProps {
@@ -18,7 +18,9 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
   const [isExpanded, setIsExpanded] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
   const [currentTermIndex, setCurrentTermIndex] = useState(0)
+  const [showAchievement, setShowAchievement] = useState(false)
   const updateProgressMutation = useUpdateUserProgress()
+  const checkAchievementsMutation = useCheckAchievements()
 
   // 용어가 있는지 확인
   const hasTerms = info.terms && info.terms.length > 0
@@ -39,6 +41,13 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
         date,
         infoIndex: index
       })
+      
+      // 성취 확인
+      const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
+      if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
+        setShowAchievement(true)
+        setTimeout(() => setShowAchievement(false), 3000)
+      }
     } catch (error) {
       console.error('Failed to update progress:', error)
     }

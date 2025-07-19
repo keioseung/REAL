@@ -18,6 +18,7 @@ export const aiInfoAPI = {
   fetchNews: () => api.get('/api/ai-info/news/fetch'),
   getTermsQuiz: (sessionId: string) => api.get(`/api/ai-info/terms-quiz/${sessionId}`),
   getTermsQuizByDate: (date: string) => api.get(`/api/ai-info/terms-quiz-by-date/${date}`),
+  getLearnedTerms: (sessionId: string) => api.get(`/api/ai-info/learned-terms/${sessionId}`),
 }
 
 // Quiz API
@@ -38,6 +39,8 @@ export const userProgressAPI = {
   getStats: (sessionId: string) => api.get(`/api/user-progress/stats/${sessionId}`),
   updateStats: (sessionId: string, stats: any) => 
     api.post(`/api/user-progress/stats/${sessionId}`, stats),
+  updateQuizScore: (sessionId: string, scoreData: any) => 
+    api.post(`/api/user-progress/quiz-score/${sessionId}`, scoreData),
   checkAchievements: (sessionId: string) => 
     api.get(`/api/user-progress/achievements/${sessionId}`),
 }

@@ -355,6 +355,96 @@ def get_terms_quiz_by_date(date: str, db: Session = Depends(get_db)):
         print(f"Error in get_terms_quiz_by_date: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate terms quiz: {str(e)}")
 
+@router.get("/learned-terms/{session_id}")
+def get_learned_terms(session_id: str, db: Session = Depends(get_db)):
+    """사용자가 학습한 모든 용어를 가져옵니다."""
+    try:
+        from ..models import UserProgress
+        
+        # 사용자의 학습 진행상황 가져오기
+        user_progress = db.query(UserProgress).filter(
+            UserProgress.session_id == session_id,
+            UserProgress.date != '__stats__'
+        ).all()
+        
+        if not user_progress:
+            return {"terms": [], "message": "학습한 내용이 없습니다."}
+        
+        # 학습한 날짜들의 모든 용어 수집
+        all_terms = []
+        learned_dates = []
+        
+        for progress in user_progress:
+            if progress.learned_info:
+                try:
+                    learned_indices = json.loads(progress.learned_info)
+                    ai_info = db.query(AIInfo).filter(AIInfo.date == progress.date).first()
+                    if ai_info:
+                        learned_dates.append(progress.date)
+                        # 각 학습한 info의 용어들 가져오기
+                        for info_idx in learned_indices:
+                            if info_idx == 0 and ai_info.info1_terms:
+                                try:
+                                    terms = json.loads(ai_info.info1_terms)
+                                    for term in terms:
+                                        term['learned_date'] = progress.date
+                                        term['info_index'] = info_idx
+                                    all_terms.extend(terms)
+                                except json.JSONDecodeError:
+                                    pass
+                            elif info_idx == 1 and ai_info.info2_terms:
+                                try:
+                                    terms = json.loads(ai_info.info2_terms)
+                                    for term in terms:
+                                        term['learned_date'] = progress.date
+                                        term['info_index'] = info_idx
+                                    all_terms.extend(terms)
+                                except json.JSONDecodeError:
+                                    pass
+                            elif info_idx == 2 and ai_info.info3_terms:
+                                try:
+                                    terms = json.loads(ai_info.info3_terms)
+                                    for term in terms:
+                                        term['learned_date'] = progress.date
+                                        term['info_index'] = info_idx
+                                    all_terms.extend(terms)
+                                except json.JSONDecodeError:
+                                    pass
+                except json.JSONDecodeError:
+                    continue
+        
+        if not all_terms:
+            return {"terms": [], "message": "학습한 용어가 없습니다."}
+        
+        # 중복 제거 (같은 용어라도 다른 날짜에 학습했다면 모두 포함)
+        unique_terms = []
+        seen_terms = set()
+        
+        for term in all_terms:
+            term_key = f"{term.get('term')}_{term.get('learned_date')}_{term.get('info_index')}"
+            if term_key not in seen_terms:
+                unique_terms.append(term)
+                seen_terms.add(term_key)
+        
+        # 날짜별로 그룹화
+        terms_by_date = {}
+        for term in unique_terms:
+            date = term.get('learned_date', '')
+            if date not in terms_by_date:
+                terms_by_date[date] = []
+            terms_by_date[date].append(term)
+        
+        return {
+            "terms": unique_terms,
+            "terms_by_date": terms_by_date,
+            "total_terms": len(unique_terms),
+            "learned_dates": learned_dates
+        }
+        
+    except Exception as e:
+        print(f"Error in get_learned_terms: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get learned terms: {str(e)}")
+
 @router.get("/news/fetch")
 def fetch_ai_news():
     """AI 뉴스를 가져와서 번역하고 정리합니다."""

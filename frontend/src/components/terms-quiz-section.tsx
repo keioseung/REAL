@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { HelpCircle, CheckCircle, XCircle, RotateCcw, BookOpen, Target } from 'lucide-react'
+import { HelpCircle, CheckCircle, XCircle, RotateCcw, BookOpen, Target, Trophy } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { aiInfoAPI } from '@/lib/api'
+import { useUpdateQuizScore } from '@/hooks/use-user-progress'
 
 interface TermsQuizSectionProps {
   sessionId: string
@@ -33,6 +34,8 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
+  const [quizCompleted, setQuizCompleted] = useState(false)
+  const updateQuizScoreMutation = useUpdateQuizScore()
 
   const { data: quizData, isLoading, refetch } = useQuery<TermsQuizResponse>({
     queryKey: ['terms-quiz', selectedDate],
@@ -66,6 +69,14 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
       setCurrentQuizIndex(currentQuizIndex + 1)
       setSelectedAnswer(null)
       setShowResult(false)
+    } else if (quizData?.quizzes && currentQuizIndex === quizData.quizzes.length - 1) {
+      // 퀴즈 완료 시 점수 저장
+      setQuizCompleted(true)
+      updateQuizScoreMutation.mutate({
+        sessionId,
+        score,
+        totalQuestions: quizData.quizzes.length
+      })
     }
   }
 

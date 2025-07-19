@@ -69,6 +69,31 @@ export function useUpdateUserStats() {
   })
 }
 
+export function useUpdateQuizScore() {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ 
+      sessionId, 
+      score, 
+      totalQuestions 
+    }: { 
+      sessionId: string
+      score: number
+      totalQuestions: number 
+    }) => {
+      const response = await userProgressAPI.updateQuizScore(sessionId, {
+        score,
+        total_questions: totalQuestions
+      })
+      return response.data
+    },
+    onSuccess: (data, { sessionId }) => {
+      queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] })
+    },
+  })
+}
+
 export function useCheckAchievements() {
   const queryClient = useQueryClient()
   

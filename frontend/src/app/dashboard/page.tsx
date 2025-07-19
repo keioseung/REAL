@@ -7,6 +7,7 @@ import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
 import TermsQuizSection from '@/components/terms-quiz-section'
 import ProgressSection from '@/components/progress-section'
+import LearnedTermsSection from '@/components/learned-terms-section'
 import useAIInfo from '@/hooks/use-ai-info'
 import useUserProgress from '@/hooks/use-user-progress'
 import { useRouter } from 'next/navigation'
@@ -335,20 +336,7 @@ export default function DashboardPage() {
           )}
           {activeTab === 'term' && (
             <section className="mb-8 md:mb-16">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
-                <FaBrain className="w-6 h-6 md:w-8 md:h-8" />
-                랜덤 용어 학습
-              </h2>
-              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 flex flex-col items-center justify-center text-center text-white shadow-xl min-h-[180px] border border-white/10">
-                <div className="text-xl md:text-2xl font-bold mb-2">{randomTerm.term}</div>
-                <div className="text-white/80 mb-4 text-sm md:text-base">{randomTerm.desc}</div>
-                <button 
-                  onClick={handleRandomTerm} 
-                  className="px-4 md:px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition-all backdrop-blur-xl border border-white/10"
-                >
-                  다른 용어 보기
-                </button>
-              </div>
+              <LearnedTermsSection sessionId={sessionId} />
             </section>
           )}
         </motion.div>
