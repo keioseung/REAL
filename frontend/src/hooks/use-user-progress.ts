@@ -116,6 +116,24 @@ export function useUpdateTermProgress() {
       })
       return response.data
     },
+    onMutate: async ({ sessionId, term, date, infoIndex }) => {
+      // 낙관적 업데이트: 즉시 UI에 반영
+      const queryKey = ['learned-terms-detail', sessionId, date, infoIndex]
+      const previousData = queryClient.getQueryData(queryKey)
+      
+      queryClient.setQueryData(queryKey, (old: Set<string> | undefined) => {
+        const currentSet = old || new Set()
+        return new Set([...currentSet, term])
+      })
+      
+      return { previousData, queryKey }
+    },
+    onError: (err, { sessionId, date, infoIndex }, context) => {
+      // 에러 시 이전 상태로 롤백
+      if (context?.queryKey) {
+        queryClient.setQueryData(context.queryKey, context.previousData)
+      }
+    },
     onSuccess: (data, { sessionId, date, infoIndex }) => {
       queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] })
       queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] })
