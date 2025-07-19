@@ -526,10 +526,10 @@ export default function DashboardPage() {
             <section className="mb-8 md:mb-16">
               <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
                 <TrendingUp className="w-6 h-6 md:w-8 md:h-8" />
-                학습 진행률 & 성취도
+                나의 학습 성장도
               </h2>
               
-              {/* 오늘 하루 진행률 요약 */}
+              {/* 오늘의 학습 현황 */}
               <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
                   <Calendar className="w-5 h-5 md:w-6 md:h-6" />
@@ -551,82 +551,121 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* 성취 배지 섹션 */}
+              {/* 학습 성장 지표 */}
               <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <Trophy className="w-5 h-5 md:w-6 md:h-6" />
-                  성취 배지
+                  <Target className="w-5 h-5 md:w-6 md:h-6" />
+                  학습 성장 지표
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {/* 일일 성취 */}
-                  <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-4 text-white">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* 연속 학습 */}
+                  <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-4 text-white">
                     <div className="flex items-center gap-3 mb-3">
-                      <Sun className="w-6 h-6" />
-                      <h4 className="font-bold text-lg">일일 성취</h4>
+                      <TrendingUp className="w-6 h-6" />
+                      <h4 className="font-bold text-lg">연속 학습</h4>
                     </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>AI 정보 학습</span>
-                        <span>{learnedAIInfo > 0 ? '✅' : '⏳'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>용어 학습</span>
-                        <span>{learnedTerms > 0 ? '✅' : '⏳'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>퀴즈 참여</span>
-                        <span>{quizScore > 0 ? '✅' : '⏳'}</span>
-                      </div>
-                    </div>
+                    <div className="text-3xl font-bold mb-2">{streakDays}일</div>
+                    <div className="text-sm opacity-90">최고 기록: {maxStreak}일</div>
                   </div>
 
-                  {/* 주간 성취 */}
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl p-4 text-white">
+                  {/* 총 학습일 */}
+                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 text-white">
                     <div className="flex items-center gap-3 mb-3">
                       <Calendar className="w-6 h-6" />
-                      <h4 className="font-bold text-lg">주간 성취</h4>
+                      <h4 className="font-bold text-lg">총 학습일</h4>
                     </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>연속 학습</span>
-                        <span>{streakDays}일</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>최고 기록</span>
-                        <span>{maxStreak}일</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>주간 목표</span>
-                        <span>{streakDays >= 5 ? '✅' : '⏳'}</span>
-                      </div>
+                    <div className="text-3xl font-bold mb-2">{userProgress?.total_days || 0}일</div>
+                    <div className="text-sm opacity-90">꾸준한 학습 중!</div>
+                  </div>
+
+                  {/* 총 AI 정보 */}
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Trophy className="w-6 h-6" />
+                      <h4 className="font-bold text-lg">총 AI 정보</h4>
+                    </div>
+                    <div className="text-3xl font-bold mb-2">{userProgress?.total_ai_info || 0}개</div>
+                    <div className="text-sm opacity-90">지식이 쌓이고 있어요!</div>
+                  </div>
+
+                  {/* 총 용어 */}
+                  <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-4 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <BookOpen className="w-6 h-6" />
+                      <h4 className="font-bold text-lg">총 용어</h4>
+                    </div>
+                    <div className="text-3xl font-bold mb-2">{userProgress?.total_terms || 0}개</div>
+                    <div className="text-sm opacity-90">전문 용어 마스터!</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 학습 진행률 */}
+              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
+                  학습 진행률
+                </h3>
+                <div className="space-y-6">
+                  {/* AI 정보 진행률 */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-white font-semibold">AI 정보 학습</span>
+                      <span className="text-white/70">{learnedAIInfo} / {totalAIInfo}</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-3">
+                      <div
+                        className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${aiInfoProgress}%` }}
+                      />
                     </div>
                   </div>
 
-                  {/* 월간 성취 */}
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 text-white">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Target className="w-6 h-6" />
-                      <h4 className="font-bold text-lg">월간 성취</h4>
+                  {/* 용어 학습 진행률 */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-white font-semibold">용어 학습</span>
+                      <span className="text-white/70">{learnedTerms} / {totalTerms}</span>
                     </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>총 학습일</span>
-                        <span>{userProgress?.total_days || 0}일</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>총 AI 정보</span>
-                        <span>{userProgress?.total_ai_info || 0}개</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>총 용어</span>
-                        <span>{userProgress?.total_terms || 0}개</span>
-                      </div>
+                    <div className="w-full bg-white/10 rounded-full h-3">
+                      <div
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${termsProgress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 퀴즈 진행률 */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-white font-semibold">퀴즈 점수</span>
+                      <span className="text-white/70">{quizScore} / 100점</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-3">
+                      <div
+                        className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${quizProgress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 연속 학습 진행률 */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-white font-semibold">연속 학습</span>
+                      <span className="text-white/70">{streakDays} / {maxStreak}일</span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-3">
+                      <div
+                        className="bg-gradient-to-r from-orange-500 to-red-500 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${streakProgress}%` }}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 기존 진행률 차트 */}
+              {/* 주간 학습 통계 */}
               <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
