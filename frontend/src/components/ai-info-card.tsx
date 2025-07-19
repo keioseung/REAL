@@ -62,7 +62,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
 
       {/* 내용 */}
       <div className="mb-4">
-        <p className={`text-white/80 leading-relaxed ${
+        <p className={`text-white/80 leading-relaxed whitespace-pre-line ${
           isExpanded ? '' : 'line-clamp-3'
         }`}>
           {info.content}
