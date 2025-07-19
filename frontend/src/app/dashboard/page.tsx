@@ -106,8 +106,8 @@ export default function DashboardPage() {
   const learnedAIInfo = userProgress?.[selectedDate]?.length || 0
   const aiInfoProgress = totalAIInfo > 0 ? (learnedAIInfo / totalAIInfo) * 100 : 0
 
-  const totalTerms = (userProgress?.total_terms_available as number) || 0
-  const learnedTerms = (userProgress?.total_terms_learned as number) || 0
+  const totalTerms = Array.isArray(userProgress?.total_terms_available) ? userProgress.total_terms_available.length : (userProgress?.total_terms_available as number) || 0
+  const learnedTerms = Array.isArray(userProgress?.total_terms_learned) ? userProgress.total_terms_learned.length : (userProgress?.total_terms_learned as number) || 0
   const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
 
   const quizScore = userProgress?.quiz_score || 0
