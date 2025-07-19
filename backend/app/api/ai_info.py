@@ -9,7 +9,7 @@ from deep_translator import GoogleTranslator
 
 from ..database import get_db
 from ..models import AIInfo
-from ..schemas import AIInfoCreate, AIInfoResponse, AIInfoItem
+from ..schemas import AIInfoCreate, AIInfoResponse, AIInfoItem, TermItem
 
 router = APIRouter()
 
@@ -41,11 +41,26 @@ def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
     
     infos = []
     if ai_info.info1_title and ai_info.info1_content:
-        infos.append({"title": ai_info.info1_title, "content": ai_info.info1_content})
+        terms1 = json.loads(ai_info.info1_terms) if ai_info.info1_terms else []
+        infos.append({
+            "title": ai_info.info1_title, 
+            "content": ai_info.info1_content,
+            "terms": terms1
+        })
     if ai_info.info2_title and ai_info.info2_content:
-        infos.append({"title": ai_info.info2_title, "content": ai_info.info2_content})
+        terms2 = json.loads(ai_info.info2_terms) if ai_info.info2_terms else []
+        infos.append({
+            "title": ai_info.info2_title, 
+            "content": ai_info.info2_content,
+            "terms": terms2
+        })
     if ai_info.info3_title and ai_info.info3_content:
-        infos.append({"title": ai_info.info3_title, "content": ai_info.info3_content})
+        terms3 = json.loads(ai_info.info3_terms) if ai_info.info3_terms else []
+        infos.append({
+            "title": ai_info.info3_title, 
+            "content": ai_info.info3_content,
+            "terms": terms3
+        })
     
     return infos
 
@@ -56,27 +71,43 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
     def build_infos(obj):
         infos = []
         if obj.info1_title and obj.info1_content:
-            infos.append({"title": obj.info1_title, "content": obj.info1_content})
+            terms1 = json.loads(obj.info1_terms) if obj.info1_terms else []
+            infos.append({
+                "title": obj.info1_title, 
+                "content": obj.info1_content,
+                "terms": terms1
+            })
         if obj.info2_title and obj.info2_content:
-            infos.append({"title": obj.info2_title, "content": obj.info2_content})
+            terms2 = json.loads(obj.info2_terms) if obj.info2_terms else []
+            infos.append({
+                "title": obj.info2_title, 
+                "content": obj.info2_content,
+                "terms": terms2
+            })
         if obj.info3_title and obj.info3_content:
-            infos.append({"title": obj.info3_title, "content": obj.info3_content})
+            terms3 = json.loads(obj.info3_terms) if obj.info3_terms else []
+            infos.append({
+                "title": obj.info3_title, 
+                "content": obj.info3_content,
+                "terms": terms3
+            })
         return infos
 
     if existing_info:
         # 기존 데이터 업데이트 (비어있는 info2, info3에 순차적으로 채움)
         infos_to_add = [i for i in ai_info_data.infos if i.title and i.content]
         fields = [
-            ("info1_title", "info1_content"),
-            ("info2_title", "info2_content"),
-            ("info3_title", "info3_content"),
+            ("info1_title", "info1_content", "info1_terms"),
+            ("info2_title", "info2_content", "info2_terms"),
+            ("info3_title", "info3_content", "info3_terms"),
         ]
-        for i, (title_field, content_field) in enumerate(fields):
+        for i, (title_field, content_field, terms_field) in enumerate(fields):
             if getattr(existing_info, title_field) == '' or getattr(existing_info, content_field) == '':
                 if infos_to_add:
                     info = infos_to_add.pop(0)
                     setattr(existing_info, title_field, info.title)
                     setattr(existing_info, content_field, info.content)
+                    setattr(existing_info, terms_field, json.dumps(info.terms or []))
         db.commit()
         db.refresh(existing_info)
         return {
@@ -91,10 +122,13 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
             date=ai_info_data.date,
             info1_title=ai_info_data.infos[0].title if len(ai_info_data.infos) >= 1 else "",
             info1_content=ai_info_data.infos[0].content if len(ai_info_data.infos) >= 1 else "",
+            info1_terms=json.dumps(ai_info_data.infos[0].terms or []) if len(ai_info_data.infos) >= 1 else "[]",
             info2_title=ai_info_data.infos[1].title if len(ai_info_data.infos) >= 2 else "",
             info2_content=ai_info_data.infos[1].content if len(ai_info_data.infos) >= 2 else "",
+            info2_terms=json.dumps(ai_info_data.infos[1].terms or []) if len(ai_info_data.infos) >= 2 else "[]",
             info3_title=ai_info_data.infos[2].title if len(ai_info_data.infos) >= 3 else "",
-            info3_content=ai_info_data.infos[2].content if len(ai_info_data.infos) >= 3 else ""
+            info3_content=ai_info_data.infos[2].content if len(ai_info_data.infos) >= 3 else "",
+            info3_terms=json.dumps(ai_info_data.infos[2].terms or []) if len(ai_info_data.infos) >= 3 else "[]"
         )
         db.add(db_ai_info)
         db.commit()

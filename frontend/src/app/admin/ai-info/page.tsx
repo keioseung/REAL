@@ -4,9 +4,15 @@ import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { aiInfoAPI } from '@/lib/api'
 
+interface TermItem {
+  term: string
+  description: string
+}
+
 interface AIInfoItem {
   title: string
   content: string
+  terms?: TermItem[]
 }
 
 interface Prompt {
@@ -25,7 +31,7 @@ interface BaseContent {
 export default function AdminAIInfoPage() {
   const queryClient = useQueryClient()
   const [date, setDate] = useState('')
-  const [inputs, setInputs] = useState([{ title: '', content: '' }])
+  const [inputs, setInputs] = useState([{ title: '', content: '', terms: [] as TermItem[] }])
   const [editId, setEditId] = useState<boolean>(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -95,7 +101,7 @@ export default function AdminAIInfoPage() {
     onSuccess: () => {
       refetchAIInfo()
       refetchDates()
-      setInputs([{ title: '', content: '' }])
+      setInputs([{ title: '', content: '', terms: [] }])
       setDate('')
       setEditId(false)
       setSuccess('등록이 완료되었습니다!')
@@ -113,7 +119,7 @@ export default function AdminAIInfoPage() {
     onSuccess: () => {
       refetchAIInfo()
       refetchDates()
-      setInputs([{ title: '', content: '' }])
+      setInputs([{ title: '', content: '', terms: [] }])
       setDate('')
       setEditId(false)
       setSuccess('삭제가 완료되었습니다!')
@@ -129,12 +135,42 @@ export default function AdminAIInfoPage() {
 
   const handleAddInput = () => {
     if (inputs.length < 3) {
-      setInputs([...inputs, { title: '', content: '' }])
+      setInputs([...inputs, { title: '', content: '', terms: [] }])
     }
   }
 
   const handleRemoveInput = (idx: number) => {
     setInputs(inputs => inputs.length === 1 ? inputs : inputs.filter((_, i) => i !== idx))
+  }
+
+  // 용어 관리 핸들러
+  const handleAddTerm = (infoIdx: number) => {
+    setInputs(inputs => inputs.map((input, i) => 
+      i === infoIdx 
+        ? { ...input, terms: [...input.terms, { term: '', description: '' }] }
+        : input
+    ))
+  }
+
+  const handleRemoveTerm = (infoIdx: number, termIdx: number) => {
+    setInputs(inputs => inputs.map((input, i) => 
+      i === infoIdx 
+        ? { ...input, terms: input.terms.filter((_, j) => j !== termIdx) }
+        : input
+    ))
+  }
+
+  const handleTermChange = (infoIdx: number, termIdx: number, field: 'term' | 'description', value: string) => {
+    setInputs(inputs => inputs.map((input, i) => 
+      i === infoIdx 
+        ? { 
+            ...input, 
+            terms: input.terms.map((term, j) => 
+              j === termIdx ? { ...term, [field]: value } : term
+            )
+          }
+        : input
+    ))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -154,7 +190,7 @@ export default function AdminAIInfoPage() {
 
   const handleEdit = (info: AIInfoItem, idx: number) => {
     setEditId(true)
-    setInputs([{ title: info.title, content: info.content }])
+    setInputs([{ title: info.title, content: info.content, terms: info.terms || [] }])
   }
 
   const handleDelete = (date: string) => {
@@ -283,6 +319,48 @@ export default function AdminAIInfoPage() {
                   <label className="font-semibold text-blue-700">내용</label>
                   <textarea placeholder={`내용 ${idx+1}`} value={input.content} onChange={e => handleInputChange(idx, 'content', e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" rows={2} />
                 </div>
+                
+                {/* 용어 입력 섹션 */}
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <label className="font-semibold text-blue-700">관련 용어</label>
+                    <button 
+                      type="button" 
+                      onClick={() => handleAddTerm(idx)} 
+                      className="px-3 py-1 bg-green-200 text-green-700 rounded-lg font-bold hover:bg-green-300 transition text-sm"
+                    >
+                      + 용어 추가
+                    </button>
+                  </div>
+                  {input.terms.map((term, termIdx) => (
+                    <div key={termIdx} className="flex gap-2 items-start">
+                      <div className="flex-1 flex gap-2">
+                        <input 
+                          type="text" 
+                          placeholder="용어" 
+                          value={term.term} 
+                          onChange={e => handleTermChange(idx, termIdx, 'term', e.target.value)} 
+                          className="flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-300 text-sm" 
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="용어 설명" 
+                          value={term.description} 
+                          onChange={e => handleTermChange(idx, termIdx, 'description', e.target.value)} 
+                          className="flex-1 p-2 border rounded focus:ring-2 focus:ring-blue-300 text-sm" 
+                        />
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => handleRemoveTerm(idx, termIdx)} 
+                        className="px-2 py-1 bg-red-200 text-red-700 rounded-lg font-bold hover:bg-red-300 transition text-sm"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                
                 {inputs.length > 1 && (
                   <button type="button" onClick={() => handleRemoveInput(idx)} className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">-</button>
                 )}

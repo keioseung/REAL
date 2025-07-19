@@ -1,7 +1,13 @@
 // AI Info Types
+export interface TermItem {
+  term: string
+  description: string
+}
+
 export interface AIInfoItem {
   title: string
   content: string
+  terms?: TermItem[]
 }
 
 export interface AIInfoCreate {

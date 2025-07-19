@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { CheckCircle, Circle, BookOpen, ExternalLink } from 'lucide-react'
+import { CheckCircle, Circle, BookOpen, ExternalLink, Brain } from 'lucide-react'
 import { useUpdateUserProgress } from '@/hooks/use-user-progress'
-import type { AIInfoItem } from '@/types'
+import type { AIInfoItem, TermItem } from '@/types'
 
 interface AIInfoCardProps {
   info: AIInfoItem
@@ -16,7 +16,19 @@ interface AIInfoCardProps {
 
 function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
+  const [currentTermIndex, setCurrentTermIndex] = useState(0)
   const updateProgressMutation = useUpdateUserProgress()
+
+  // 용어가 있는지 확인
+  const hasTerms = info.terms && info.terms.length > 0
+  const currentTerm = hasTerms ? info.terms[currentTermIndex] : null
+
+  const handleNextTerm = () => {
+    if (hasTerms) {
+      setCurrentTermIndex((prev) => (prev + 1) % info.terms.length)
+    }
+  }
 
   const handleLearn = async () => {
     if (isLearned) return
@@ -77,6 +89,43 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
           </button>
         )}
       </div>
+
+      {/* 용어 학습 섹션 */}
+      {hasTerms && (
+        <div className="mb-4">
+          <button
+            onClick={() => setShowTerms(!showTerms)}
+            className="flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm font-medium mb-3"
+          >
+            <Brain className="w-4 h-4" />
+            {showTerms ? '용어 학습 숨기기' : '관련 용어 학습하기'}
+          </button>
+          
+          {showTerms && currentTerm && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/10 backdrop-blur-xl rounded-xl p-4 border border-white/20"
+            >
+              <div className="text-center mb-3">
+                <div className="text-lg font-bold text-white mb-2">{currentTerm.term}</div>
+                <div className="text-white/80 text-sm">{currentTerm.description}</div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-white/60 text-xs">
+                  {currentTermIndex + 1} / {info.terms.length}
+                </span>
+                <button
+                  onClick={handleNextTerm}
+                  className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
+                >
+                  다음 용어
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
 
       {/* 액션 버튼 */}
       <div className="flex gap-3">

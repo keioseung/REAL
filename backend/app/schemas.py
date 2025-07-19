@@ -3,9 +3,14 @@ from typing import List, Optional
 from datetime import datetime
 
 # AI Info Schemas
+class TermItem(BaseModel):
+    term: str
+    description: str
+
 class AIInfoItem(BaseModel):
     title: str
     content: str
+    terms: Optional[List[TermItem]] = []
 
 class AIInfoCreate(BaseModel):
     date: str
