@@ -91,7 +91,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
     setIsLearning(true)
     try {
       if (isLearned) {
-        // 학습 완료 상태에서 학습 전 상태로 되돌리기 (로컬 스토리지 사용)
+        // 학습 이력 삭제 후 즉시 학습완료(파란색)로 전환
         const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}')
         if (currentProgress[sessionId] && currentProgress[sessionId][date]) {
           const learnedIndices = currentProgress[sessionId][date].filter((i: number) => i !== index)
@@ -109,6 +109,15 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
         if (onProgressUpdate) {
           onProgressUpdate()
         }
+        // 즉시 학습완료(파란색)로 전환
+        await updateProgressMutation.mutateAsync({
+          sessionId,
+          date,
+          infoIndex: index
+        })
+        setIsLearned(true)
+        if (setForceUpdate) setForceUpdate(prev => prev + 1)
+        if (onProgressUpdate) onProgressUpdate()
       } else {
         // 학습 전 상태에서 학습 완료 상태로 변경
         await updateProgressMutation.mutateAsync({
@@ -128,7 +137,6 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
         const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
         if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
           setShowAchievement(true)
-          setTimeout(() => setShowAchievement(false), 3000)
         }
       }
     } catch (error) {
