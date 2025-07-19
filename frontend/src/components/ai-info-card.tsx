@@ -103,21 +103,10 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           localStorage.setItem('userProgress', JSON.stringify(currentProgress))
         }
         setIsLearned(false)
-        // 강제 리렌더링
-        if (setForceUpdate) setForceUpdate(prev => prev + 1)
-        // 진행률 업데이트 콜백 호출
-        if (onProgressUpdate) {
-          onProgressUpdate()
-        }
-        // 즉시 학습완료(파란색)로 전환
-        await updateProgressMutation.mutateAsync({
-          sessionId,
-          date,
-          infoIndex: index
-        })
-        setIsLearned(true)
         if (setForceUpdate) setForceUpdate(prev => prev + 1)
         if (onProgressUpdate) onProgressUpdate()
+        // 바로 학습완료(파란색)로 전환
+        setTimeout(() => setIsLearned(true), 0)
       } else {
         // 학습 전 상태에서 학습 완료 상태로 변경
         await updateProgressMutation.mutateAsync({

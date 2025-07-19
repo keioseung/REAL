@@ -320,23 +320,6 @@ export default function DashboardPage() {
 
       {/* 헤더 섹션 */}
       <div className="relative z-10 flex flex-col items-center justify-center pt-8 md:pt-12 pb-6">
-        {/* 오늘기록 초기화 버튼 */}
-        <button
-          onClick={() => {
-            const progress = JSON.parse(localStorage.getItem('userProgress') || '{}');
-            if (progress[sessionId] && progress[sessionId][selectedDate]) {
-              delete progress[sessionId][selectedDate];
-              localStorage.setItem('userProgress', JSON.stringify(progress));
-              setForceUpdate(prev => prev + 1);
-              showToast('success', '오늘 기록이 초기화되었습니다.');
-            } else {
-              showToast('error', '오늘 기록이 없습니다.');
-            }
-          }}
-          className="mb-4 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg font-semibold shadow hover:from-red-600 hover:to-pink-600 transition"
-        >
-          오늘기록 초기화
-        </button>
         {/* 상단 아이콘과 제목 */}
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-6 md:mb-8 text-center md:text-left">
           <div className="relative">
@@ -713,14 +696,15 @@ export default function DashboardPage() {
                 </h2>
                 <button
                   onClick={() => {
-                    // 오늘 날짜의 학습 데이터만 삭제
                     const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
                     if (currentProgress[sessionId] && currentProgress[sessionId][selectedDate]) {
                       delete currentProgress[sessionId][selectedDate];
                       localStorage.setItem('userProgress', JSON.stringify(currentProgress));
                       setForceUpdate(prev => prev + 1);
                       handleProgressUpdate();
-                      alert('오늘 학습 상태가 초기화되었습니다!');
+                      showToast('success', '오늘 학습 상태가 초기화되었습니다!');
+                    } else {
+                      showToast('error', '오늘 기록이 없습니다.');
                     }
                   }}
                   className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
