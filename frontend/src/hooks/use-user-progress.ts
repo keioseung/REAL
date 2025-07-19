@@ -175,5 +175,7 @@ export function useLearnedTerms(sessionId: string, date: string, infoIndex: numb
       return new Set<string>()
     },
     enabled: !!sessionId && !!date,
+    staleTime: 0, // 항상 최신 데이터 가져오기
+    refetchOnWindowFocus: true, // 창 포커스 시 새로고침
   })
 } 

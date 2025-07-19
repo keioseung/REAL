@@ -34,7 +34,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   const [isLearned, setIsLearned] = useState(isLearnedProp)
   
   // 용어 학습 상태를 React Query로 관리
-  const { data: learnedTerms = new Set<string>() } = useLearnedTerms(sessionId, date, index)
+  const { data: learnedTerms = new Set<string>(), refetch: refetchLearnedTerms } = useLearnedTerms(sessionId, date, index)
   
   // prop이 바뀌거나 forceUpdate, selectedDate가 바뀌면 동기화
   useEffect(() => {
@@ -72,6 +72,9 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
             date,
             infoIndex: index
           })
+
+          // 즉시 데이터 새로고침
+          await refetchLearnedTerms()
 
           // N개 학습완료 알림 매번 표시
           setShowAllTermsComplete(true)
@@ -273,6 +276,10 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
                             date,
                             infoIndex: index
                           })
+                          
+                          // 즉시 데이터 새로고침
+                          await refetchLearnedTerms()
+                          
                           // 진행률 업데이트 콜백 호출
                           if (onProgressUpdate) {
                             onProgressUpdate()
