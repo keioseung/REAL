@@ -193,7 +193,7 @@ function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate }: TermsQu
               {currentQuizIndex + 1} / {quizData.quizzes.length}
             </span>
             <span className="text-white font-semibold">
-              점수: {score} / {currentQuizIndex + (showResult ? 1 : 0)}
+              점수: {score} / {quizData.quizzes.length}
             </span>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2">

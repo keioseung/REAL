@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaFire, FaStar, FaCrosshairs, FaChartBar } from 'react-icons/fa'
+import { TrendingUp, Calendar, Trophy, Sun, Target, BarChart3 } from 'lucide-react'
 import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
 import TermsQuizSection from '@/components/terms-quiz-section'
@@ -523,12 +524,121 @@ export default function DashboardPage() {
           )}
           {activeTab === 'progress' && (
             <section className="mb-8 md:mb-16">
-              <div className="flex justify-end mb-4">
-                <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg font-semibold shadow backdrop-blur-xl border border-white/10">
-                  최고 연속 학습일: {userProgress?.max_streak || 0}일
-                </span>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
+                <TrendingUp className="w-6 h-6 md:w-8 md:h-8" />
+                학습 진행률 & 성취도
+              </h2>
+              
+              {/* 오늘 하루 진행률 요약 */}
+              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Calendar className="w-5 h-5 md:w-6 md:h-6" />
+                  오늘의 학습 현황
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">{learnedAIInfo}</div>
+                    <div className="text-white/70 text-sm md:text-base">AI 정보 학습</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-purple-400 mb-2">{learnedTerms}</div>
+                    <div className="text-white/70 text-sm md:text-base">용어 학습</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">{quizScore}</div>
+                    <div className="text-white/70 text-sm md:text-base">퀴즈 점수</div>
+                  </div>
+                </div>
               </div>
-              <ProgressSection sessionId={sessionId} />
+
+              {/* 성취 배지 섹션 */}
+              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 mb-8 border border-white/10">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                  <Trophy className="w-5 h-5 md:w-6 md:h-6" />
+                  성취 배지
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* 일일 성취 */}
+                  <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-4 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Sun className="w-6 h-6" />
+                      <h4 className="font-bold text-lg">일일 성취</h4>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>AI 정보 학습</span>
+                        <span>{learnedAIInfo > 0 ? '✅' : '⏳'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>용어 학습</span>
+                        <span>{learnedTerms > 0 ? '✅' : '⏳'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>퀴즈 참여</span>
+                        <span>{quizScore > 0 ? '✅' : '⏳'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 주간 성취 */}
+                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl p-4 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Calendar className="w-6 h-6" />
+                      <h4 className="font-bold text-lg">주간 성취</h4>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>연속 학습</span>
+                        <span>{streakDays}일</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>최고 기록</span>
+                        <span>{maxStreak}일</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>주간 목표</span>
+                        <span>{streakDays >= 5 ? '✅' : '⏳'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 월간 성취 */}
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-4 text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Target className="w-6 h-6" />
+                      <h4 className="font-bold text-lg">월간 성취</h4>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>총 학습일</span>
+                        <span>{userProgress?.total_days || 0}일</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>총 AI 정보</span>
+                        <span>{userProgress?.total_ai_info || 0}개</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>총 용어</span>
+                        <span>{userProgress?.total_terms || 0}개</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 기존 진행률 차트 */}
+              <div className="glass backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/10">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
+                    주간 학습 통계
+                  </h3>
+                  <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg font-semibold shadow backdrop-blur-xl border border-white/10">
+                    최고 연속: {maxStreak}일
+                  </span>
+                </div>
+                <ProgressSection sessionId={sessionId} />
+              </div>
             </section>
           )}
           {activeTab === 'news' && (
