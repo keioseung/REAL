@@ -52,7 +52,10 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
   }, [sessionId, date, index])
   
   // 실제 학습된 용어는 React Query 데이터와 localStorage 데이터를 합침
-  const actualLearnedTerms = new Set([...learnedTerms, ...localLearnedTerms])
+  const actualLearnedTerms = new Set<string>([
+    ...(learnedTerms instanceof Set ? Array.from(learnedTerms) : []),
+    ...Array.from(localLearnedTerms)
+  ])
   
   // prop이 바뀌거나 forceUpdate, selectedDate가 바뀌면 동기화
   useEffect(() => {
