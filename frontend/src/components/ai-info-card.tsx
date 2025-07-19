@@ -12,9 +12,10 @@ interface AIInfoCardProps {
   date: string
   sessionId: string
   isLearned: boolean
+  onProgressUpdate?: () => void
 }
 
-function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps) {
+function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate }: AIInfoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
   const [currentTermIndex, setCurrentTermIndex] = useState(0)
@@ -53,6 +54,11 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
           setShowTermAchievement(true)
           setTimeout(() => setShowTermAchievement(false), 3000)
           
+          // 진행률 업데이트 콜백 호출
+          if (onProgressUpdate) {
+            onProgressUpdate()
+          }
+          
           // 성취 확인
           const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
           if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
@@ -83,6 +89,11 @@ function AIInfoCard({ info, index, date, sessionId, isLearned }: AIInfoCardProps
       // 학습 완료 알림
       setShowLearnComplete(true)
       setTimeout(() => setShowLearnComplete(false), 3000)
+      
+      // 진행률 업데이트 콜백 호출
+      if (onProgressUpdate) {
+        onProgressUpdate()
+      }
       
       // 성취 확인
       const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)

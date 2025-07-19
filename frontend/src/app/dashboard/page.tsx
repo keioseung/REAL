@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye } from 'react-icons/fa'
+import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaFire, FaStar, FaTarget, FaTrendingUp } from 'react-icons/fa'
 import Sidebar from '@/components/sidebar'
 import AIInfoCard from '@/components/ai-info-card'
 import TermsQuizSection from '@/components/terms-quiz-section'
@@ -101,23 +101,36 @@ export default function DashboardPage() {
     }
   }, [router])
 
-  const stats = [
-    { label: '총 학습', value: userProgress?.total_learned || 0, icon: FaBookOpen, color: 'from-blue-500 to-cyan-500' },
-    { label: '용어 학습', value: userProgress?.total_terms_learned || 0, icon: FaBrain, color: 'from-purple-500 to-pink-500' },
-    { label: '연속 학습', value: userProgress?.streak_days || 0, icon: FaChartLine, color: 'from-green-500 to-emerald-500' },
-    { label: '퀴즈 점수', value: userProgress?.quiz_score || 0, icon: FaBullseye, color: 'from-orange-500 to-red-500' },
-    { label: '성취', value: userProgress?.achievements?.length || 0, icon: FaTrophy, color: 'from-yellow-500 to-orange-500' },
+  // 학습 진행률 계산
+  const totalAIInfo = aiInfo?.length || 0
+  const learnedAIInfo = userProgress?.[selectedDate]?.length || 0
+  const aiInfoProgress = totalAIInfo > 0 ? (learnedAIInfo / totalAIInfo) * 100 : 0
+
+  const totalTerms = userProgress?.total_terms_available || 0
+  const learnedTerms = userProgress?.total_terms_learned || 0
+  const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
+
+  const quizScore = userProgress?.quiz_score || 0
+  const maxQuizScore = 100
+  const quizProgress = (quizScore / maxQuizScore) * 100
+
+  const streakDays = userProgress?.streak_days || 0
+  const maxStreak = userProgress?.max_streak || 0
+  const streakProgress = maxStreak > 0 ? (streakDays / maxStreak) * 100 : 0
+
+  // 주간 학습 데이터 (예시)
+  const weeklyData = [
+    { day: '월', ai: 2, terms: 3, quiz: 80 },
+    { day: '화', ai: 1, terms: 2, quiz: 90 },
+    { day: '수', ai: 3, terms: 4, quiz: 85 },
+    { day: '목', ai: 2, terms: 1, quiz: 95 },
+    { day: '금', ai: 1, terms: 3, quiz: 88 },
+    { day: '토', ai: 0, terms: 0, quiz: 0 },
+    { day: '일', ai: 0, terms: 0, quiz: 0 },
   ]
 
   // AI 정보 3개만 정확히 보여줌
   const aiInfoFixed = aiInfo && aiInfo.length > 0 ? aiInfo.slice(0, 3) : []
-
-  // 오늘의 요약 배너 데이터
-  const todayStats = [
-    { label: '총 학습', value: userProgress?.total_learned || 0 },
-    { label: '연속 학습', value: userProgress?.streak_days || 0 },
-    { label: '퀴즈 점수', value: userProgress?.quiz_score || 0 }
-  ]
 
   // 새로고침 핸들러(탭별)
   const handleRefresh = () => window.location.reload()
@@ -189,21 +202,219 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 통계 카드들 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8 w-full max-w-4xl">
-          {stats.map((stat, index) => (
-            <div
-              key={stat.label}
-              className="group bg-white/10 backdrop-blur-xl rounded-xl md:rounded-2xl p-3 md:p-4 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 hover:bg-white/15"
-            >
-              <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                <stat.icon className="text-white text-sm md:text-base" />
+        {/* 실시간 진행률 게이지 섹션 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8 w-full max-w-6xl">
+          {/* AI 정보 학습 진행률 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                  <FaBrain className="text-white text-lg md:text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">AI 정보</h3>
+                  <p className="text-white/60 text-sm">{learnedAIInfo}/{totalAIInfo} 완료</p>
+                </div>
               </div>
-              <div className="text-white font-bold text-lg md:text-xl mb-1">{stat.value}</div>
-              <div className="text-gray-300 text-xs md:text-sm">{stat.label}</div>
             </div>
-          ))}
+            <div className="relative">
+              <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${aiInfoProgress}%` }}
+                  transition={{ duration: 1, delay: 0.2 }}
+                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                </motion.div>
+              </div>
+              <div className="text-center mt-2">
+                <span className="text-white font-bold text-lg">{Math.round(aiInfoProgress)}%</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 용어 학습 진행률 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                  <FaTarget className="text-white text-lg md:text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">용어 학습</h3>
+                  <p className="text-white/60 text-sm">{learnedTerms}/{totalTerms} 완료</p>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${termsProgress}%` }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                </motion.div>
+              </div>
+              <div className="text-center mt-2">
+                <span className="text-white font-bold text-lg">{Math.round(termsProgress)}%</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 퀴즈 점수 진행률 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+                  <FaBullseye className="text-white text-lg md:text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">퀴즈 점수</h3>
+                  <p className="text-white/60 text-sm">{quizScore}/100점</p>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${quizProgress}%` }}
+                  transition={{ duration: 1, delay: 0.4 }}
+                  className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                </motion.div>
+              </div>
+              <div className="text-center mt-2">
+                <span className="text-white font-bold text-lg">{Math.round(quizProgress)}%</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* 연속 학습 진행률 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+                  <FaFire className="text-white text-lg md:text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">연속 학습</h3>
+                  <p className="text-white/60 text-sm">{streakDays}일 연속</p>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${streakProgress}%` }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                  className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                </motion.div>
+              </div>
+              <div className="text-center mt-2">
+                <span className="text-white font-bold text-lg">{Math.round(streakProgress)}%</span>
+              </div>
+            </div>
+          </motion.div>
         </div>
+
+        {/* 주간 학습 차트 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 mb-6 md:mb-8 w-full max-w-6xl border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+              <FaTrendingUp className="text-white text-sm md:text-base" />
+            </div>
+            <h3 className="text-white font-bold text-lg md:text-xl">주간 학습 현황</h3>
+          </div>
+          <div className="grid grid-cols-7 gap-2 md:gap-4">
+            {weeklyData.map((day, index) => (
+              <div key={day.day} className="text-center">
+                <div className="text-white/60 text-xs md:text-sm mb-2">{day.day}</div>
+                <div className="space-y-1">
+                  <div className="h-8 md:h-12 bg-gradient-to-b from-blue-500/20 to-blue-500/40 rounded-t-sm relative">
+                    {day.ai > 0 && (
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${(day.ai / 3) * 100}%` }}
+                        transition={{ duration: 0.8, delay: index * 0.1 }}
+                        className="absolute bottom-0 w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t-sm"
+                      />
+                    )}
+                  </div>
+                  <div className="h-8 md:h-12 bg-gradient-to-b from-purple-500/20 to-purple-500/40 rounded-t-sm relative">
+                    {day.terms > 0 && (
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${(day.terms / 4) * 100}%` }}
+                        transition={{ duration: 0.8, delay: index * 0.1 + 0.2 }}
+                        className="absolute bottom-0 w-full bg-gradient-to-t from-purple-500 to-pink-500 rounded-t-sm"
+                      />
+                    )}
+                  </div>
+                  <div className="h-8 md:h-12 bg-gradient-to-b from-green-500/20 to-green-500/40 rounded-t-sm relative">
+                    {day.quiz > 0 && (
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${day.quiz}%` }}
+                        transition={{ duration: 0.8, delay: index * 0.1 + 0.4 }}
+                        className="absolute bottom-0 w-full bg-gradient-to-t from-green-500 to-emerald-500 rounded-t-sm"
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="text-white/40 text-xs mt-1">
+                  {day.ai + day.terms > 0 ? `${day.ai + day.terms}개` : '-'}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center gap-4 md:gap-8 mt-4 text-xs md:text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded"></div>
+              <span className="text-white/60">AI 정보</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded"></div>
+              <span className="text-white/60">용어 학습</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded"></div>
+              <span className="text-white/60">퀴즈 점수</span>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* 탭 메뉴 */}
@@ -286,6 +497,10 @@ export default function DashboardPage() {
                     date={selectedDate}
                     sessionId={sessionId}
                     isLearned={userProgress?.[selectedDate]?.includes(index) || false}
+                    onProgressUpdate={() => {
+                      // 진행률 데이터 새로고침
+                      window.location.reload()
+                    }}
                   />
                 ))}
               </div>
@@ -293,7 +508,14 @@ export default function DashboardPage() {
           )}
           {activeTab === 'quiz' && (
             <section className="mb-8 md:mb-16">
-              <TermsQuizSection sessionId={sessionId} selectedDate={selectedDate} />
+              <TermsQuizSection 
+                sessionId={sessionId} 
+                selectedDate={selectedDate} 
+                onProgressUpdate={() => {
+                  // 진행률 데이터 새로고침
+                  window.location.reload()
+                }}
+              />
             </section>
           )}
           {activeTab === 'progress' && (

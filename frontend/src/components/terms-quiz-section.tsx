@@ -10,6 +10,7 @@ import { useUpdateQuizScore, useCheckAchievements } from '@/hooks/use-user-progr
 interface TermsQuizSectionProps {
   sessionId: string
   selectedDate: string
+  onProgressUpdate?: () => void
 }
 
 interface TermsQuiz {
@@ -29,7 +30,7 @@ interface TermsQuizResponse {
   message?: string
 }
 
-function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
+function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate }: TermsQuizSectionProps) {
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
@@ -95,6 +96,11 @@ function TermsQuizSection({ sessionId, selectedDate }: TermsQuizSectionProps) {
         // 퀴즈 완료 알림
         setShowQuizComplete(true)
         setTimeout(() => setShowQuizComplete(false), 4000)
+        
+        // 진행률 업데이트 콜백 호출
+        if (onProgressUpdate) {
+          onProgressUpdate()
+        }
         
         // 성취 확인
         const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
