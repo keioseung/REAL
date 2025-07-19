@@ -110,7 +110,7 @@ export default function DashboardPage() {
   const learnedTerms = Array.isArray(userProgress?.total_terms_learned) ? userProgress.total_terms_learned.length : (userProgress?.total_terms_learned ?? 0)
   const termsProgress = totalTerms > 0 ? (learnedTerms / totalTerms) * 100 : 0
 
-  const quizScore = (userProgress?.quiz_score as number) || 0
+  const quizScore = Array.isArray(userProgress?.quiz_score) ? userProgress.quiz_score.length : (userProgress?.quiz_score ?? 0)
   const maxQuizScore = 100
   const quizProgress = (quizScore / maxQuizScore) * 100
 
