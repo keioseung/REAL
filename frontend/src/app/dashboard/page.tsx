@@ -615,11 +615,7 @@ export default function DashboardPage() {
                       handleProgressUpdate()
                       
                       // 성공 메시지 표시
-                      if (typeof window !== 'undefined' && window.showToast) {
-                        window.showToast('success', '모든 학습 상태가 초기화되었습니다!')
-                      } else {
-                        alert('모든 학습 상태가 초기화되었습니다!')
-                      }
+                      alert('모든 학습 상태가 초기화되었습니다!')
                     }
                   }}
                   className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 font-semibold"
