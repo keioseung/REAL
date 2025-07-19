@@ -302,6 +302,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
       {/* 액션 버튼 */}
       <div className="flex gap-3">
         <button
+          onClick={handleLearnToggle}
           disabled={isLearned || isLearning}
           className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg text-sm font-medium transition-all ${
             isLearned
@@ -312,7 +313,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           }`}
         >
           <BookOpen className="w-4 h-4" />
-          학습완료
+          {isLearned ? '학습완료' : '학습완료'}
         </button>
         {/* 부분 초기화 버튼 제거됨 */}
         <button className="p-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all">
