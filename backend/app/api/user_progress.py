@@ -13,9 +13,25 @@ router = APIRouter()
 def get_user_progress(session_id: str, db: Session = Depends(get_db)):
     progress = db.query(UserProgress).filter(UserProgress.session_id == session_id).all()
     result = {}
+    
+    # AI 정보 학습 기록
     for p in progress:
-        if p.learned_info:
+        if p.learned_info and not p.date.startswith('__'):
             result[p.date] = json.loads(p.learned_info)
+    
+    # 통계 정보 추가
+    stats_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date == '__stats__'
+    ).first()
+    
+    if stats_progress and stats_progress.stats:
+        try:
+            stats = json.loads(stats_progress.stats)
+            result.update(stats)
+        except json.JSONDecodeError:
+            pass
+    
     return result
 
 @router.post("/{session_id}/{date}/{info_index}")
@@ -84,27 +100,38 @@ def update_term_progress(session_id: str, term_data: dict, db: Session = Depends
 
 def update_user_statistics(session_id: str, db: Session):
     """사용자의 통계를 계산하고 업데이트합니다."""
-    # 모든 학습 기록 가져오기 (AI 정보 + 용어 학습)
-    all_progress = db.query(UserProgress).filter(
+    # AI 정보 학습 기록 가져오기
+    ai_progress = db.query(UserProgress).filter(
         UserProgress.session_id == session_id,
-        UserProgress.date != '__stats__'
+        UserProgress.date.notlike('__%')
+    ).all()
+    
+    # 용어 학습 기록 가져오기
+    terms_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date.like('__terms__%')
     ).all()
     
     total_learned = 0
     total_terms_learned = 0
     learned_dates = []
     
-    for p in all_progress:
+    # AI 정보 학습 통계
+    for p in ai_progress:
         if p.learned_info:
             try:
                 learned_data = json.loads(p.learned_info)
-                if p.date.startswith('__terms__'):
-                    # 용어 학습 기록
-                    total_terms_learned += len(learned_data)
-                else:
-                    # AI 정보 학습 기록
-                    total_learned += len(learned_data)
-                    learned_dates.append(p.date)
+                total_learned += len(learned_data)
+                learned_dates.append(p.date)
+            except json.JSONDecodeError:
+                continue
+    
+    # 용어 학습 통계
+    for p in terms_progress:
+        if p.learned_info:
+            try:
+                learned_data = json.loads(p.learned_info)
+                total_terms_learned += len(learned_data)
             except json.JSONDecodeError:
                 continue
     
@@ -148,7 +175,9 @@ def update_user_statistics(session_id: str, db: Session):
     new_stats = {
         'total_learned': total_learned,
         'total_terms_learned': total_terms_learned,
+        'total_terms_available': total_terms_learned,  # 프론트엔드 호환성
         'streak_days': streak_days,
+        'max_streak': current_stats.get('max_streak', streak_days),  # 최대 연속일
         'last_learned_date': last_learned_date,
         'quiz_score': current_stats.get('quiz_score', 0),
         'achievements': current_stats.get('achievements', [])
