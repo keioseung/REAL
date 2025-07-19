@@ -45,6 +45,8 @@ export const userProgressAPI = {
     api.post(`/api/user-progress/quiz-score/${sessionId}`, scoreData),
   checkAchievements: (sessionId: string) => 
     api.get(`/api/user-progress/achievements/${sessionId}`),
+  deleteByDate: (sessionId: string, date: string) => api.delete(`/api/user-progress/${sessionId}/${date}`),
+  deleteInfoIndex: (sessionId: string, date: string, infoIndex: number) => api.delete(`/api/user-progress/${sessionId}/${date}/${infoIndex}`),
 }
 
 // Prompt API

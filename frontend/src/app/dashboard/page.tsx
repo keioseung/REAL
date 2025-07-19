@@ -14,6 +14,7 @@ import useUserProgress from '@/hooks/use-user-progress'
 import { useRouter } from 'next/navigation'
 import { useFetchAINews } from '@/hooks/use-ai-info'
 import { useQueryClient } from '@tanstack/react-query'
+import { userProgressAPI } from '@/lib/api'
 
 // 예시 용어 데이터
 const TERMS = [
@@ -342,8 +343,8 @@ export default function DashboardPage() {
         </div>
         {/* 오늘기록 초기화 버튼 - 전역(상단) 위치 */}
         <button
-          onClick={() => {
-            // 오늘 날짜의 모든 학습 정보 완전 초기화
+          onClick={async () => {
+            // 오늘 날짜의 모든 학습 정보 완전 초기화 (localStorage)
             const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
             if (currentProgress[sessionId] && currentProgress[sessionId][selectedDate]) {
               delete currentProgress[sessionId][selectedDate];
@@ -360,6 +361,10 @@ export default function DashboardPage() {
               }
               localStorage.setItem('userStats', JSON.stringify(userStats));
             }
+            // 백엔드 기록도 삭제
+            try {
+              await userProgressAPI.deleteByDate(sessionId, selectedDate);
+            } catch (e) { /* 무시 */ }
             // 강제 리렌더 및 진행률/통계 갱신
             setForceUpdate(prev => prev + 1);
             handleProgressUpdate();

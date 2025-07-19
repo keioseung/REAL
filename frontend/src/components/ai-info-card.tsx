@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, Circle, BookOpen, ExternalLink, Brain, Trophy, Star, Sparkles } from 'lucide-react'
 import { useUpdateUserProgress, useCheckAchievements, useUpdateTermProgress } from '@/hooks/use-user-progress'
 import type { AIInfoItem, TermItem } from '@/types'
+import { userProgressAPI } from '@/lib/api'
 
 interface AIInfoCardProps {
   info: AIInfoItem
@@ -101,6 +102,10 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           }
           localStorage.setItem('userProgress', JSON.stringify(currentProgress))
         }
+        // 백엔드 기록도 삭제
+        try {
+          await userProgressAPI.deleteInfoIndex(sessionId, date, index)
+        } catch (e) { /* 무시 */ }
         setIsLearned(false)
         if (setForceUpdate) setForceUpdate(prev => prev + 1)
         if (onProgressUpdate) onProgressUpdate()
