@@ -139,6 +139,10 @@ export function useUpdateTermProgress() {
       queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] })
       queryClient.invalidateQueries({ queryKey: ['learned-terms-detail', sessionId, date, infoIndex] })
     },
+    onSettled: (data, error, { sessionId }) => {
+      // 성공/실패 관계없이 learned-terms 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] })
+    },
   })
 }
 

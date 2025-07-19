@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, Calendar, Brain, Target, Trophy, TrendingUp, Search, Star, Download, Filter, Shuffle, Bookmark } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { aiInfoAPI } from '@/lib/api'
 
 interface LearnedTermsSectionProps {
@@ -34,6 +34,8 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
   const [autoPlay, setAutoPlay] = useState(false)
   const [autoPlayInterval, setAutoPlayInterval] = useState(3000) // 3초
 
+  const queryClient = useQueryClient()
+  
   const { data: learnedData, isLoading } = useQuery<LearnedTermsResponse>({
     queryKey: ['learned-terms', sessionId],
     queryFn: async () => {
@@ -41,6 +43,8 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
       return response.data
     },
     enabled: !!sessionId,
+    refetchInterval: 2000, // 2초마다 새로고침
+    refetchIntervalInBackground: true,
   })
 
   // 필터링 및 정렬된 용어 목록
