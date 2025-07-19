@@ -35,63 +35,86 @@ def normalize_text(text):
 
 @router.get("/{date}", response_model=List[AIInfoItem])
 def get_ai_info_by_date(date: str, db: Session = Depends(get_db)):
-    ai_info = db.query(AIInfo).filter(AIInfo.date == date).first()
-    if not ai_info:
+    try:
+        ai_info = db.query(AIInfo).filter(AIInfo.date == date).first()
+        if not ai_info:
+            return []
+        
+        infos = []
+        if ai_info.info1_title and ai_info.info1_content:
+            try:
+                terms1 = json.loads(ai_info.info1_terms) if hasattr(ai_info, 'info1_terms') and ai_info.info1_terms else []
+            except (AttributeError, json.JSONDecodeError):
+                terms1 = []
+            infos.append({
+                "title": ai_info.info1_title, 
+                "content": ai_info.info1_content,
+                "terms": terms1
+            })
+        if ai_info.info2_title and ai_info.info2_content:
+            try:
+                terms2 = json.loads(ai_info.info2_terms) if hasattr(ai_info, 'info2_terms') and ai_info.info2_terms else []
+            except (AttributeError, json.JSONDecodeError):
+                terms2 = []
+            infos.append({
+                "title": ai_info.info2_title, 
+                "content": ai_info.info2_content,
+                "terms": terms2
+            })
+        if ai_info.info3_title and ai_info.info3_content:
+            try:
+                terms3 = json.loads(ai_info.info3_terms) if hasattr(ai_info, 'info3_terms') and ai_info.info3_terms else []
+            except (AttributeError, json.JSONDecodeError):
+                terms3 = []
+            infos.append({
+                "title": ai_info.info3_title, 
+                "content": ai_info.info3_content,
+                "terms": terms3
+            })
+        
+        return infos
+    except Exception as e:
+        print(f"Error in get_ai_info_by_date: {e}")
         return []
-    
-    infos = []
-    if ai_info.info1_title and ai_info.info1_content:
-        terms1 = json.loads(ai_info.info1_terms) if ai_info.info1_terms else []
-        infos.append({
-            "title": ai_info.info1_title, 
-            "content": ai_info.info1_content,
-            "terms": terms1
-        })
-    if ai_info.info2_title and ai_info.info2_content:
-        terms2 = json.loads(ai_info.info2_terms) if ai_info.info2_terms else []
-        infos.append({
-            "title": ai_info.info2_title, 
-            "content": ai_info.info2_content,
-            "terms": terms2
-        })
-    if ai_info.info3_title and ai_info.info3_content:
-        terms3 = json.loads(ai_info.info3_terms) if ai_info.info3_terms else []
-        infos.append({
-            "title": ai_info.info3_title, 
-            "content": ai_info.info3_content,
-            "terms": terms3
-        })
-    
-    return infos
 
 @router.post("/", response_model=AIInfoResponse)
 def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
-    existing_info = db.query(AIInfo).filter(AIInfo.date == ai_info_data.date).first()
-    
-    def build_infos(obj):
-        infos = []
-        if obj.info1_title and obj.info1_content:
-            terms1 = json.loads(obj.info1_terms) if obj.info1_terms else []
-            infos.append({
-                "title": obj.info1_title, 
-                "content": obj.info1_content,
-                "terms": terms1
-            })
-        if obj.info2_title and obj.info2_content:
-            terms2 = json.loads(obj.info2_terms) if obj.info2_terms else []
-            infos.append({
-                "title": obj.info2_title, 
-                "content": obj.info2_content,
-                "terms": terms2
-            })
-        if obj.info3_title and obj.info3_content:
-            terms3 = json.loads(obj.info3_terms) if obj.info3_terms else []
-            infos.append({
-                "title": obj.info3_title, 
-                "content": obj.info3_content,
-                "terms": terms3
-            })
-        return infos
+    try:
+        existing_info = db.query(AIInfo).filter(AIInfo.date == ai_info_data.date).first()
+        
+        def build_infos(obj):
+            infos = []
+            if obj.info1_title and obj.info1_content:
+                try:
+                    terms1 = json.loads(obj.info1_terms) if hasattr(obj, 'info1_terms') and obj.info1_terms else []
+                except (AttributeError, json.JSONDecodeError):
+                    terms1 = []
+                infos.append({
+                    "title": obj.info1_title, 
+                    "content": obj.info1_content,
+                    "terms": terms1
+                })
+            if obj.info2_title and obj.info2_content:
+                try:
+                    terms2 = json.loads(obj.info2_terms) if hasattr(obj, 'info2_terms') and obj.info2_terms else []
+                except (AttributeError, json.JSONDecodeError):
+                    terms2 = []
+                infos.append({
+                    "title": obj.info2_title, 
+                    "content": obj.info2_content,
+                    "terms": terms2
+                })
+            if obj.info3_title and obj.info3_content:
+                try:
+                    terms3 = json.loads(obj.info3_terms) if hasattr(obj, 'info3_terms') and obj.info3_terms else []
+                except (AttributeError, json.JSONDecodeError):
+                    terms3 = []
+                infos.append({
+                    "title": obj.info3_title, 
+                    "content": obj.info3_content,
+                    "terms": terms3
+                })
+            return infos
 
     if existing_info:
         # 기존 데이터 업데이트 (비어있는 info2, info3에 순차적으로 채움)
@@ -107,7 +130,11 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
                     info = infos_to_add.pop(0)
                     setattr(existing_info, title_field, info.title)
                     setattr(existing_info, content_field, info.content)
-                    setattr(existing_info, terms_field, json.dumps(info.terms or []))
+                    try:
+                        setattr(existing_info, terms_field, json.dumps(info.terms or []))
+                    except AttributeError:
+                        # terms 필드가 없는 경우 무시
+                        pass
         db.commit()
         db.refresh(existing_info)
         return {
@@ -122,14 +149,23 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
             date=ai_info_data.date,
             info1_title=ai_info_data.infos[0].title if len(ai_info_data.infos) >= 1 else "",
             info1_content=ai_info_data.infos[0].content if len(ai_info_data.infos) >= 1 else "",
-            info1_terms=json.dumps(ai_info_data.infos[0].terms or []) if len(ai_info_data.infos) >= 1 else "[]",
             info2_title=ai_info_data.infos[1].title if len(ai_info_data.infos) >= 2 else "",
             info2_content=ai_info_data.infos[1].content if len(ai_info_data.infos) >= 2 else "",
-            info2_terms=json.dumps(ai_info_data.infos[1].terms or []) if len(ai_info_data.infos) >= 2 else "[]",
             info3_title=ai_info_data.infos[2].title if len(ai_info_data.infos) >= 3 else "",
-            info3_content=ai_info_data.infos[2].content if len(ai_info_data.infos) >= 3 else "",
-            info3_terms=json.dumps(ai_info_data.infos[2].terms or []) if len(ai_info_data.infos) >= 3 else "[]"
+            info3_content=ai_info_data.infos[2].content if len(ai_info_data.infos) >= 3 else ""
         )
+        
+        # terms 필드가 있는 경우에만 설정
+        try:
+            if len(ai_info_data.infos) >= 1:
+                db_ai_info.info1_terms = json.dumps(ai_info_data.infos[0].terms or [])
+            if len(ai_info_data.infos) >= 2:
+                db_ai_info.info2_terms = json.dumps(ai_info_data.infos[1].terms or [])
+            if len(ai_info_data.infos) >= 3:
+                db_ai_info.info3_terms = json.dumps(ai_info_data.infos[2].terms or [])
+        except AttributeError:
+            # terms 필드가 없는 경우 무시
+            pass
         db.add(db_ai_info)
         db.commit()
         db.refresh(db_ai_info)
@@ -139,6 +175,9 @@ def add_ai_info(ai_info_data: AIInfoCreate, db: Session = Depends(get_db)):
             "infos": build_infos(db_ai_info),
             "created_at": str(db_ai_info.created_at) if db_ai_info.created_at else None
         }
+    except Exception as e:
+        print(f"Error in add_ai_info: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to add AI info: {str(e)}")
 
 @router.delete("/{date}")
 def delete_ai_info(date: str, db: Session = Depends(get_db)):
