@@ -86,13 +86,17 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
     setIsLearning(true)
     try {
       if (isLearned) {
-        // 학습 완료 상태에서 학습 전 상태로 되돌리기
-        await updateProgressMutation.mutateAsync({
-          sessionId,
-          date,
-          infoIndex: index,
-          action: 'unlearn'
-        })
+        // 학습 완료 상태에서 학습 전 상태로 되돌리기 (로컬 스토리지 사용)
+        const currentProgress = JSON.parse(localStorage.getItem('userProgress') || '{}')
+        if (currentProgress[sessionId] && currentProgress[sessionId][date]) {
+          const learnedIndices = currentProgress[sessionId][date].filter((i: number) => i !== index)
+          if (learnedIndices.length === 0) {
+            delete currentProgress[sessionId][date]
+          } else {
+            currentProgress[sessionId][date] = learnedIndices
+          }
+          localStorage.setItem('userProgress', JSON.stringify(currentProgress))
+        }
       } else {
         // 학습 전 상태에서 학습 완료 상태로 변경
         await updateProgressMutation.mutateAsync({
@@ -111,11 +115,13 @@ function AIInfoCard({ info, index, date, sessionId, isLearned, onProgressUpdate 
         onProgressUpdate()
       }
       
-      // 성취 확인
-      const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
-      if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
-        setShowAchievement(true)
-        setTimeout(() => setShowAchievement(false), 3000)
+      // 성취 확인 (학습 완료 시에만)
+      if (!isLearned) {
+        const achievementResult = await checkAchievementsMutation.mutateAsync(sessionId)
+        if (achievementResult.new_achievements && achievementResult.new_achievements.length > 0) {
+          setShowAchievement(true)
+          setTimeout(() => setShowAchievement(false), 3000)
+        }
       }
     } catch (error) {
       console.error('Failed to update progress:', error)
