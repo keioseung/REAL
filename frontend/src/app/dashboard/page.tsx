@@ -107,7 +107,7 @@ export default function DashboardPage() {
   // 학습 진행률 계산 (로컬 스토리지와 백엔드 데이터 통합)
   const totalAIInfo = aiInfo?.length || 0
   
-  // 로컬 스토리지에서 학습 상태 확인
+  // 로컬 스토리지에서 학습 상태 확인 (강제 업데이트 포함)
   const localProgress = (() => {
     if (typeof window !== 'undefined') {
       try {
@@ -175,11 +175,14 @@ export default function DashboardPage() {
   // AI 정보 3개만 정확히 보여줌
   const aiInfoFixed = aiInfo && aiInfo.length > 0 ? aiInfo.slice(0, 3) : []
 
+  const [forceUpdate, setForceUpdate] = useState(0)
+  
   // 진행률 업데이트 핸들러
   const handleProgressUpdate = () => {
     queryClient.invalidateQueries({ queryKey: ['user-progress', sessionId] })
     queryClient.invalidateQueries({ queryKey: ['user-stats', sessionId] })
     queryClient.invalidateQueries({ queryKey: ['learned-terms', sessionId] })
+    setForceUpdate(prev => prev + 1) // 강제 리렌더링
   }
 
   // 새로고침 핸들러(탭별)
@@ -402,64 +405,140 @@ export default function DashboardPage() {
           transition={{ delay: 0.6 }}
           className="glass backdrop-blur-xl rounded-2xl p-4 md:p-6 mb-6 md:mb-8 w-full max-w-4xl border border-white/10"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                 <FaChartBar className="text-white text-sm" />
               </div>
               <h3 className="text-white font-bold text-lg md:text-xl">이번 주 학습 현황</h3>
             </div>
-            
-            {/* 간단한 요약 */}
-            <div className="flex gap-4 text-sm">
-              <div className="text-center">
-                <div className="text-lg font-bold text-blue-400">{weeklyData.reduce((sum, day) => sum + day.ai, 0)}</div>
-                <div className="text-xs text-white/60">AI 정보</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-purple-400">{weeklyData.reduce((sum, day) => sum + day.terms, 0)}</div>
-                <div className="text-xs text-white/60">용어</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-green-400">{quizScore}%</div>
-                <div className="text-xs text-white/60">퀴즈</div>
-              </div>
-            </div>
           </div>
           
-          {/* 간단한 주간 그래프 */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white">일별 학습량</span>
-              <span className="text-xs text-white/60">이번 주</span>
+          {/* 원형 진행률 차트 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* AI 정보 진행률 */}
+            <div className="text-center">
+              <div className="relative w-24 h-24 mx-auto mb-3">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <motion.circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="url(#aiGradient)"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeLinecap="round"
+                    initial={{ strokeDasharray: "0 251.2" }}
+                    animate={{ strokeDasharray: `${(weeklyData.reduce((sum, day) => sum + day.ai, 0) / 21) * 251.2} 251.2` }}
+                    transition={{ duration: 1, delay: 0.2 }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-lg font-bold text-blue-400">
+                    {weeklyData.reduce((sum, day) => sum + day.ai, 0)}
+                  </span>
+                </div>
+              </div>
+              <div className="text-sm font-medium text-white">AI 정보</div>
+              <div className="text-xs text-white/60">이번 주 학습</div>
             </div>
-            <div className="flex gap-2 h-20">
-              {weeklyData.map((day, dayIndex) => {
-                const totalValue = day.ai + day.terms + (day.quiz / 10) // 퀴즈는 10으로 나누어 정규화
-                const maxValue = 25 // AI(3) + 용어(20) + 퀴즈(2) = 25
-                const height = Math.min((totalValue / maxValue) * 100, 100)
-                
-                return (
-                  <div key={dayIndex} className="flex-1 flex flex-col items-center">
-                    <div className="text-xs text-white/60 mb-1">{day.day}</div>
-                    <div className="relative w-full bg-white/5 rounded-t overflow-hidden">
-                      <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${height}%` }}
-                        transition={{ duration: 0.5, delay: dayIndex * 0.1 }}
-                        className={`w-full bg-gradient-to-t from-blue-500 via-purple-500 to-green-500 ${
-                          day.isToday ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
-                        }`}
-                      />
-                    </div>
-                    <div className="text-xs text-white/40 mt-1">
-                      {totalValue > 0 ? Math.round(totalValue) : '-'}
-                    </div>
-                  </div>
-                )
-              })}
+
+            {/* 용어 학습 진행률 */}
+            <div className="text-center">
+              <div className="relative w-24 h-24 mx-auto mb-3">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <motion.circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="url(#termsGradient)"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeLinecap="round"
+                    initial={{ strokeDasharray: "0 251.2" }}
+                    animate={{ strokeDasharray: `${(weeklyData.reduce((sum, day) => sum + day.terms, 0) / 140) * 251.2} 251.2` }}
+                    transition={{ duration: 1, delay: 0.4 }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-lg font-bold text-purple-400">
+                    {weeklyData.reduce((sum, day) => sum + day.terms, 0)}
+                  </span>
+                </div>
+              </div>
+              <div className="text-sm font-medium text-white">용어</div>
+              <div className="text-xs text-white/60">이번 주 학습</div>
+            </div>
+
+            {/* 퀴즈 점수 진행률 */}
+            <div className="text-center">
+              <div className="relative w-24 h-24 mx-auto mb-3">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <motion.circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="url(#quizGradient)"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeLinecap="round"
+                    initial={{ strokeDasharray: "0 251.2" }}
+                    animate={{ strokeDasharray: `${(quizScore / 100) * 251.2} 251.2` }}
+                    transition={{ duration: 1, delay: 0.6 }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-lg font-bold text-green-400">
+                    {quizScore}%
+                  </span>
+                </div>
+              </div>
+              <div className="text-sm font-medium text-white">퀴즈</div>
+              <div className="text-xs text-white/60">정답률</div>
             </div>
           </div>
+
+          {/* SVG 그라디언트 정의 */}
+          <svg width="0" height="0">
+            <defs>
+              <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#3B82F6" />
+                <stop offset="100%" stopColor="#06B6D4" />
+              </linearGradient>
+              <linearGradient id="termsGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#8B5CF6" />
+                <stop offset="100%" stopColor="#EC4899" />
+              </linearGradient>
+              <linearGradient id="quizGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#10B981" />
+                <stop offset="100%" stopColor="#059669" />
+              </linearGradient>
+            </defs>
+          </svg>
         </motion.div>
       </div>
 
@@ -537,6 +616,9 @@ export default function DashboardPage() {
                       // 해당 날짜의 학습 기록 삭제
                       delete currentProgress[sessionId][selectedDate]
                       localStorage.setItem('userProgress', JSON.stringify(currentProgress))
+                      
+                      // 강제 리렌더링
+                      setForceUpdate(prev => prev + 1)
                       
                       // 진행률 업데이트
                       handleProgressUpdate()
