@@ -51,6 +51,12 @@ export interface UserStats {
   last_learned_date: string | null
   quiz_score: number
   achievements: string[]
+  today_ai_info?: number
+  today_terms?: number
+  today_quiz_score?: number
+  total_terms_learned?: number
+  total_terms_available?: number
+  max_streak?: number
 }
 
 // Prompt Types
