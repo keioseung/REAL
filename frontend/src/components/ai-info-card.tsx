@@ -193,8 +193,9 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
           >
             <Brain className="w-4 h-4" />
             {showTerms ? '용어 학습 숨기기' : '관련 용어 학습하기'}
-            {learnedTerms.size === (info.terms?.length || 0) && showAllTermsComplete && (
-              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+            {/* 항상 완료 개수 표시 */}
+            {hasTerms && (
+              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full ml-2">
                 {learnedTerms.size}개 학습완료
               </span>
             )}
@@ -277,22 +278,7 @@ function AIInfoCard({ info, index, date, sessionId, isLearned: isLearnedProp, on
         )}
       </AnimatePresence>
 
-      {/* 모든 용어 학습 완료 알림 */}
-      <AnimatePresence>
-        {showAllTermsComplete && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 rounded-xl shadow-2xl border border-green-300"
-          >
-            <div className="flex items-center gap-2">
-              <Star className="w-5 h-5 animate-bounce" />
-              <span className="font-bold text-sm">🎉 {learnedTerms.size}개 학습완료!</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* 모든 용어 학습 완료 알림 제거됨 */}
 
       {/* 성취 알림 */}
       <AnimatePresence>
