@@ -55,6 +55,18 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
       ? learnedData.terms.filter(term => term.learned_date === selectedDate)
       : learnedData.terms
 
+    // 중복 제거 (같은 용어가 여러 날짜에 있으면 최신 날짜 것만 유지)
+    if (!selectedDate) {
+      const uniqueTerms = new Map()
+      terms.forEach(term => {
+        const existing = uniqueTerms.get(term.term)
+        if (!existing || new Date(term.learned_date) > new Date(existing.learned_date)) {
+          uniqueTerms.set(term.term, term)
+        }
+      })
+      terms = Array.from(uniqueTerms.values())
+    }
+
     // 검색 필터
     if (searchQuery) {
       terms = terms.filter(term => 

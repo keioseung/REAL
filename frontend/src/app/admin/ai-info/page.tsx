@@ -604,13 +604,13 @@ export default function AdminAIInfoPage() {
       <section>
         <div className="mb-8 p-6 bg-gradient-to-r from-pink-200 to-purple-100 rounded-2xl border-2 border-pink-300 shadow flex flex-col gap-3">
           <div className="mb-2 font-semibold text-pink-700 text-lg">ChatGPT에 물어볼 프롬프트와 기반 내용을 선택하세요.</div>
-          <select value={selectedPromptId || ''} onChange={e => setSelectedPromptId(e.target.value)} className="w-full p-2 border rounded mb-2">
-            <option value="">프롬프트 선택</option>
-            {prompts.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+          <select value={selectedPromptId || ''} onChange={e => setSelectedPromptId(e.target.value)} className="w-full p-2 border rounded mb-2 text-black bg-white">
+            <option value="" className="text-black">프롬프트 선택</option>
+            {prompts.map(p => <option key={p.id} value={p.id} className="text-black">{p.title}</option>)}
           </select>
-          <select value={selectedBaseId || ''} onChange={e => setSelectedBaseId(e.target.value)} className="w-full p-2 border rounded mb-2">
-            <option value="">기반 내용 선택(선택사항)</option>
-            {baseContents.map(b => <option key={b.id} value={b.id}>{b.title}</option>)}
+          <select value={selectedBaseId || ''} onChange={e => setSelectedBaseId(e.target.value)} className="w-full p-2 border rounded mb-2 text-black bg-white">
+            <option value="" className="text-black">기반 내용 선택(선택사항)</option>
+            {baseContents.map(b => <option key={b.id} value={b.id} className="text-black">{b.title}</option>)}
           </select>
           <button onClick={handleCopyAndGo} disabled={!selectedPromptId} className="w-full px-4 py-2 bg-pink-600 text-white rounded-xl font-bold mt-2 disabled:opacity-50 hover:bg-pink-700 transition">ChatGPT에 물어보기</button>
           {copied && <div className="text-green-600 mt-2">프롬프트+기반내용이 복사되었습니다!</div>}

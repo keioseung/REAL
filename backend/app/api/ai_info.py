@@ -476,13 +476,20 @@ def get_learned_terms(session_id: str, db: Session = Depends(get_db)):
                 unique_terms.append(term)
                 seen_terms.add(term_key)
         
-        # 날짜별로 그룹화
+        # 날짜별로 그룹화 (중복 제거)
         terms_by_date = {}
         for term in unique_terms:
             date = term.get('learned_date', '')
             if date not in terms_by_date:
                 terms_by_date[date] = []
-            terms_by_date[date].append(term)
+            # 같은 날짜에 같은 용어가 이미 있는지 확인
+            existing_term = next((t for t in terms_by_date[date] if t.get('term') == term.get('term')), None)
+            if not existing_term:
+                terms_by_date[date].append(term)
+        
+        # learned_dates 중복 제거 및 정렬
+        learned_dates = list(set(learned_dates))
+        learned_dates.sort(reverse=True)  # 최신 날짜부터
         
         return {
             "terms": unique_terms,
