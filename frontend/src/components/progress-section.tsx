@@ -131,8 +131,13 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               onClick={() => {
                 alert('진행률 탭 - 날짜 input 클릭됨!')
               }}
-              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
-              style={{ colorScheme: 'dark' }}
+              className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer touch-manipulation"
+              style={{ 
+                colorScheme: 'dark',
+                minHeight: '44px',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none'
+              }}
             />
           </div>
         </div>
@@ -147,11 +152,21 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('주간 버튼 클릭됨!')
                   handlePeriodChange('week')
                 }}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
+                onTouchStart={() => {
+                  alert('주간 버튼 터치됨!')
+                  handlePeriodChange('week')
+                }}
+                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] ${
                   periodType === 'week'
                     ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-white/70 hover:text-white hover:bg-white/20'
+                    : 'text-white/70 hover:text-white hover:bg-white/20 active:bg-white/30'
                 }`}
+                style={{ 
+                  WebkitTapHighlightColor: 'transparent',
+                  WebkitTouchCallout: 'none',
+                  WebkitUserSelect: 'none',
+                  userSelect: 'none'
+                }}
               >
                 주간
               </button>
@@ -161,11 +176,21 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('월간 버튼 클릭됨!')
                   handlePeriodChange('month')
                 }}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
+                onTouchStart={() => {
+                  alert('월간 버튼 터치됨!')
+                  handlePeriodChange('month')
+                }}
+                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] ${
                   periodType === 'month'
                     ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-white/70 hover:text-white hover:bg-white/20'
+                    : 'text-white/70 hover:text-white hover:bg-white/20 active:bg-white/30'
                 }`}
+                style={{ 
+                  WebkitTapHighlightColor: 'transparent',
+                  WebkitTouchCallout: 'none',
+                  WebkitUserSelect: 'none',
+                  userSelect: 'none'
+                }}
               >
                 월간
               </button>
@@ -175,11 +200,21 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('사용자 버튼 클릭됨!')
                   handlePeriodChange('custom')
                 }}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
+                onTouchStart={() => {
+                  alert('사용자 버튼 터치됨!')
+                  handlePeriodChange('custom')
+                }}
+                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] ${
                   periodType === 'custom'
                     ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-white/70 hover:text-white hover:bg-white/20'
+                    : 'text-white/70 hover:text-white hover:bg-white/20 active:bg-white/30'
                 }`}
+                style={{ 
+                  WebkitTapHighlightColor: 'transparent',
+                  WebkitTouchCallout: 'none',
+                  WebkitUserSelect: 'none',
+                  userSelect: 'none'
+                }}
               >
                 사용자
               </button>
@@ -195,7 +230,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('시작 날짜 변경됨!')
                   handleCustomStartDateChange(e.target.value)
                 }}
-                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation"
+                style={{ 
+                  minHeight: '44px',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none'
+                }}
               />
               <span className="text-white/50">~</span>
               <input
@@ -205,7 +245,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('종료 날짜 변경됨!')
                   handleCustomEndDateChange(e.target.value)
                 }}
-                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation"
+                style={{ 
+                  minHeight: '44px',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none'
+                }}
               />
             </div>
           )}
