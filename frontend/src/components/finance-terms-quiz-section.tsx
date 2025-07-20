@@ -82,7 +82,8 @@ export default function FinancialTermsQuizSection({ sessionId, selectedDate, onP
     })
   })[0]
 
-  const currentQuiz = quizData
+  // currentQuiz를 현재 인덱스에 맞게 단일 TermsQuiz로 지정
+  const currentQuiz = Array.isArray(quizData) && quizData.length > 0 ? quizData[currentQuizIndex] : undefined
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (showResult) return
@@ -281,11 +282,11 @@ export default function FinancialTermsQuizSection({ sessionId, selectedDate, onP
           다음 용어의 정의를 선택하세요:
         </h3>
         <div className="text-2xl font-bold text-green-400 mb-8 text-center">
-          {currentQuiz.question}
+          {currentQuiz?.question}
         </div>
 
         <div className="space-y-4">
-          {currentQuiz.options.map((option, index) => (
+          {currentQuiz?.options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswerSelect(index)}
@@ -296,13 +297,13 @@ export default function FinancialTermsQuizSection({ sessionId, selectedDate, onP
                 <span className="text-lg font-medium">{String.fromCharCode(65 + index)}.</span>
                 <span className="flex-1">{option}</span>
                 {showResult && selectedAnswer === index && (
-                  index === currentQuiz.correct ? (
+                  index === currentQuiz?.correct ? (
                     <FaCheck className="text-green-400" />
                   ) : (
                     <FaTimes className="text-red-400" />
                   )
                 )}
-                {showResult && index === currentQuiz.correct && selectedAnswer !== index && (
+                {showResult && index === currentQuiz?.correct && selectedAnswer !== index && (
                   <FaCheck className="text-green-400" />
                 )}
               </div>
