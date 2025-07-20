@@ -362,27 +362,26 @@ export default function AdminFinancialAIInfoPage() {
       {/* 금융 정보 관리 */}
       <section>
       <h2 className="text-3xl font-extrabold mb-8 text-blue-700 flex items-center gap-2">📝 금융 정보 관리</h2>
-      <form onSubmit={handleSubmit} className="mb-10 bg-blue-50 rounded-xl p-6 shadow flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row md:items-end gap-4">
+      <form onSubmit={handleSubmit} className="mb-10 bg-blue-50 rounded-xl p-4 md:p-6 shadow flex flex-col gap-4 md:gap-6">
+        <div className="flex flex-col md:flex-row md:items-end gap-3 md:gap-4">
           <div className="flex-1 flex flex-col gap-2">
             <label className="font-semibold text-blue-700">날짜</label>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-3 border rounded focus:ring-2 focus:ring-blue-300 text-base md:text-lg" />
           </div>
         </div>
-        <div className="grid gap-6">
+        <div className="grid gap-4 md:gap-6">
           {inputs.map((input, idx) => (
-            <div key={idx} className="bg-white rounded-xl border border-blue-100 shadow-sm p-6 flex flex-col gap-3 relative">
+            <div key={idx} className="bg-white rounded-xl border border-blue-100 shadow-sm p-4 md:p-6 flex flex-col gap-2 md:gap-3 relative">
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-blue-700">제목</label>
-                <input type="text" placeholder={`제목 ${idx+1}`} value={input.title} onChange={e => handleInputChange(idx, 'title', e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
+                <input type="text" placeholder={`제목 ${idx+1}`} value={input.title} onChange={e => handleInputChange(idx, 'title', e.target.value)} className="p-3 border rounded focus:ring-2 focus:ring-blue-300 text-base" />
               </div>
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-blue-700">내용</label>
-                <textarea placeholder={`내용 ${idx+1}`} value={input.content} onChange={e => handleInputChange(idx, 'content', e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" rows={2} />
+                <textarea placeholder={`내용 ${idx+1}`} value={input.content} onChange={e => handleInputChange(idx, 'content', e.target.value)} className="p-3 border rounded focus:ring-2 focus:ring-blue-300 text-base" rows={2} />
               </div>
-                
                 {/* 용어 입력 섹션 */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2 md:gap-3">
                   <div className="flex items-center justify-between">
                     <label className="font-semibold text-blue-700">관련 용어</label>
                     <div className="flex gap-2">
@@ -403,7 +402,6 @@ export default function AdminFinancialAIInfoPage() {
                       </button>
                     </div>
                   </div>
-                  
                   {/* 일괄 입력 모달 */}
                   {showBulkInput === idx && (
                     <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mb-4">
@@ -423,15 +421,15 @@ export default function AdminFinancialAIInfoPage() {
                         </p>
                         <div className="text-xs text-yellow-600 bg-yellow-100 p-2 rounded mb-2">
                           <strong>예시:</strong><br/>
-                          LLM	GPT 같은 대형 언어 모델<br/>
-                          자연어	우리가 일상에서 쓰는 언어<br/>
-                          DSL	특정 분야 전용 프로그래밍 언어
+                          LLM\tGPT 같은 대형 언어 모델<br/>
+                          자연어\t우리가 일상에서 쓰는 언어<br/>
+                          DSL\t특정 분야 전용 프로그래밍 언어
                         </div>
                       </div>
                       <textarea
                         value={bulkTermsText}
                         onChange={(e) => setBulkTermsText(e.target.value)}
-                        placeholder="용어	뜻&#10;LLM	GPT 같은 대형 언어 모델&#10;자연어	우리가 일상에서 쓰는 언어"
+                        placeholder="용어\t뜻&#10;LLM\tGPT 같은 대형 언어 모델&#10;자연어\t우리가 일상에서 쓰는 언어"
                         className="w-full p-3 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-300 text-sm"
                         rows={6}
                       />
@@ -453,7 +451,6 @@ export default function AdminFinancialAIInfoPage() {
                       </div>
                     </div>
                   )}
-                  
                   {input.terms.map((term, termIdx) => (
                     <div key={termIdx} className="flex gap-2 items-start">
                       <div className="flex-1 flex gap-2">
@@ -482,7 +479,6 @@ export default function AdminFinancialAIInfoPage() {
                     </div>
                   ))}
                 </div>
-                
               {inputs.length > 1 && (
                 <button type="button" onClick={() => handleRemoveInput(idx)} className="absolute top-4 right-4 px-3 py-1 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition">-</button>
               )}
@@ -496,10 +492,11 @@ export default function AdminFinancialAIInfoPage() {
           {addOrUpdateMutation.isPending ? '등록 중...' : (editId ? '수정' : '등록')}
         </button>
       </form>
-      <div className="grid gap-6">
+      {/* 등록된 날짜 리스트 (AI 정보 관리와 동일하게) */}
+      <div className="grid gap-4 md:gap-6">
         {dates.length === 0 && <div className="text-gray-400 text-center">등록된 금융 정보가 없습니다.</div>}
         {dates.map(dateItem => (
-          <div key={dateItem} className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
+          <div key={dateItem} className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 shadow">
             <div className="flex-1">
               <div className="text-xs text-blue-500 mb-1">{dateItem}</div>
               {/* 해당 날짜의 금융 정보 불러오기 */}
