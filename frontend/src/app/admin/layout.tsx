@@ -58,24 +58,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 관리자 대시보드
               </Link>
             </div>
-            <div className="flex items-center space-x-4">
+            {/* 모바일 친화적 네비게이션: 가로 스크롤, 아이콘+짧은 텍스트 */}
+            <div className="flex items-center overflow-x-auto space-x-2 sm:space-x-4 scrollbar-hide max-w-full py-2">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                       isActive
                         ? 'bg-white/20 text-white'
                         : 'text-white/60 hover:text-white/80 hover:bg-white/10'
                     }`}
                   >
-                    <item.icon className={item.color} />
-                    {item.name}
+                    <item.icon className={item.color + ' text-base sm:text-lg'} />
+                    <span className="hidden xs:inline sm:inline">{item.name}</span>
+                    <span className="inline xs:hidden sm:hidden">{item.name.replace(/관리|통계|프롬프트|퀴즈/g, '')}</span>
                   </Link>
                 )
               })}
+              {/* 금융정보관리 탭(완전 동일) */}
+              <Link
+                href="/admin/financial-ai-info"
+                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${pathname === '/admin/financial-ai-info' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white/80 hover:bg-white/10'}`}
+              >
+                <FaDollarSign className="text-green-400 text-base sm:text-lg" />
+                <span className="hidden xs:inline sm:inline">금융정보관리</span>
+                <span className="inline xs:hidden sm:hidden">금융</span>
+              </Link>
             </div>
           </div>
         </div>
