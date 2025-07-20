@@ -143,20 +143,36 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           <div className="flex items-center gap-2">
             <span className="text-white/80 text-sm font-medium">기간:</span>
             <div className="flex bg-white/10 rounded-lg p-1">
-              {(['week', 'month', 'custom'] as const).map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => handlePeriodChange(type)}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
-                    periodType === type
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'text-white/70 hover:text-white hover:bg-white/20'
-                  }`}
-                >
-                  {type === 'week' ? '주간' : type === 'month' ? '월간' : '사용자'}
-                </button>
-              ))}
+              <div 
+                onClick={() => handlePeriodChange('week')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                  periodType === 'week'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'text-white/70 hover:text-white hover:bg-white/20'
+                }`}
+              >
+                주간
+              </div>
+              <div 
+                onClick={() => handlePeriodChange('month')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                  periodType === 'month'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'text-white/70 hover:text-white hover:bg-white/20'
+                }`}
+              >
+                월간
+              </div>
+              <div 
+                onClick={() => handlePeriodChange('custom')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                  periodType === 'custom'
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'text-white/70 hover:text-white hover:bg-white/20'
+                }`}
+              >
+                사용자
+              </div>
             </div>
           </div>
 
