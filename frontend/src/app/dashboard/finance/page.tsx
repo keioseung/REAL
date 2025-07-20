@@ -382,7 +382,7 @@ export default function FinanceDashboardPage() {
                     <span className="text-base md:text-lg font-semibold">금융 정보가 없습니다</span>
                   </div>
                 )}
-                {financeInfoFixed.map((info, index) => {
+                {financeInfoFixed.map((info: any, index: number) => {
                   // 로컬 스토리지와 백엔드 데이터를 모두 확인하여 학습 상태 결정
                   const isLearnedLocally = localProgress.includes(index)
                   const isLearnedBackend = backendProgress.includes(index)
