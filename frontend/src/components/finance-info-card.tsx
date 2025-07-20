@@ -253,7 +253,7 @@ export default function FinanceInfoCard({
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-3"
               >
-                {displayedTerms.map((term) => {
+                {displayedTerms?.map((term) => {
                   const isTermLearned = learnedTerms.has(term.id)
                   return (
                     <motion.div
