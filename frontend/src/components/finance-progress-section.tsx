@@ -38,7 +38,7 @@ export default function ProgressSection({ sessionId, selectedDate, onDateChange 
     try {
       setLoading(true)
       // 실제 구현에서는 사용자 ID가 필요
-      const response = await financeUserProgressAPI.getStats(1)
+      const response = await financeUserProgressAPI.getStats(sessionId)
       setStats(response.data)
     } catch (err) {
       setError('진행률을 불러오는데 실패했습니다.')
