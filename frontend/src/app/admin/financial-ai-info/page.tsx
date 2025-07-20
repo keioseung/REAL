@@ -369,6 +369,23 @@ export default function AdminFinancialAIInfoPage() {
             <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-3 border rounded focus:ring-2 focus:ring-blue-300 text-base md:text-lg" />
           </div>
         </div>
+        {/* 등록된 날짜 리스트 (AI 정보 관리와 완전히 동일하게) */}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {dates.length === 0 ? (
+            <span className="text-gray-400 text-sm">등록된 날짜가 없습니다.</span>
+          ) : (
+            dates.map(dateItem => (
+              <button
+                key={dateItem}
+                type="button"
+                onClick={() => setDate(dateItem)}
+                className={`px-3 py-1 rounded-lg border font-semibold text-xs md:text-sm transition-colors ${date === dateItem ? 'bg-blue-500 text-white border-blue-600' : 'bg-white text-blue-700 border-blue-200 hover:bg-blue-100'}`}
+              >
+                {dateItem}
+              </button>
+            ))
+          )}
+        </div>
         <div className="grid gap-4 md:gap-6">
           {inputs.map((input, idx) => (
             <div key={idx} className="bg-white rounded-xl border border-blue-100 shadow-sm p-4 md:p-6 flex flex-col gap-2 md:gap-3 relative">
