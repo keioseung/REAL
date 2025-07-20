@@ -42,7 +42,7 @@ export default function LearnedTermsSection({ sessionId }: LearnedTermsSectionPr
       // 사용 가능한 날짜들 추출
       const dates = [...new Set(response.data.map((term: LearnedTerm) => 
         term.learned_at.split(' ')[0]
-      ))].sort().reverse()
+      ))].sort().reverse() as string[]
       setAvailableDates(dates)
     } catch (err) {
       setError('학습한 용어를 불러오는데 실패했습니다.')

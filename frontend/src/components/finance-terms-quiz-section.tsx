@@ -50,7 +50,7 @@ export default function TermsQuizSection({ sessionId }: TermsQuizSectionProps) {
       setTerms(response.data)
       
       // 사용 가능한 날짜들 추출 (실제로는 finance_info의 날짜를 사용해야 함)
-      const dates = ['2025-01-20', '2025-01-19', '2025-01-18']
+      const dates = ['2025-01-20', '2025-01-19', '2025-01-18'] as string[]
       setAvailableDates(dates)
     } catch (err) {
       setError('용어를 불러오는데 실패했습니다.')
@@ -70,8 +70,8 @@ export default function TermsQuizSection({ sessionId }: TermsQuizSectionProps) {
     const questions: QuizQuestion[] = selectedTerms.map((term, index) => {
       // 다른 용어들의 정의를 옵션으로 사용
       const otherDefinitions = terms
-        .filter(t => t.id !== term.id)
-        .map(t => t.definition)
+        .filter((t: FinanceTerm) => t.id !== term.id)
+        .map((t: FinanceTerm) => t.definition)
         .sort(() => Math.random() - 0.5)
         .slice(0, 3)
 
