@@ -240,22 +240,30 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
             except json.JSONDecodeError:
                 continue
     
-    # 오늘 퀴즈 점수 상세 정보
-    today_quiz_progress = db.query(UserProgress).filter(
+    # 오늘 퀴즈 점수 누적 계산
+    today_quiz_correct = 0
+    today_quiz_total = 0
+    today_quiz_score = 0
+    
+    # 오늘 날짜의 모든 퀴즈 기록 가져오기
+    today_quiz_progress_list = db.query(UserProgress).filter(
         UserProgress.session_id == session_id,
-        UserProgress.date == f'__quiz__{today}'
-    ).first()
+        UserProgress.date.like(f'__quiz__{today}%')
+    ).all()
     
-    if today_quiz_progress and today_quiz_progress.stats:
-        try:
-            quiz_data = json.loads(today_quiz_progress.stats)
-            today_quiz_correct = quiz_data.get('correct', 0)
-            today_quiz_total = quiz_data.get('total', 0)
-            today_quiz_score = quiz_data.get('score', 0)
-        except json.JSONDecodeError:
-            pass
+    for quiz_progress in today_quiz_progress_list:
+        if quiz_progress.stats:
+            try:
+                quiz_data = json.loads(quiz_progress.stats)
+                today_quiz_correct += quiz_data.get('correct', 0)
+                today_quiz_total += quiz_data.get('total', 0)
+            except json.JSONDecodeError:
+                continue
     
-    # 누적 퀴즈 통계 계산
+    # 오늘 누적 퀴즈 점수 계산
+    today_quiz_score = int((today_quiz_correct / today_quiz_total) * 100) if today_quiz_total > 0 else 0
+    
+    # 전체 누적 퀴즈 통계 계산
     total_quiz_correct = 0
     total_quiz_questions = 0
     
@@ -274,7 +282,7 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
             except json.JSONDecodeError:
                 continue
     
-    # 누적 퀴즈 점수 계산
+    # 전체 누적 퀴즈 점수 계산
     cumulative_quiz_score = int((total_quiz_correct / total_quiz_questions) * 100) if total_quiz_questions > 0 else 0
     
     # 총 AI 정보 수 계산 (모든 날짜의 AI 정보 수)
