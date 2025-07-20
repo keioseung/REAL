@@ -397,7 +397,6 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
               <div className={`px-2 py-1 rounded-lg text-xs font-bold ${difficulty?.bg} ${difficulty?.color}`}>
                 {difficulty?.level}
               </div>
-              <span className="text-white/60 text-sm">길이: {currentTerm.term.length}자</span>
             </div>
             <button
               onClick={() => toggleFavorite(currentTerm.term)}
@@ -416,14 +415,10 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
             <div className="text-white/80 text-lg leading-relaxed">{currentTerm.description}</div>
           </div>
           
-          <div className="flex items-center justify-between text-white/60 text-sm">
+          <div className="flex items-center justify-center text-white/60 text-sm">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span>학습일: {currentTerm.learned_date}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              <span>정보 {currentTerm.info_index + 1}</span>
             </div>
           </div>
         </motion.div>
@@ -458,13 +453,6 @@ function LearnedTermsSection({ sessionId }: LearnedTermsSectionProps) {
           >
             다음
           </button>
-        </div>
-      </div>
-
-      {/* 단축키 안내 */}
-      <div className="mb-6 p-3 bg-white/5 rounded-lg">
-        <div className="text-white/60 text-sm">
-          <strong>단축키:</strong> ←/→ (이전/다음), 스페이스바 (자동재생), F (즐겨찾기)
         </div>
       </div>
 
