@@ -63,7 +63,7 @@ export default function FinanceAdminPage() {
       if (editingId) {
         await financeInfoAPI.update(editingId, formData)
       } else {
-        await financeInfoAPI.create(formData)
+        await financeInfoAPI.add(formData)
       }
       setShowForm(false)
       setEditingId(null)
