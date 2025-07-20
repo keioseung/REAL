@@ -11,6 +11,7 @@ interface TermsQuizSectionProps {
   sessionId: string
   selectedDate: string
   onProgressUpdate?: () => void
+  onDateChange?: (date: string) => void
 }
 
 interface TermsQuiz {
@@ -30,7 +31,7 @@ interface TermsQuizResponse {
   message?: string
 }
 
-function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate }: TermsQuizSectionProps) {
+function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate, onDateChange }: TermsQuizSectionProps) {
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
@@ -178,6 +179,18 @@ function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate }: TermsQu
       <div className="flex items-center justify-between mb-6">
         <div className="text-white/70 text-sm">
           총 {quizData.total_terms}개 용어 중 {quizData.quizzes.length}개 출제
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="quiz-date-select" className="text-white/80 text-sm font-medium">
+            퀴즈 날짜:
+          </label>
+          <input
+            id="quiz-date-select"
+            type="date"
+            value={selectedDate}
+            onChange={(e) => onDateChange?.(e.target.value)}
+            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
       </div>
 

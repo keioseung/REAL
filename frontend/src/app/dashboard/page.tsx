@@ -437,30 +437,15 @@ export default function DashboardPage() {
           )}
           {activeTab === 'quiz' && (
             <section className="mb-8 md:mb-16">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-3 md:gap-4 drop-shadow">
-                  <Target className="w-6 h-6 md:w-8 md:h-8" />
-                  용어 퀴즈
-                </h2>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="quiz-date" className="text-white/80 text-sm font-medium">
-                      퀴즈 날짜:
-                    </label>
-                    <input
-                      id="quiz-date"
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
+              <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-6 md:mb-8 flex items-center gap-3 md:gap-4 drop-shadow">
+                <Target className="w-6 h-6 md:w-8 md:h-8" />
+                용어 퀴즈
+              </h2>
               <TermsQuizSection 
                 sessionId={sessionId} 
                 selectedDate={selectedDate} 
                 onProgressUpdate={handleProgressUpdate}
+                onDateChange={setSelectedDate}
               />
             </section>
           )}
