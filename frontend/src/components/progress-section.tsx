@@ -30,7 +30,11 @@ interface PeriodStats {
 }
 
 function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSectionProps) {
-  const [currentDate, setCurrentDate] = useState(selectedDate || new Date().toISOString().split('T')[0])
+  // 독립적인 날짜 상태 관리
+  const [currentDate, setCurrentDate] = useState(() => {
+    // selectedDate가 있으면 사용, 없으면 오늘 날짜
+    return selectedDate || new Date().toISOString().split('T')[0]
+  })
   const [periodType, setPeriodType] = useState<'week' | 'month' | 'custom'>('week')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
@@ -83,14 +87,14 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
 
   // 날짜 변경 핸들러
   const handleDateChange = (date: string) => {
-    console.log('날짜 변경:', date)
+    console.log('진행률 탭 - 날짜 변경:', date)
     setCurrentDate(date)
     onDateChange?.(date)
   }
 
   // 기간 변경 핸들러
   const handlePeriodChange = (type: 'week' | 'month' | 'custom') => {
-    console.log('기간 변경:', type)
+    console.log('진행률 탭 - 기간 변경:', type)
     setPeriodType(type)
     if (type === 'custom') {
       const today = new Date()
@@ -103,12 +107,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
 
   // 커스텀 날짜 변경 핸들러
   const handleCustomStartDateChange = (date: string) => {
-    console.log('시작 날짜 변경:', date)
+    console.log('진행률 탭 - 시작 날짜 변경:', date)
     setCustomStartDate(date)
   }
 
   const handleCustomEndDateChange = (date: string) => {
-    console.log('종료 날짜 변경:', date)
+    console.log('진행률 탭 - 종료 날짜 변경:', date)
     setCustomEndDate(date)
   }
 
@@ -145,31 +149,34 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
             <div className="flex bg-white/10 rounded-lg p-1">
               <div 
                 onClick={() => handlePeriodChange('week')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer select-none ${
                   periodType === 'week'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20'
                 }`}
+                style={{ userSelect: 'none' }}
               >
                 주간
               </div>
               <div 
                 onClick={() => handlePeriodChange('month')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer select-none ${
                   periodType === 'month'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20'
                 }`}
+                style={{ userSelect: 'none' }}
               >
                 월간
               </div>
               <div 
                 onClick={() => handlePeriodChange('custom')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer select-none ${
                   periodType === 'custom'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20'
                 }`}
+                style={{ userSelect: 'none' }}
               >
                 사용자
               </div>
