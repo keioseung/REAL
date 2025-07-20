@@ -144,15 +144,11 @@ export default function IntroPage() {
               </span>
               <br />
               <span className="text-white/90">
-                관련 용어를 학습하고
+                관련 용어를 학습
               </span>
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
                 실전 퀴즈로 지식을 점검
-              </span>
-              <br />
-              <span className="text-white/80 text-lg md:text-xl lg:text-2xl font-medium">
-                해보세요
               </span>
             </h2>
             <p className="text-white/70 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto">
