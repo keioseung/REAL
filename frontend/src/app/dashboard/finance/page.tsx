@@ -244,8 +244,8 @@ export default function FinanceDashboardPage() {
 
   const handleProgressUpdate = () => {
     setForceUpdate(prev => prev + 1)
-    queryClient.invalidateQueries(['financeUserProgress', sessionId])
-    queryClient.invalidateQueries(['financeUserStats', sessionId])
+    queryClient.invalidateQueries({ queryKey: ['financeUserProgress', sessionId] })
+    queryClient.invalidateQueries({ queryKey: ['financeUserStats', sessionId] })
   }
 
   const handleRefresh = () => window.location.reload()
