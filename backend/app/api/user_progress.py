@@ -383,10 +383,18 @@ def update_quiz_score(session_id: str, score_data: dict, db: Session = Depends(g
     from datetime import datetime
     today = datetime.now().strftime('%Y-%m-%d')
     
-    # 오늘 퀴즈 상세 정보 저장
+    # 오늘 퀴즈 세션 번호 찾기
+    existing_quiz_sessions = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date.like(f'__quiz__{today}%')
+    ).count()
+    
+    session_number = existing_quiz_sessions + 1
+    
+    # 오늘 퀴즈 상세 정보 저장 (세션 번호 포함)
     today_quiz_progress = db.query(UserProgress).filter(
         UserProgress.session_id == session_id,
-        UserProgress.date == f'__quiz__{today}'
+        UserProgress.date == f'__quiz__{today}_{session_number}'
     ).first()
     
     quiz_detail = {
@@ -400,7 +408,7 @@ def update_quiz_score(session_id: str, score_data: dict, db: Session = Depends(g
     else:
         today_quiz_progress = UserProgress(
             session_id=session_id,
-            date=f'__quiz__{today}',
+            date=f'__quiz__{today}_{session_number}',
             learned_info=None,
             stats=json.dumps(quiz_detail)
         )
