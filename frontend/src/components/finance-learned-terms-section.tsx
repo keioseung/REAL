@@ -43,8 +43,8 @@ export default function LearnedTermsSection({ sessionId }: LearnedTermsSectionPr
       const dateStrings: string[] = response.data.map((term: LearnedTerm) => 
         term.learned_at.split(' ')[0]
       )
-      const uniqueDates: string[] = Array.from(new Set(dateStrings))
-      const sortedDates: string[] = uniqueDates.sort().reverse()
+      const uniqueDates: string[] = Array.from(new Set(dateStrings)) as string[]
+      const sortedDates: string[] = (uniqueDates.sort() as string[]).reverse() as string[]
       setAvailableDates(sortedDates)
     } catch (err) {
       setError('학습한 용어를 불러오는데 실패했습니다.')
