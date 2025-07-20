@@ -180,7 +180,7 @@ export default function FinanceDashboardPage() {
     }
     if (Array.isArray(userProgress?.quiz_score)) {
       const totalQuestions = userProgress.quiz_score.length
-      const correctAnswers = userProgress.quiz_score.filter(score => score > 0).length
+      const correctAnswers = userProgress.quiz_score.filter((score: number) => score > 0).length
       return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0
     }
     return 0
