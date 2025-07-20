@@ -220,43 +220,64 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           </div>
 
           {periodType === 'custom' && (
-            <div className="flex items-center gap-2 relative z-20">
-              <div className="flex flex-col gap-1">
-                <label className="text-white/60 text-xs">시작일</label>
-                <input
-                  type="date"
-                  value={customStartDate}
-                  onChange={(e) => {
-                    handleCustomStartDateChange(e.target.value)
-                  }}
-                  className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
-                  style={{ 
-                    minHeight: '44px',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    position: 'relative',
-                    zIndex: 9999
-                  }}
-                />
+            <div className="flex flex-col gap-3 relative z-20 bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-center">
+                <span className="text-white/80 text-sm font-medium">사용자 정의 기간 설정</span>
               </div>
-              <span className="text-white/50 self-end mb-2">~</span>
-              <div className="flex flex-col gap-1">
-                <label className="text-white/60 text-xs">종료일</label>
-                <input
-                  type="date"
-                  value={customEndDate}
-                  onChange={(e) => {
-                    handleCustomEndDateChange(e.target.value)
-                  }}
-                  className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
-                  style={{ 
-                    minHeight: '44px',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    position: 'relative',
-                    zIndex: 9999
-                  }}
-                />
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <label className="block text-white/70 text-xs font-medium mb-2">
+                    📅 시작일
+                  </label>
+                  <input
+                    type="date"
+                    value={customStartDate}
+                    onChange={(e) => {
+                      handleCustomStartDateChange(e.target.value)
+                    }}
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
+                    style={{ 
+                      minHeight: '44px',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      position: 'relative',
+                      zIndex: 9999
+                    }}
+                  />
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  <div className="w-8 h-0.5 bg-white/30 rounded-full"></div>
+                  <span className="text-white/50 text-xs mt-1">~</span>
+                  <div className="w-8 h-0.5 bg-white/30 rounded-full"></div>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-white/70 text-xs font-medium mb-2">
+                    📅 종료일
+                  </label>
+                  <input
+                    type="date"
+                    value={customEndDate}
+                    onChange={(e) => {
+                      handleCustomEndDateChange(e.target.value)
+                    }}
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
+                    style={{ 
+                      minHeight: '44px',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      position: 'relative',
+                      zIndex: 9999
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="text-center">
+                <span className="text-white/50 text-xs">
+                  {customStartDate && customEndDate ? 
+                    `${customStartDate} ~ ${customEndDate}` : 
+                    '시작일과 종료일을 선택해주세요'
+                  }
+                </span>
               </div>
             </div>
           )}
