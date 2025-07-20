@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { FaDollarSign, FaPlay, FaCheck, FaTimes, FaRedo, FaCalendar } from 'react-icons/fa'
 import { financeTermAPI, financeUserProgressAPI } from '@/lib/api'
+import { useQuery } from '@tanstack/react-query'
+import { financialAIInfoAPI, financialUserProgressAPI } from '@/lib/api'
 
 interface FinanceTerm {
   id: number
@@ -19,167 +21,150 @@ interface QuizQuestion {
   correctAnswer: number
 }
 
+interface TermItem {
+  term: string
+  description: string
+}
+
 interface TermsQuizSectionProps {
   sessionId: string
   selectedDate: string
-  onProgressUpdate: () => void
-  onDateChange: (date: string) => void
+  onProgressUpdate?: () => void
+  onDateChange?: (date: string) => void
 }
 
-export default function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate, onDateChange }: TermsQuizSectionProps) {
-  const [terms, setTerms] = useState<FinanceTerm[]>([])
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([])
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+interface TermsQuiz {
+  id: number
+  question: string
+  options: string[]
+  correct: number
+  explanation: string
+}
+
+export default function FinancialTermsQuizSection({ sessionId, selectedDate, onProgressUpdate, onDateChange }: TermsQuizSectionProps) {
+  const [currentQuizIndex, setCurrentQuizIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
-  const [isAnswered, setIsAnswered] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
+  const [showResult, setShowResult] = useState(false)
   const [score, setScore] = useState(0)
-  const [totalQuestions, setTotalQuestions] = useState(0)
-  const [quizStarted, setQuizStarted] = useState(false)
   const [quizCompleted, setQuizCompleted] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [availableDates, setAvailableDates] = useState<string[]>([])
+  const [showQuizComplete, setShowQuizComplete] = useState(false)
+  const [showAchievement, setShowAchievement] = useState(false)
+  const [finalScore, setFinalScore] = useState<{score: number, total: number, percentage: number} | null>(null)
 
-  useEffect(() => {
-    fetchTerms()
-  }, [selectedDate])
+  // 날짜별 금융 정보의 용어만 불러오기
+  const { data: aiInfos, isLoading } = useQuery({
+    queryKey: ['financial-ai-info', selectedDate],
+    queryFn: async () => {
+      if (!selectedDate) return []
+      const res = await financialAIInfoAPI.getByDate(selectedDate)
+      return res.data as { title: string, content: string, terms?: TermItem[] }[]
+    },
+    enabled: !!selectedDate,
+  })
 
-  const fetchTerms = async () => {
-    try {
-      setLoading(true)
-      const response = await financeTermAPI.getAll()
-      setTerms(response.data)
-      
-      // 사용 가능한 날짜들 추출 (실제로는 finance_info의 날짜를 사용해야 함)
-      const dates = ['2025-01-20', '2025-01-19', '2025-01-18'] as string[]
-      setAvailableDates(dates)
-    } catch (err) {
-      setError('용어를 불러오는데 실패했습니다.')
-      console.error('Error fetching terms:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  // 해당 날짜의 모든 용어를 하나의 배열로 합침
+  const terms: TermItem[] = (aiInfos || []).flatMap(info => info.terms || [])
 
-  const generateQuiz = () => {
-    if (terms.length === 0) return
-
-    const shuffledTerms = [...terms].sort(() => Math.random() - 0.5)
-    const quizSize = Math.min(10, shuffledTerms.length)
-    const selectedTerms = shuffledTerms.slice(0, quizSize)
-
-    const questions: QuizQuestion[] = selectedTerms.map((term, index) => {
-      // 다른 용어들의 정의를 옵션으로 사용
-      const otherDefinitions = terms
-        .filter((t: FinanceTerm) => t.id !== term.id)
-        .map((t: FinanceTerm) => t.definition)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3)
-
-      const options = [term.definition, ...otherDefinitions]
-        .sort(() => Math.random() - 0.5)
-
+  // 퀴즈 문제 생성 (최대 10개, 랜덤)
+  const quizData: TermsQuiz[] = useState(() => {
+    const shuffled = [...terms].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 10).map((term, idx) => {
+      // 오답 옵션 생성
+      const otherDefs = shuffled.filter(t => t.term !== term.term).map(t => t.description).sort(() => Math.random() - 0.5).slice(0, 3)
+      const options = [term.description, ...otherDefs].sort(() => Math.random() - 0.5)
       return {
-        id: index,
-        term: term.term,
-        definition: term.definition,
+        id: idx,
+        question: `${term.term}의 뜻은?`,
         options,
-        correctAnswer: options.indexOf(term.definition)
+        correct: options.indexOf(term.description),
+        explanation: term.description
       }
     })
+  })[0]
 
-    setQuizQuestions(questions)
-    setCurrentQuestionIndex(0)
-    setSelectedAnswer(null)
-    setIsAnswered(false)
-    setScore(0)
-    setTotalQuestions(quizSize)
-    setQuizStarted(true)
-    setQuizCompleted(false)
-  }
+  const currentQuiz = quizData
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (isAnswered) return
+    if (showResult) return
     setSelectedAnswer(answerIndex)
   }
 
   const handleSubmitAnswer = () => {
-    if (selectedAnswer === null) return
-
-    const currentQuestion = quizQuestions[currentQuestionIndex]
-    const correct = selectedAnswer === currentQuestion.correctAnswer
-
-    setIsAnswered(true)
-    setIsCorrect(correct)
-
-    if (correct) {
+    if (selectedAnswer === null || !currentQuiz) return
+    const isCorrect = selectedAnswer === currentQuiz.correct
+    if (isCorrect) {
       setScore(score + 1)
     }
+    setShowResult(true)
   }
 
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < quizQuestions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1)
+  const handleNextQuiz = async () => {
+    if (quizData && currentQuizIndex < quizData.length - 1) {
+      setCurrentQuizIndex(currentQuizIndex + 1)
       setSelectedAnswer(null)
-      setIsAnswered(false)
-    } else {
-      // 퀴즈 완료
-      setQuizCompleted(true)
-      // 퀴즈 결과 저장
-      saveQuizResult()
-    }
-  }
-
-  const saveQuizResult = async () => {
-    try {
-      // 실제 구현에서는 사용자 ID가 필요
-      await financeUserProgressAPI.recordQuizResult(sessionId, {
+      setShowResult(false)
+    } else if (quizData && currentQuizIndex === quizData.length - 1) {
+      // 퀴즈 완료 시 점수 저장 및 성취 체크
+      const finalScoreData = {
         score: score,
-        total_questions: totalQuestions,
-        correct_answers: score,
-        quiz_date: new Date().toISOString()
-      })
-    } catch (err) {
-      console.error('Error saving quiz result:', err)
+        total: quizData.length,
+        percentage: Math.round((score / quizData.length) * 100)
+      }
+      setFinalScore(finalScoreData)
+      setQuizCompleted(true)
+      try {
+        // 점수 저장
+        await financialUserProgressAPI.updateQuizScore(sessionId, {
+          score: finalScoreData.score,
+          totalQuestions: finalScoreData.total
+        })
+        setShowQuizComplete(true)
+        setTimeout(() => setShowQuizComplete(false), 4000)
+        if (onProgressUpdate) onProgressUpdate()
+        // 성취 체크(필요시 별도 API 호출)
+        // ... (AI와 동일하게 구현)
+      } catch (error) {
+        console.error('Failed to save quiz score:', error)
+      }
     }
   }
 
-  const restartQuiz = () => {
-    setQuizStarted(false)
-    setQuizCompleted(false)
-    setCurrentQuestionIndex(0)
+  const handleResetQuiz = () => {
+    setCurrentQuizIndex(0)
     setSelectedAnswer(null)
-    setIsAnswered(false)
+    setShowResult(false)
     setScore(0)
-    setTotalQuestions(0)
+    setQuizCompleted(false)
+    setFinalScore(null)
   }
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case '초급':
-        return 'bg-green-500/20 text-green-400 border-green-500/30'
-      case '중급':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-      case '고급':
-        return 'bg-red-500/20 text-red-400 border-red-500/30'
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+  const getOptionClass = (index: number) => {
+    if (!showResult) {
+      return selectedAnswer === index
+        ? 'bg-blue-500 border-blue-500 text-white'
+        : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
     }
+    if (index === currentQuiz?.correct) {
+      return 'bg-green-500 border-green-500 text-white'
+    }
+    if (selectedAnswer === index && index !== currentQuiz?.correct) {
+      return 'bg-red-500 border-red-500 text-white'
+    }
+    return 'bg-white/10 border-white/20 text-white/50'
   }
 
-  if (loading) {
+  const getScoreMessage = (percentage: number) => {
+    if (percentage >= 90) return "🏆 완벽합니다! 훌륭한 실력이네요!"
+    if (percentage >= 80) return "🌟 아주 잘했어요! 거의 다 맞췄네요!"
+    if (percentage >= 70) return "👍 좋아요! 꽤 잘 알고 있네요!"
+    if (percentage >= 60) return "💪 괜찮아요! 조금만 더 노력하면 됩니다!"
+    return "📚 더 공부해보세요! 다음엔 더 잘할 수 있을 거예요!"
+  }
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-center">
-        <p className="text-red-400">{error}</p>
       </div>
     )
   }
@@ -194,7 +179,7 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
     )
   }
 
-  if (!quizStarted) {
+  if (!quizCompleted) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -206,15 +191,14 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
             <FaCalendar className="text-white/60" />
             <select
               value={selectedDate}
-              onChange={(e) => onDateChange(e.target.value)}
+              onChange={(e) => onDateChange?.(e.target.value)}
               className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
             >
               <option value="all">전체 기간</option>
-              {availableDates.map((date) => (
-                <option key={date} value={date}>
-                  {date}
-                </option>
-              ))}
+              {/* availableDates 로직은 제거되었으므로 임시로 빈 배열 또는 기본값 사용 */}
+              <option value="2025-01-20">2025-01-20</option>
+              <option value="2025-01-19">2025-01-19</option>
+              <option value="2025-01-18">2025-01-18</option>
             </select>
           </div>
         </div>
@@ -227,7 +211,7 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
             총 {terms.length}개의 용어 중 10개가 랜덤으로 출제됩니다.
           </p>
           <button
-            onClick={generateQuiz}
+            onClick={handleResetQuiz} // 퀴즈 시작 버튼 클릭 시 퀴즈 재시작
             className="px-8 py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2 mx-auto"
           >
             <FaPlay />
@@ -239,22 +223,22 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
   }
 
   if (quizCompleted) {
-    const percentage = Math.round((score / totalQuestions) * 100)
     return (
       <div className="space-y-6">
         <div className="bg-white/5 backdrop-blur-xl rounded-xl p-8 text-center border border-white/10">
           <div className="text-6xl mb-4">
-            {percentage >= 80 ? '🎉' : percentage >= 60 ? '👍' : '😅'}
+            {finalScore?.percentage >= 80 ? '🎉' : finalScore?.percentage >= 60 ? '👍' : '😅'}
           </div>
           <h3 className="text-2xl font-bold text-white mb-4">퀴즈 완료!</h3>
           <div className="text-4xl font-bold text-green-400 mb-2">
-            {score} / {totalQuestions}
+            {finalScore?.score} / {finalScore?.total}
           </div>
           <div className="text-xl text-white/60 mb-6">
-            정답률: {percentage}%
+            정답률: {finalScore?.percentage}%
           </div>
+          <p className="text-white/60 text-lg">{getScoreMessage(finalScore?.percentage || 0)}</p>
           <button
-            onClick={restartQuiz}
+            onClick={handleResetQuiz}
             className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 mx-auto"
           >
             <FaRedo />
@@ -265,8 +249,6 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
     )
   }
 
-  const currentQuestion = quizQuestions[currentQuestionIndex]
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -275,7 +257,7 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
           금융 용어 퀴즈
         </h2>
         <div className="text-white/60">
-          {currentQuestionIndex + 1} / {totalQuestions}
+          {currentQuizIndex + 1} / {quizData.length}
         </div>
       </div>
 
@@ -283,7 +265,7 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
       <div className="w-full bg-white/10 rounded-full h-2">
         <div
           className="bg-green-500 h-2 rounded-full transition-all duration-300"
-          style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
+          style={{ width: `${((currentQuizIndex + 1) / quizData.length) * 100}%` }}
         />
       </div>
 
@@ -299,36 +281,28 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
           다음 용어의 정의를 선택하세요:
         </h3>
         <div className="text-2xl font-bold text-green-400 mb-8 text-center">
-          {currentQuestion.term}
+          {currentQuiz.question}
         </div>
 
         <div className="space-y-4">
-          {currentQuestion.options.map((option, index) => (
+          {currentQuiz.options.map((option, index) => (
             <button
               key={index}
               onClick={() => handleAnswerSelect(index)}
-              disabled={isAnswered}
-              className={`w-full p-4 rounded-lg border text-left transition-all ${
-                selectedAnswer === index
-                  ? isAnswered
-                    ? index === currentQuestion.correctAnswer
-                      ? 'bg-green-500/20 border-green-500 text-green-400'
-                      : 'bg-red-500/20 border-red-500 text-red-400'
-                    : 'bg-green-500/20 border-green-500 text-green-400'
-                  : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
-              } ${isAnswered && index === currentQuestion.correctAnswer ? 'bg-green-500/20 border-green-500 text-green-400' : ''}`}
+              disabled={showResult}
+              className={`w-full p-4 rounded-lg border text-left transition-all ${getOptionClass(index)}`}
             >
               <div className="flex items-center gap-3">
                 <span className="text-lg font-medium">{String.fromCharCode(65 + index)}.</span>
                 <span className="flex-1">{option}</span>
-                {isAnswered && selectedAnswer === index && (
-                  index === currentQuestion.correctAnswer ? (
+                {showResult && selectedAnswer === index && (
+                  index === currentQuiz.correct ? (
                     <FaCheck className="text-green-400" />
                   ) : (
                     <FaTimes className="text-red-400" />
                   )
                 )}
-                {isAnswered && index === currentQuestion.correctAnswer && selectedAnswer !== index && (
+                {showResult && index === currentQuiz.correct && selectedAnswer !== index && (
                   <FaCheck className="text-green-400" />
                 )}
               </div>
@@ -337,7 +311,7 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
         </div>
 
         <div className="mt-8 flex justify-center">
-          {!isAnswered ? (
+          {!showResult ? (
             <button
               onClick={handleSubmitAnswer}
               disabled={selectedAnswer === null}
@@ -347,10 +321,10 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
             </button>
           ) : (
             <button
-              onClick={handleNextQuestion}
+              onClick={handleNextQuiz}
               className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
             >
-              {currentQuestionIndex < quizQuestions.length - 1 ? '다음 문제' : '퀴즈 완료'}
+              {currentQuizIndex < quizData.length - 1 ? '다음 문제' : '퀴즈 완료'}
             </button>
           )}
         </div>

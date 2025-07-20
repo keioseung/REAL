@@ -153,6 +153,8 @@ export const financialUserProgressAPI = {
   updateTermProgress: (sessionId: string, termData: any) => 
     api.post(`/api/financial-user-progress/term-progress/${sessionId}`, termData),
   getStats: (sessionId: string) => api.get(`/api/financial-user-progress/stats/${sessionId}`),
+  updateQuizScore: (sessionId: string, scoreData: any) => 
+    api.post(`/api/financial-user-progress/quiz-score/${sessionId}`, scoreData),
 }
 
 export const financialPromptAPI = {
