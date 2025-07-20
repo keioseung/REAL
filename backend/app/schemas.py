@@ -109,4 +109,75 @@ class TermResponse(BaseModel):
     created_at: datetime
 
     class Config:
+        from_attributes = True
+
+# 금융 관련 스키마들
+class FinanceInfoCreate(BaseModel):
+    title: str
+    content: str
+    date: datetime
+    source: Optional[str] = None
+
+class FinanceInfoResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    date: datetime
+    source: Optional[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class FinanceTermCreate(BaseModel):
+    term: str
+    definition: str
+    finance_info_id: int
+    difficulty: str = "초급"
+
+class FinanceTermResponse(BaseModel):
+    id: int
+    term: str
+    definition: str
+    finance_info_id: int
+    difficulty: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class UserFinanceProgressCreate(BaseModel):
+    user_id: int
+    finance_term_id: int
+    is_learned: bool
+
+class UserFinanceProgressResponse(BaseModel):
+    id: int
+    user_id: int
+    finance_term_id: int
+    is_learned: bool
+    learned_at: Optional[datetime]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class UserFinanceQuizCreate(BaseModel):
+    user_id: int
+    score: int
+    total_questions: int
+    correct_answers: int
+    quiz_data: Optional[dict] = None
+
+class UserFinanceQuizResponse(BaseModel):
+    id: int
+    user_id: int
+    score: int
+    total_questions: int
+    correct_answers: int
+    quiz_date: datetime
+    quiz_data: Optional[dict]
+    created_at: datetime
+
+    class Config:
         from_attributes = True 

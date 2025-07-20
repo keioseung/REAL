@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from 'next/navigation'
-import { FaRobot, FaArrowRight, FaBrain, FaRocket, FaChartLine } from 'react-icons/fa'
+import { FaRobot, FaArrowRight, FaBrain, FaRocket, FaChartLine, FaDollarSign, FaChartBar, FaCoins } from 'react-icons/fa'
 import { useEffect, useState } from 'react'
 
 export default function IntroPage() {
@@ -11,12 +11,12 @@ export default function IntroPage() {
   const [isTyping, setIsTyping] = useState(true)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   
-  const fullText = "AI Mastery Hub"
+  const fullText = "Learning Mastery Hub"
   const taglines = [
-    "매일 새로운 AI 정보로 지식을 쌓아보세요",
+    "AI와 금융, 두 분야의 전문가가 되어보세요",
+    "체계적인 학습 시스템으로 지식을 쌓아보세요",
     "실전 퀴즈로 학습한 내용을 점검하세요",
-    "개인별 학습 진행률을 체계적으로 관리하세요",
-    "AI 세계의 핵심 개념을 쉽게 이해하세요"
+    "개인별 학습 진행률을 체계적으로 관리하세요"
   ]
   const [currentTagline, setCurrentTagline] = useState(0)
 
@@ -117,7 +117,7 @@ export default function IntroPage() {
           <div className="flex flex-col items-center gap-8 mb-12">
             <div className="relative">
               <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl animate-glow">
-                <FaRobot className="text-4xl md:text-5xl text-white" />
+                <FaBrain className="text-4xl md:text-5xl text-white" />
               </div>
               <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse" />
               {/* 빛나는 효과 */}
@@ -140,11 +140,11 @@ export default function IntroPage() {
           <div className="text-center mb-12 md:mb-16 max-w-4xl mx-auto">
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
               <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                매일 업데이트되는 AI 정보
+                AI와 금융 전문가로 성장
               </span>
               <br />
               <span className="text-white/90">
-                관련 용어를 학습
+                체계적인 학습 시스템
               </span>
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
@@ -152,20 +152,89 @@ export default function IntroPage() {
               </span>
             </h2>
             <p className="text-white/70 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto">
-              최신 AI 트렌드와 핵심 개념을 체계적으로 학습하고,<br />
+              AI와 금융 분야의 최신 정보를 체계적으로 학습하고,<br />
               실전 문제를 통해 확실한 이해를 확인하세요
             </p>
           </div>
+        </div>
 
-          {/* CTA 버튼 */}
-          <button
-            className="group px-12 md:px-16 py-5 md:py-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white text-xl md:text-2xl rounded-2xl font-bold shadow-2xl hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all flex items-center gap-4 mx-auto animate-fade-in hover:scale-105 active:scale-95 relative overflow-hidden animate-button-glow"
-            onClick={() => router.push('/auth')}
+        {/* 학습 시스템 선택 카드들 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 w-full max-w-6xl mb-20">
+          {/* AI 학습 시스템 */}
+          <div
+            className="group bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/10 relative overflow-hidden animate-card-float cursor-pointer"
+            onClick={() => router.push('/auth?system=ai')}
           >
-            <span className="relative z-10">지금 시작하기</span>
-            <FaArrowRight className="group-hover:translate-x-2 transition-transform duration-200 relative z-10" />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-          </button>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <FaRobot className="text-2xl text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-white">AI 학습 시스템</h3>
+              </div>
+              <p className="text-white/80 text-lg mb-6 leading-relaxed">
+                최신 AI 트렌드와 핵심 개념을 체계적으로 학습합니다. 
+                매일 업데이트되는 AI 정보와 관련 용어들을 퀴즈로 점검하세요.
+              </p>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3 text-white/70">
+                  <FaBrain className="text-blue-400" />
+                  <span>AI 정보 학습</span>
+                </div>
+                <div className="flex items-center gap-3 text-white/70">
+                  <FaRocket className="text-cyan-400" />
+                  <span>용어 퀴즈</span>
+                </div>
+                <div className="flex items-center gap-3 text-white/70">
+                  <FaChartLine className="text-blue-400" />
+                  <span>학습 진행률</span>
+                </div>
+              </div>
+              <button className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all flex items-center justify-center gap-2">
+                <span>AI 학습 시작</span>
+                <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
+
+          {/* 금융 학습 시스템 */}
+          <div
+            className="group bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/10 relative overflow-hidden animate-card-float cursor-pointer"
+            onClick={() => router.push('/auth?system=finance')}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <FaDollarSign className="text-2xl text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-white">금융 학습 시스템</h3>
+              </div>
+              <p className="text-white/80 text-lg mb-6 leading-relaxed">
+                금융 시장과 투자 개념을 체계적으로 학습합니다. 
+                최신 금융 정보와 관련 용어들을 퀴즈로 점검하세요.
+              </p>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3 text-white/70">
+                  <FaChartBar className="text-green-400" />
+                  <span>금융 정보 학습</span>
+                </div>
+                <div className="flex items-center gap-3 text-white/70">
+                  <FaCoins className="text-emerald-400" />
+                  <span>투자 용어 퀴즈</span>
+                </div>
+                <div className="flex items-center gap-3 text-white/70">
+                  <FaChartLine className="text-green-400" />
+                  <span>학습 진행률</span>
+                </div>
+              </div>
+              <button className="w-full px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2">
+                <span>금융 학습 시작</span>
+                <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* 기능 카드들 */}
@@ -173,14 +242,14 @@ export default function IntroPage() {
           {[
             { 
               icon: FaBrain, 
-              title: "AI 정보 학습", 
-              desc: "매일 새로운 AI 정보를 제공합니다. 각 정보에는 관련 용어들이 포함되어 있어 AI 개념을 체계적으로 학습할 수 있습니다.", 
+              title: "전문 정보 학습", 
+              desc: "AI와 금융 분야의 최신 정보를 제공합니다. 각 정보에는 관련 용어들이 포함되어 있어 전문 개념을 체계적으로 학습할 수 있습니다.", 
               color: "from-blue-500 to-cyan-500"
             },
             { 
               icon: FaRocket, 
               title: "용어 퀴즈", 
-              desc: "학습한 AI 정보의 관련 용어들을 퀴즈로 점검합니다. 다양한 난이도의 문제로 지식 이해도를 확인하고 실력을 향상시켜보세요.", 
+              desc: "학습한 정보의 관련 용어들을 퀴즈로 점검합니다. 다양한 난이도의 문제로 지식 이해도를 확인하고 실력을 향상시켜보세요.", 
               color: "from-purple-500 to-pink-500"
             },
             { 
@@ -198,142 +267,150 @@ export default function IntroPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 animate-icon-glow`}>
-                  <feature.icon className="text-white text-2xl" />
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center shadow-lg mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <feature.icon className="text-2xl text-white" />
                 </div>
-                <h3 className="text-white font-bold text-2xl mb-4">{feature.title}</h3>
-                <p className="text-gray-300 text-base leading-relaxed">{feature.desc}</p>
+                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-purple-300 transition-colors duration-300">
+                  {feature.title}
+                </h3>
+                <p className="text-white/70 leading-relaxed group-hover:text-white/80 transition-colors duration-300">
+                  {feature.desc}
+                </p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* 하단 통계 */}
-        <div className="grid grid-cols-3 gap-8 md:gap-12 w-full max-w-4xl">
-          {[
-            { label: "매일 새로운", value: "AI 정보", icon: FaBrain },
-            { label: "핵심 개념", value: "관련 용어", icon: FaRocket },
-            { label: "지식 점검", value: "실전 퀴즈", icon: FaChartLine }
-          ].map((stat, index) => (
-            <div key={index} className="text-center animate-stat-fade-in" style={{ animationDelay: `${index * 0.3}s` }}>
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 animate-stat-glow">
-                <stat.icon className="text-purple-400 text-xl md:text-2xl" />
-              </div>
-              <div className="text-xl md:text-2xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-white/60 text-sm">{stat.label}</div>
+        {/* 하단 섹션 */}
+        <div className="text-center">
+          <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 max-w-4xl mx-auto">
+            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              지금 시작하고 전문가가 되어보세요
+            </h3>
+            <p className="text-white/70 text-lg mb-6">
+              AI와 금융 분야의 전문가로 성장할 수 있는 체계적인 학습 시스템을 제공합니다.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all flex items-center justify-center gap-2"
+                onClick={() => router.push('/auth?system=ai')}
+              >
+                <FaRobot />
+                <span>AI 학습 시작</span>
+              </button>
+              <button
+                className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
+                onClick={() => router.push('/auth?system=finance')}
+              >
+                <FaDollarSign />
+                <span>금융 학습 시작</span>
+              </button>
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-      <style jsx global>{`
+      <style jsx>{`
+        @keyframes gradient-shift {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(-10px) translateY(-10px); }
+          50% { transform: translateX(10px) translateY(-5px); }
+          75% { transform: translateX(-5px) translateY(10px); }
+        }
+        
+        @keyframes gradient-float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-20px) scale(1.05); }
+        }
+        
         @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
-          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
         }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
+        
+        @keyframes slide-down {
+          0% { transform: translateY(-100px); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(100vh); opacity: 0; }
         }
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
+        
+        @keyframes text-glow {
+          0%, 100% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.5)); }
+          50% { filter: drop-shadow(0 0 30px rgba(236, 72, 153, 0.8)); }
         }
-        .animate-bounce-slow {
-          animation: bounce-slow 3s infinite;
+        
+        @keyframes button-glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+          50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.6); }
         }
+        
+        @keyframes card-float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+          50% { box-shadow: 0 0 40px rgba(236, 72, 153, 0.8); }
+        }
+        
         @keyframes blink {
           0%, 50% { opacity: 1; }
           51%, 100% { opacity: 0; }
         }
-        .animate-blink {
-          animation: blink 1s infinite;
-        }
+        
         @keyframes fade-in-out {
-          0%, 100% { opacity: 0; transform: translateY(10px); }
-          20%, 80% { opacity: 1; transform: translateY(0); }
+          0%, 100% { opacity: 0.7; transform: translateY(10px); }
+          50% { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in-out {
-          animation: fade-in-out 3s ease-in-out infinite;
-        }
+        
         @keyframes fade-in {
           from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: none; }
+          to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in {
-          animation: fade-in 1.5s cubic-bezier(0.22,1,0.36,1) both;
-        }
-        @keyframes gradient-shift {
-          0%, 100% { transform: translateX(0) translateY(0); }
-          25% { transform: translateX(10px) translateY(-10px); }
-          50% { transform: translateX(-5px) translateY(5px); }
-          75% { transform: translateX(5px) translateY(-5px); }
-        }
+        
         .animate-gradient-shift {
           animation: gradient-shift 8s ease-in-out infinite;
         }
-        @keyframes gradient-float {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-20px) scale(1.1); }
-        }
+        
         .animate-gradient-float {
           animation: gradient-float 6s ease-in-out infinite;
         }
-        @keyframes slide-down {
-          0% { transform: translateY(-100vh); opacity: 0; }
-          50% { opacity: 1; }
-          100% { transform: translateY(100vh); opacity: 0; }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
+        
         .animate-slide-down {
           animation: slide-down 4s linear infinite;
         }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); }
-          50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.6); }
-        }
-        .animate-glow {
-          animation: glow 3s ease-in-out infinite;
-        }
-        @keyframes text-glow {
-          0%, 100% { filter: drop-shadow(0 0 10px rgba(147, 51, 234, 0.3)); }
-          50% { filter: drop-shadow(0 0 20px rgba(147, 51, 234, 0.6)); }
-        }
+        
         .animate-text-glow {
-          animation: text-glow 4s ease-in-out infinite;
+          animation: text-glow 3s ease-in-out infinite;
         }
-        @keyframes button-glow {
-          0%, 100% { box-shadow: 0 0 30px rgba(147, 51, 234, 0.2); }
-          50% { box-shadow: 0 0 50px rgba(147, 51, 234, 0.4); }
-        }
+        
         .animate-button-glow {
-          animation: button-glow 3s ease-in-out infinite;
+          animation: button-glow 2s ease-in-out infinite;
         }
-        @keyframes card-float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
+        
         .animate-card-float {
           animation: card-float 4s ease-in-out infinite;
         }
-        @keyframes icon-glow {
-          0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
-          50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); }
+        
+        .animate-glow {
+          animation: glow 2s ease-in-out infinite;
         }
-        .animate-icon-glow {
-          animation: icon-glow 2s ease-in-out infinite;
+        
+        .animate-blink {
+          animation: blink 1s infinite;
         }
-        @keyframes stat-fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+        
+        .animate-fade-in-out {
+          animation: fade-in-out 3s ease-in-out infinite;
         }
-        .animate-stat-fade-in {
-          animation: stat-fade-in 1s ease-out both;
-        }
-        @keyframes stat-glow {
-          0%, 100% { box-shadow: 0 0 15px rgba(147, 51, 234, 0.2); }
-          50% { box-shadow: 0 0 25px rgba(147, 51, 234, 0.4); }
-        }
-        .animate-stat-glow {
-          animation: stat-glow 3s ease-in-out infinite;
+        
+        .animate-fade-in {
+          animation: fade-in 1s ease-out;
         }
       `}</style>
     </div>

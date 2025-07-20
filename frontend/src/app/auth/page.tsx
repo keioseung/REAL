@@ -1,11 +1,15 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { FaRobot, FaUser, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaStar } from 'react-icons/fa'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { FaRobot, FaUser, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaStar, FaDollarSign, FaBrain } from 'react-icons/fa'
 import { User } from '@/types'
 
 export default function AuthPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const system = searchParams.get('system') || 'ai'
+  
   const [tab, setTab] = useState<'login' | 'register'>('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -13,7 +17,6 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const router = useRouter()
 
   // 마우스 위치 추적
   useEffect(() => {
@@ -23,6 +26,29 @@ export default function AuthPage() {
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
+
+  const getSystemConfig = () => {
+    if (system === 'finance') {
+      return {
+        title: 'Finance Mastery Hub',
+        subtitle: '지금 시작하고 금융 세계를 탐험하세요',
+        icon: FaDollarSign,
+        gradient: 'from-green-500 to-emerald-500',
+        bgGradient: 'from-slate-900 via-green-900 to-slate-900',
+        accentColor: 'green'
+      }
+    }
+    return {
+      title: 'AI Mastery Hub',
+      subtitle: '지금 시작하고 AI 세계를 탐험하세요',
+      icon: FaRobot,
+      gradient: 'from-purple-500 to-pink-500',
+      bgGradient: 'from-slate-900 via-purple-900 to-slate-900',
+      accentColor: 'purple'
+    }
+  }
+
+  const config = getSystemConfig()
 
   // 회원가입
   const handleRegister = (e: React.FormEvent) => {
@@ -57,16 +83,17 @@ export default function AuthPage() {
     localStorage.setItem('isAdminLoggedIn', user.role === 'admin' ? 'true' : 'false')
     localStorage.setItem('currentUser', JSON.stringify(user))
     localStorage.setItem('sessionId', user.username)
+    localStorage.setItem('selectedSystem', system)
     setError('')
     if (user.role === 'admin') {
-      router.replace('/admin')
+      router.replace(`/admin?system=${system}`)
     } else {
-      router.replace('/dashboard')
+      router.replace(system === 'finance' ? '/dashboard/finance' : '/dashboard')
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+    <div className={`min-h-screen bg-gradient-to-br ${config.bgGradient} relative overflow-hidden`}>
       {/* 고급스러운 배경 효과 */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.15),transparent_50%)]" />
@@ -113,8 +140,8 @@ export default function AuthPage() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-2xl animate-glow">
-                  <FaRobot className="text-2xl text-white" />
+                <div className={`w-16 h-16 bg-gradient-to-r ${config.gradient} rounded-2xl flex items-center justify-center shadow-2xl animate-glow`}>
+                  <config.icon className="text-2xl text-white" />
                 </div>
                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse flex items-center justify-center">
                   <FaStar className="text-xs text-white" />
@@ -122,9 +149,14 @@ export default function AuthPage() {
               </div>
             </div>
             <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight leading-tight mb-2">
-              AI Mastery Hub
+              {config.title}
             </h1>
-            <p className="text-purple-300 font-medium">지금 시작하고 AI 세계를 탐험하세요</p>
+            <p className="text-purple-300 font-medium">{config.subtitle}</p>
+            <div className="mt-4 flex items-center justify-center gap-2 text-sm text-white/60">
+              <span className={`px-3 py-1 rounded-full bg-${config.accentColor}-500/20 text-${config.accentColor}-400 border border-${config.accentColor}-500/30`}>
+                {system === 'finance' ? '금융 학습 시스템' : 'AI 학습 시스템'}
+              </span>
+            </div>
           </div>
 
           {/* 인증 카드 */}
@@ -136,7 +168,7 @@ export default function AuthPage() {
                 <button
                   className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all duration-300 ${
                     tab === 'login' 
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
+                      ? `bg-gradient-to-r ${config.gradient} text-white shadow-lg` 
                       : 'text-white/60 hover:text-white hover:bg-white/10'
                   }`}
                   onClick={() => { setTab('login'); setError('') }}
@@ -146,7 +178,7 @@ export default function AuthPage() {
                 <button
                   className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all duration-300 ${
                     tab === 'register' 
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
+                      ? `bg-gradient-to-r ${config.gradient} text-white shadow-lg` 
                       : 'text-white/60 hover:text-white hover:bg-white/10'
                   }`}
                   onClick={() => { setTab('register'); setError('') }}
@@ -198,9 +230,9 @@ export default function AuthPage() {
                       {error}
                     </div>
                   )}
-                  <button 
-                    type="submit" 
-                    className="w-full py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all flex items-center justify-center gap-2 group hover:scale-105 active:scale-95"
+                  <button
+                    type="submit"
+                    className={`w-full py-4 bg-gradient-to-r ${config.gradient} text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group`}
                   >
                     <span>로그인</span>
                     <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -244,42 +276,27 @@ export default function AuthPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">
-                      계정 유형
+                    <label className="block text-white/80 text-sm font-medium mb-2 flex items-center gap-2">
+                      <FaBrain className="text-purple-400" />
+                      역할
                     </label>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setRole('user')}
-                        className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all ${
-                          role === 'user' 
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
-                            : 'bg-white/10 text-white/60 hover:text-white hover:bg-white/20'
-                        }`}
-                      >
-                        일반 사용자
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRole('admin')}
-                        className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all ${
-                          role === 'admin' 
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
-                            : 'bg-white/10 text-white/60 hover:text-white hover:bg-white/20'
-                        }`}
-                      >
-                        관리자
-                      </button>
-                    </div>
+                    <select
+                      value={role}
+                      onChange={e => setRole(e.target.value as 'admin' | 'user')}
+                      className="w-full p-4 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                    >
+                      <option value="user">사용자</option>
+                      <option value="admin">관리자</option>
+                    </select>
                   </div>
                   {error && (
                     <div className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 rounded-lg p-3">
                       {error}
                     </div>
                   )}
-                  <button 
-                    type="submit" 
-                    className="w-full py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all flex items-center justify-center gap-2 group hover:scale-105 active:scale-95"
+                  <button
+                    type="submit"
+                    className={`w-full py-4 bg-gradient-to-r ${config.gradient} text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group`}
                   >
                     <span>회원가입</span>
                     <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -288,39 +305,56 @@ export default function AuthPage() {
               )}
             </div>
           </div>
+
+          {/* 시스템 변경 링크 */}
+          <div className="text-center mt-6">
+            <button
+              onClick={() => router.push(`/auth?system=${system === 'ai' ? 'finance' : 'ai'}`)}
+              className="text-white/60 hover:text-white transition-colors text-sm"
+            >
+              {system === 'ai' ? '금융 학습 시스템으로 변경' : 'AI 학습 시스템으로 변경'}
+            </button>
+          </div>
         </div>
       </div>
 
-      <style jsx global>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
-          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
+      <style jsx>{`
         @keyframes gradient-shift {
           0%, 100% { transform: translateX(0) translateY(0); }
-          25% { transform: translateX(10px) translateY(-10px); }
-          50% { transform: translateX(-5px) translateY(5px); }
-          75% { transform: translateX(5px) translateY(-5px); }
+          25% { transform: translateX(-10px) translateY(-10px); }
+          50% { transform: translateX(10px) translateY(-5px); }
+          75% { transform: translateX(-5px) translateY(10px); }
         }
+        
+        @keyframes gradient-float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-20px) scale(1.05); }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+          50% { box-shadow: 0 0 40px rgba(236, 72, 153, 0.8); }
+        }
+        
         .animate-gradient-shift {
           animation: gradient-shift 8s ease-in-out infinite;
         }
-        @keyframes gradient-float {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-20px) scale(1.1); }
-        }
+        
         .animate-gradient-float {
           animation: gradient-float 6s ease-in-out infinite;
         }
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); }
-          50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.6); }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
+        
         .animate-glow {
-          animation: glow 3s ease-in-out infinite;
+          animation: glow 2s ease-in-out infinite;
         }
       `}</style>
     </div>

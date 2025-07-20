@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, JSON
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from .database import Base
 
 class AIInfo(Base):
@@ -65,4 +66,74 @@ class Term(Base):
     id = Column(Integer, primary_key=True, index=True)
     term = Column(String, unique=True, index=True)
     description = Column(Text)
-    created_at = Column(DateTime(timezone=True), server_default=func.now()) 
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# 금융 관련 모델들
+class FinanceInfo(Base):
+    __tablename__ = "finance_info"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    date = Column(DateTime, nullable=False)
+    source = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # 관계 설정
+    terms = relationship("FinanceTerm", back_populates="finance_info")
+
+class FinanceTerm(Base):
+    __tablename__ = "finance_terms"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    term = Column(String, nullable=False, index=True)
+    definition = Column(Text, nullable=False)
+    finance_info_id = Column(Integer, ForeignKey("finance_info.id"), nullable=False)
+    difficulty = Column(String, default="초급")  # 초급, 중급, 고급
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # 관계 설정
+    finance_info = relationship("FinanceInfo", back_populates="terms")
+    user_progress = relationship("UserFinanceProgress", back_populates="finance_term")
+
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # 관계 설정
+    finance_progress = relationship("UserFinanceProgress", back_populates="user")
+    finance_quizzes = relationship("UserFinanceQuiz", back_populates="user")
+
+class UserFinanceProgress(Base):
+    __tablename__ = "user_finance_progress"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    finance_term_id = Column(Integer, ForeignKey("finance_terms.id"), nullable=False)
+    is_learned = Column(Boolean, default=False)
+    learned_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # 관계 설정
+    user = relationship("User", back_populates="finance_progress")
+    finance_term = relationship("FinanceTerm", back_populates="user_progress")
+
+class UserFinanceQuiz(Base):
+    __tablename__ = "user_finance_quizzes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    score = Column(Integer, default=0)
+    total_questions = Column(Integer, default=0)
+    correct_answers = Column(Integer, default=0)
+    quiz_date = Column(DateTime, nullable=False)
+    quiz_data = Column(JSON)  # 퀴즈 상세 데이터
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # 관계 설정
+    user = relationship("User", back_populates="finance_quizzes") 

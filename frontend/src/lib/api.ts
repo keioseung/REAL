@@ -67,4 +67,42 @@ export const baseContentAPI = {
   update: (id: number, data: any) => api.put(`/api/base-content/${id}`, data),
   delete: (id: number) => api.delete(`/api/base-content/${id}`),
   getByCategory: (category: string) => api.get(`/api/base-content/category/${category}`),
+}
+
+// 금융 관련 API들
+export const financeInfoAPI = {
+  getAll: (skip: number = 0, limit: number = 10) => 
+    api.get(`/api/finance/finance-info?skip=${skip}&limit=${limit}`),
+  getById: (id: number) => api.get(`/api/finance/finance-info/${id}`),
+  add: (data: any) => api.post('/api/finance/finance-info', data),
+  update: (id: number, data: any) => api.put(`/api/finance/finance-info/${id}`, data),
+  delete: (id: number) => api.delete(`/api/finance/finance-info/${id}`),
+  getWithTerms: (skip: number = 0, limit: number = 10) => 
+    api.get(`/api/finance/finance-info-with-terms?skip=${skip}&limit=${limit}`),
+}
+
+export const financeTermAPI = {
+  getAll: (financeInfoId?: number) => {
+    const params = financeInfoId ? `?finance_info_id=${financeInfoId}` : '';
+    return api.get(`/api/finance/finance-terms${params}`);
+  },
+  getById: (id: number) => api.get(`/api/finance/finance-terms/${id}`),
+  add: (data: any) => api.post('/api/finance/finance-terms', data),
+  update: (id: number, data: any) => api.put(`/api/finance/finance-terms/${id}`, data),
+  delete: (id: number) => api.delete(`/api/finance/finance-terms/${id}`),
+}
+
+export const financeUserProgressAPI = {
+  createProgress: (data: any) => api.post('/api/finance/finance-progress', data),
+  getUserProgress: (userId: number) => api.get(`/api/finance/finance-progress/${userId}`),
+  getLearnedTerms: (userId: number, dateFilter?: string) => {
+    const params = dateFilter ? `?date_filter=${dateFilter}` : '';
+    return api.get(`/api/finance/finance-learned-terms/${userId}${params}`);
+  },
+  getStats: (userId: number) => api.get(`/api/finance/finance-stats/${userId}`),
+  getPeriodStats: (userId: number, period: string) => 
+    api.get(`/api/finance/finance-period-stats/${userId}?period=${period}`),
+  recordQuizResult: (userId: number, quizData: any) => 
+    api.post(`/api/finance/finance-quiz-result?user_id=${userId}`, quizData),
+  getQuizHistory: (userId: number) => api.get(`/api/finance/finance-quiz-history/${userId}`),
 } 
