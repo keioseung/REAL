@@ -212,6 +212,8 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
     today_ai_info = 0
     today_terms = 0
     today_quiz_score = 0
+    today_quiz_correct = 0
+    today_quiz_total = 0
     
     # 오늘 AI 정보 학습 수
     today_progress = db.query(UserProgress).filter(
@@ -238,12 +240,61 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
             except json.JSONDecodeError:
                 continue
     
+    # 오늘 퀴즈 점수 상세 정보
+    today_quiz_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date == f'__quiz__{today}'
+    ).first()
+    
+    if today_quiz_progress and today_quiz_progress.stats:
+        try:
+            quiz_data = json.loads(today_quiz_progress.stats)
+            today_quiz_correct = quiz_data.get('correct', 0)
+            today_quiz_total = quiz_data.get('total', 0)
+            today_quiz_score = quiz_data.get('score', 0)
+        except json.JSONDecodeError:
+            pass
+    
+    # 총 AI 정보 수 계산 (모든 날짜의 AI 정보 수)
+    total_ai_info_available = 0
+    all_ai_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        ~UserProgress.date.like('__%')
+    ).all()
+    
+    for p in all_ai_progress:
+        if p.learned_info:
+            try:
+                learned_data = json.loads(p.learned_info)
+                total_ai_info_available += len(learned_data)
+            except json.JSONDecodeError:
+                continue
+    
+    # 총 용어 수 계산 (모든 날짜의 용어 수)
+    total_terms_available = 0
+    all_terms_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date.like('__terms__%')
+    ).all()
+    
+    for p in all_terms_progress:
+        if p.learned_info:
+            try:
+                learned_data = json.loads(p.learned_info)
+                total_terms_available += len(learned_data)
+            except json.JSONDecodeError:
+                continue
+    
     if progress and progress.stats:
         stats = json.loads(progress.stats)
         stats.update({
             'today_ai_info': today_ai_info,
             'today_terms': today_terms,
-            'today_quiz_score': today_quiz_score
+            'today_quiz_score': today_quiz_score,
+            'today_quiz_correct': today_quiz_correct,
+            'today_quiz_total': today_quiz_total,
+            'total_ai_info_available': total_ai_info_available,
+            'total_terms_available': total_terms_available
         })
         return stats
     
@@ -255,7 +306,11 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
         'achievements': [],
         'today_ai_info': today_ai_info,
         'today_terms': today_terms,
-        'today_quiz_score': today_quiz_score
+        'today_quiz_score': today_quiz_score,
+        'today_quiz_correct': today_quiz_correct,
+        'today_quiz_total': today_quiz_total,
+        'total_ai_info_available': total_ai_info_available,
+        'total_terms_available': total_terms_available
     }
 
 @router.post("/stats/{session_id}")
@@ -287,6 +342,33 @@ def update_quiz_score(session_id: str, score_data: dict, db: Session = Depends(g
     
     # 점수 계산 (백분율)
     quiz_score = int((score / total_questions) * 100) if total_questions > 0 else 0
+    
+    # 오늘 날짜
+    from datetime import datetime
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    # 오늘 퀴즈 상세 정보 저장
+    today_quiz_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date == f'__quiz__{today}'
+    ).first()
+    
+    quiz_detail = {
+        'correct': score,
+        'total': total_questions,
+        'score': quiz_score
+    }
+    
+    if today_quiz_progress:
+        today_quiz_progress.stats = json.dumps(quiz_detail)
+    else:
+        today_quiz_progress = UserProgress(
+            session_id=session_id,
+            date=f'__quiz__{today}',
+            learned_info=None,
+            stats=json.dumps(quiz_detail)
+        )
+        db.add(today_quiz_progress)
     
     # 기존 통계 가져오기
     stats_progress = db.query(UserProgress).filter(
