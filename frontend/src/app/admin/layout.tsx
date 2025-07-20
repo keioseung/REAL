@@ -20,15 +20,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       icon: FaChartLine,
       color: 'text-blue-400'
     },
+    // 금융 정보 관리 탭은 마지막에만 남기고, href를 '/admin/financial-ai-info'로 변경
     {
       name: '금융 정보 관리',
-      href: '/admin/finance',
-      icon: FaDollarSign,
-      color: 'text-green-400'
-    },
-    {
-      name: '금융 통계',
-      href: '/admin/finance-stats',
+      href: '/admin/financial-ai-info',
       icon: FaChartLine,
       color: 'text-green-400'
     }

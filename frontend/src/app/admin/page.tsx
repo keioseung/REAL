@@ -5,15 +5,9 @@ import { useRouter } from 'next/navigation'
 import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaCog, FaChartBar, FaComments, FaDatabase, FaDollarSign, FaChartPie, FaCoins } from 'react-icons/fa'
 
 const adminMenus = [
-  // AI 학습 관리
   { href: '/admin/ai-info', label: 'AI 정보 관리', icon: FaBrain, desc: 'AI 정보 등록, 수정, 삭제 등', color: 'from-blue-500 to-cyan-500' },
-  { href: '/admin/prompt', label: '프롬프트 관리', icon: FaComments, desc: 'AI 프롬프트 관리', color: 'from-green-500 to-emerald-500' },
   { href: '/admin/stats', label: 'AI 통계', icon: FaChartBar, desc: 'AI 학습 통계', color: 'from-yellow-500 to-orange-500' },
-  
-  // 금융 학습 관리
-  { href: '/admin/finance', label: '금융 정보 관리', icon: FaDollarSign, desc: '금융 정보 등록, 수정, 삭제 등', color: 'from-emerald-500 to-teal-500' },
-  { href: '/admin/finance-prompt', label: '금융 프롬프트 관리', icon: FaComments, desc: '금융 프롬프트 관리', color: 'from-teal-500 to-cyan-500' },
-  { href: '/admin/finance-stats', label: '금융 통계', icon: FaCoins, desc: '금융 학습 통계', color: 'from-indigo-500 to-purple-500' },
+  { href: '/admin/financial-ai-info', label: '금융 정보 관리', icon: FaChartLine, desc: '금융 정보 등록, 수정, 삭제 등', color: 'from-indigo-500 to-purple-500' },
 ]
 
 export default function AdminPage() {
