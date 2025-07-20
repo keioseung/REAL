@@ -136,7 +136,13 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               id="progress-date"
               type="date"
               value={currentDate}
-              onChange={(e) => handleDateChange(e.target.value)}
+              onChange={(e) => {
+                console.log('진행률 탭 - 날짜 input 클릭됨!', e.target.value)
+                handleDateChange(e.target.value)
+              }}
+              onClick={(e) => {
+                console.log('진행률 탭 - 날짜 input 클릭됨!')
+              }}
               className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
               style={{ colorScheme: 'dark' }}
             />
@@ -147,39 +153,54 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           <div className="flex items-center gap-2">
             <span className="text-white/80 text-sm font-medium">기간:</span>
             <div className="flex bg-white/10 rounded-lg p-1">
-              <div 
-                onClick={() => handlePeriodChange('week')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer select-none ${
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('주간 버튼 클릭됨!')
+                  handlePeriodChange('week')
+                }}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
                   periodType === 'week'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20'
                 }`}
-                style={{ userSelect: 'none' }}
               >
                 주간
-              </div>
-              <div 
-                onClick={() => handlePeriodChange('month')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer select-none ${
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('월간 버튼 클릭됨!')
+                  handlePeriodChange('month')
+                }}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
                   periodType === 'month'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20'
                 }`}
-                style={{ userSelect: 'none' }}
               >
                 월간
-              </div>
-              <div 
-                onClick={() => handlePeriodChange('custom')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer select-none ${
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('사용자 버튼 클릭됨!')
+                  handlePeriodChange('custom')
+                }}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
                   periodType === 'custom'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20'
                 }`}
-                style={{ userSelect: 'none' }}
               >
                 사용자
-              </div>
+              </button>
             </div>
           </div>
 
@@ -188,14 +209,20 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               <input
                 type="date"
                 value={customStartDate}
-                onChange={(e) => handleCustomStartDateChange(e.target.value)}
+                onChange={(e) => {
+                  console.log('시작 날짜 input 클릭됨!')
+                  handleCustomStartDateChange(e.target.value)
+                }}
                 className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
               />
               <span className="text-white/50">~</span>
               <input
                 type="date"
                 value={customEndDate}
-                onChange={(e) => handleCustomEndDateChange(e.target.value)}
+                onChange={(e) => {
+                  console.log('종료 날짜 input 클릭됨!')
+                  handleCustomEndDateChange(e.target.value)
+                }}
                 className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
               />
             </div>
