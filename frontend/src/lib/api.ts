@@ -39,6 +39,8 @@ export const userProgressAPI = {
   updateTermProgress: (sessionId: string, termData: any) => 
     api.post(`/api/user-progress/term-progress/${sessionId}`, termData),
   getStats: (sessionId: string) => api.get(`/api/user-progress/stats/${sessionId}`),
+  getPeriodStats: (sessionId: string, startDate: string, endDate: string) => 
+    api.get(`/api/user-progress/period-stats/${sessionId}?start_date=${startDate}&end_date=${endDate}`),
   updateStats: (sessionId: string, stats: any) => 
     api.post(`/api/user-progress/stats/${sessionId}`, stats),
   updateQuizScore: (sessionId: string, scoreData: any) => 

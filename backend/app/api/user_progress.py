@@ -534,4 +534,90 @@ def check_achievements(session_id: str, db: Session = Depends(get_db)):
     return {
         "current_achievements": achievements,
         "new_achievements": new_achievements
+    }
+
+@router.get("/period-stats/{session_id}")
+def get_period_stats(session_id: str, start_date: str, end_date: str, db: Session = Depends(get_db)):
+    """특정 기간의 학습 통계를 가져옵니다."""
+    from datetime import datetime, timedelta
+    
+    try:
+        start_dt = datetime.strptime(start_date, '%Y-%m-%d')
+        end_dt = datetime.strptime(end_date, '%Y-%m-%d')
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    
+    # 기간 내 모든 날짜 생성
+    date_list = []
+    current_dt = start_dt
+    while current_dt <= end_dt:
+        date_list.append(current_dt.strftime('%Y-%m-%d'))
+        current_dt += timedelta(days=1)
+    
+    period_data = []
+    
+    for date in date_list:
+        # AI 정보 학습 수
+        ai_progress = db.query(UserProgress).filter(
+            UserProgress.session_id == session_id,
+            UserProgress.date == date
+        ).first()
+        
+        ai_count = 0
+        if ai_progress and ai_progress.learned_info:
+            try:
+                ai_count = len(json.loads(ai_progress.learned_info))
+            except json.JSONDecodeError:
+                pass
+        
+        # 용어 학습 수
+        terms_progress = db.query(UserProgress).filter(
+            UserProgress.session_id == session_id,
+            UserProgress.date.like(f'__terms__{date}%')
+        ).all()
+        
+        terms_count = 0
+        for term_progress in terms_progress:
+            if term_progress.learned_info:
+                try:
+                    terms_count += len(json.loads(term_progress.learned_info))
+                except json.JSONDecodeError:
+                    continue
+        
+        # 퀴즈 점수
+        quiz_progress = db.query(UserProgress).filter(
+            UserProgress.session_id == session_id,
+            UserProgress.date.like(f'__quiz__{date}%')
+        ).all()
+        
+        quiz_score = 0
+        quiz_correct = 0
+        quiz_total = 0
+        
+        for quiz_progress in quiz_progress:
+            if quiz_progress.stats:
+                try:
+                    quiz_data = json.loads(quiz_progress.stats)
+                    quiz_correct += quiz_data.get('correct', 0)
+                    quiz_total += quiz_data.get('total', 0)
+                except json.JSONDecodeError:
+                    continue
+        
+        if quiz_total > 0:
+            quiz_score = int((quiz_correct / quiz_total) * 100)
+        
+        period_data.append({
+            'date': date,
+            'ai_info': ai_count,
+            'terms': terms_count,
+            'quiz_score': quiz_score,
+            'quiz_correct': quiz_correct,
+            'quiz_total': quiz_total
+        })
+    
+    return {
+        'period_data': period_data,
+        'start_date': start_date,
+        'end_date': end_date,
+        'total_days': len(period_data)
     } 
