@@ -81,7 +81,7 @@ export default function FinanceInfoCard({
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['financeUserProgress', sessionId])
+      queryClient.invalidateQueries({ queryKey: ['financeUserProgress', sessionId] })
       onProgressUpdate()
     }
   })
@@ -99,7 +99,7 @@ export default function FinanceInfoCard({
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['financeUserProgress', sessionId])
+      queryClient.invalidateQueries({ queryKey: ['financeUserProgress', sessionId] })
       onProgressUpdate()
     }
   })
