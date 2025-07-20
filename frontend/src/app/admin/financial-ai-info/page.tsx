@@ -359,17 +359,17 @@ export default function AdminFinancialAIInfoPage() {
 
   return (
     <div className="max-w-4xl mx-auto mt-16 p-8 bg-white rounded-3xl shadow-2xl flex flex-col gap-12">
-      {/* 금융 정보 관리 */}
+      {/* 금융 정보 관리 (AI 정보 관리와 동일) */}
       <section>
       <h2 className="text-3xl font-extrabold mb-8 text-blue-700 flex items-center gap-2">📝 금융 정보 관리</h2>
-      <form onSubmit={handleSubmit} className="mb-10 bg-blue-50 rounded-xl p-4 md:p-6 shadow flex flex-col gap-4 md:gap-6">
-        <div className="flex flex-col md:flex-row md:items-end gap-3 md:gap-4">
+      <form onSubmit={handleSubmit} className="mb-10 bg-blue-50 rounded-xl p-6 shadow flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row md:items-end gap-4">
           <div className="flex-1 flex flex-col gap-2">
             <label className="font-semibold text-blue-700">날짜</label>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-3 border rounded focus:ring-2 focus:ring-blue-300 text-base md:text-lg" />
+            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
           </div>
         </div>
-        {/* 등록된 날짜 리스트 (AI 정보 관리와 완전히 동일하게) */}
+        {/* 등록된 날짜 리스트 */}
         <div className="flex flex-wrap gap-2 mt-2">
           {dates.length === 0 ? (
             <span className="text-gray-400 text-sm">등록된 날짜가 없습니다.</span>
@@ -386,19 +386,19 @@ export default function AdminFinancialAIInfoPage() {
             ))
           )}
         </div>
-        <div className="grid gap-4 md:gap-6">
+        <div className="grid gap-6">
           {inputs.map((input, idx) => (
-            <div key={idx} className="bg-white rounded-xl border border-blue-100 shadow-sm p-4 md:p-6 flex flex-col gap-2 md:gap-3 relative">
+            <div key={idx} className="bg-white rounded-xl border border-blue-100 shadow-sm p-6 flex flex-col gap-3 relative">
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-blue-700">제목</label>
-                <input type="text" placeholder={`제목 ${idx+1}`} value={input.title} onChange={e => handleInputChange(idx, 'title', e.target.value)} className="p-3 border rounded focus:ring-2 focus:ring-blue-300 text-base" />
+                <input type="text" placeholder={`제목 ${idx+1}`} value={input.title} onChange={e => handleInputChange(idx, 'title', e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" />
               </div>
               <div className="flex flex-col gap-2">
                 <label className="font-semibold text-blue-700">내용</label>
-                <textarea placeholder={`내용 ${idx+1}`} value={input.content} onChange={e => handleInputChange(idx, 'content', e.target.value)} className="p-3 border rounded focus:ring-2 focus:ring-blue-300 text-base" rows={2} />
+                <textarea placeholder={`내용 ${idx+1}`} value={input.content} onChange={e => handleInputChange(idx, 'content', e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-blue-300" rows={2} />
               </div>
                 {/* 용어 입력 섹션 */}
-                <div className="flex flex-col gap-2 md:gap-3">
+                <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <label className="font-semibold text-blue-700">관련 용어</label>
                     <div className="flex gap-2">
@@ -438,15 +438,15 @@ export default function AdminFinancialAIInfoPage() {
                         </p>
                         <div className="text-xs text-yellow-600 bg-yellow-100 p-2 rounded mb-2">
                           <strong>예시:</strong><br/>
-                          LLM\tGPT 같은 대형 언어 모델<br/>
-                          자연어\t우리가 일상에서 쓰는 언어<br/>
-                          DSL\t특정 분야 전용 프로그래밍 언어
+                          LLM	GPT 같은 대형 언어 모델<br/>
+                          자연어	우리가 일상에서 쓰는 언어<br/>
+                          DSL	특정 분야 전용 프로그래밍 언어
                         </div>
                       </div>
                       <textarea
                         value={bulkTermsText}
                         onChange={(e) => setBulkTermsText(e.target.value)}
-                        placeholder="용어\t뜻&#10;LLM\tGPT 같은 대형 언어 모델&#10;자연어\t우리가 일상에서 쓰는 언어"
+                        placeholder="용어	뜻&#10;LLM	GPT 같은 대형 언어 모델&#10;자연어	우리가 일상에서 쓰는 언어"
                         className="w-full p-3 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-300 text-sm"
                         rows={6}
                       />
@@ -509,14 +509,13 @@ export default function AdminFinancialAIInfoPage() {
           {addOrUpdateMutation.isPending ? '등록 중...' : (editId ? '수정' : '등록')}
         </button>
       </form>
-      {/* 등록된 날짜 리스트 (AI 정보 관리와 동일하게) */}
-      <div className="grid gap-4 md:gap-6">
-        {dates.length === 0 && <div className="text-gray-400 text-center">등록된 금융 정보가 없습니다.</div>}
+      <div className="grid gap-6">
+        {dates.length === 0 && <div className="text-gray-400 text-center">등록된 AI 정보가 없습니다.</div>}
         {dates.map(dateItem => (
-          <div key={dateItem} className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 shadow">
+          <div key={dateItem} className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
             <div className="flex-1">
               <div className="text-xs text-blue-500 mb-1">{dateItem}</div>
-              {/* 해당 날짜의 금융 정보 불러오기 */}
+              {/* 해당 날짜의 AI 정보 불러오기 */}
               <div>
                 {isFetching && date === dateItem ? (
                   <div className="text-gray-400">불러오는 중...</div>
@@ -540,94 +539,6 @@ export default function AdminFinancialAIInfoPage() {
           </div>
         ))}
       </div>
-      </section>
-
-      {/* 프롬프트 관리 */}
-      <section>
-        <h2 className="text-3xl font-extrabold mb-8 text-pink-700 flex items-center gap-2">🤖 프롬프트 관리</h2>
-        <form onSubmit={handlePromptSubmit} className="mb-8 bg-pink-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
-          <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-pink-700">프롬프트 제목</label>
-            <input type="text" placeholder="프롬프트 제목" value={promptTitle} onChange={e => setPromptTitle(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" />
-          </div>
-          <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-pink-700">프롬프트 내용</label>
-            <textarea placeholder="프롬프트 내용" value={promptContent} onChange={e => setPromptContent(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" rows={2} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <button type="submit" className="px-4 py-2 bg-pink-600 text-white rounded-xl font-bold hover:bg-pink-700 transition">{promptEditId ? '수정' : '등록'}</button>
-            {promptEditId && <button type="button" onClick={() => { setPromptEditId(null); setPromptTitle(''); setPromptContent('') }} className="px-4 py-2 bg-gray-400 text-white rounded-xl font-bold hover:bg-gray-500 transition">취소</button>}
-          </div>
-        </form>
-        <div className="grid gap-6 mb-10">
-          {prompts.length === 0 && <div className="text-gray-400 text-center">등록된 프롬프트가 없습니다.</div>}
-          {prompts.map(p => (
-            <div key={p.id} className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
-              <div className="flex-1">
-                <div className="font-bold text-lg text-pink-900 mb-1">{p.title}</div>
-                <div className="text-gray-700 text-sm whitespace-pre-line">{p.content}</div>
-              </div>
-              <div className="flex gap-2 mt-2 md:mt-0">
-                <button onClick={() => handlePromptEdit(p)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
-                <button onClick={() => handlePromptDelete(p.id)} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 기반 내용 관리 */}
-      <section>
-        <h2 className="text-3xl font-extrabold mb-8 text-pink-700 flex items-center gap-2">📄 기반 내용 관리</h2>
-        <form onSubmit={handleBaseSubmit} className="mb-8 bg-pink-50 rounded-xl p-6 shadow flex flex-col md:flex-row md:items-end gap-4">
-          <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-pink-700">기반 내용 제목</label>
-            <input type="text" placeholder="기반 내용 제목" value={baseTitle} onChange={e => setBaseTitle(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" />
-          </div>
-          <div className="flex-1 flex flex-col gap-2">
-            <label className="font-semibold text-pink-700">기반 내용</label>
-            <textarea placeholder="기반 내용" value={baseContent} onChange={e => setBaseContent(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-pink-300" rows={2} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <button type="submit" className="px-4 py-2 bg-pink-600 text-white rounded-xl font-bold hover:bg-pink-700 transition">{baseEditId ? '수정' : '등록'}</button>
-            {baseEditId && <button type="button" onClick={() => { setBaseEditId(null); setBaseTitle(''); setBaseContent('') }} className="px-4 py-2 bg-gray-400 text-white rounded-xl font-bold hover:bg-gray-500 transition">취소</button>}
-          </div>
-        </form>
-        <div className="grid gap-6 mb-10">
-          {baseContents.length === 0 && <div className="text-gray-400 text-center">등록된 기반 내용이 없습니다.</div>}
-          {baseContents.map(b => (
-            <div key={b.id} className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
-              <div className="flex-1">
-                <div className="font-bold text-lg text-pink-900 mb-1">{b.title}</div>
-                {/* <div className="text-gray-700 text-sm whitespace-pre-line">{b.content}</div> */}
-              </div>
-              <div className="flex gap-2 mt-2 md:mt-0">
-                <button onClick={() => handleBaseEdit(b)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
-                <button onClick={() => handleBaseDelete(b.id)} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 프롬프트+기반내용 합치기 */}
-      <section>
-        <div className="mb-8 p-6 bg-gradient-to-r from-pink-200 to-purple-100 rounded-2xl border-2 border-pink-300 shadow flex flex-col gap-3">
-          <div className="mb-2 font-semibold text-pink-700 text-lg">ChatGPT에 물어볼 프롬프트와 기반 내용을 선택하세요.</div>
-          <select value={selectedPromptId || ''} onChange={e => setSelectedPromptId(e.target.value)} className="w-full p-2 border rounded mb-2 text-black bg-white">
-            <option value="" className="text-black">프롬프트 선택</option>
-            {prompts.map(p => <option key={p.id} value={p.id} className="text-black">{p.title}</option>)}
-          </select>
-          <select value={selectedBaseId || ''} onChange={e => setSelectedBaseId(e.target.value)} className="w-full p-2 border rounded mb-2 text-black bg-white">
-            <option value="" className="text-black">기반 내용 선택(선택사항)</option>
-            {baseContents.map(b => <option key={b.id} value={b.id} className="text-black">{b.title}</option>)}
-          </select>
-          <button onClick={handleCopyAndGo} disabled={!selectedPromptId} className="w-full px-4 py-2 bg-pink-600 text-white rounded-xl font-bold mt-2 disabled:opacity-50 hover:bg-pink-700 transition">ChatGPT에 물어보기</button>
-          {copied && <div className="text-green-600 mt-2">프롬프트+기반내용이 복사되었습니다!</div>}
-          <div ref={combinedRef} tabIndex={0} className="mt-2 p-2 bg-white border rounded text-sm text-gray-700 whitespace-pre-line outline-none" style={{userSelect:'text'}}>
-            {getCombinedText() || '선택된 프롬프트와 기반 내용이 여기에 미리보기로 표시됩니다.'}
-          </div>
-        </div>
       </section>
     </div>
   )
