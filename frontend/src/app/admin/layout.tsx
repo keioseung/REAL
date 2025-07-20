@@ -15,15 +15,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       color: 'text-blue-400'
     },
     {
+      name: 'AI 프롬프트 관리',
+      href: '/admin/prompt',
+      icon: FaQuestion,
+      color: 'text-blue-400'
+    },
+    {
       name: 'AI 통계',
       href: '/admin/stats',
       icon: FaChartLine,
       color: 'text-blue-400'
     },
-    // 금융 정보 관리 탭은 마지막에만 남기고, href를 '/admin/financial-ai-info'로 변경
     {
       name: '금융 정보 관리',
       href: '/admin/financial-ai-info',
+      icon: FaDollarSign,
+      color: 'text-green-400'
+    },
+    {
+      name: '금융 프롬프트 관리',
+      href: '/admin/finance-prompt',
+      icon: FaQuestion,
+      color: 'text-green-400'
+    },
+    {
+      name: '금융 통계',
+      href: '/admin/finance-stats',
       icon: FaChartLine,
       color: 'text-green-400'
     }
@@ -61,15 +78,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </Link>
                 )
               })}
-              {/* 금융정보관리 탭(완전 동일) */}
-              <Link
-                href="/admin/financial-ai-info"
-                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${pathname === '/admin/financial-ai-info' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white/80 hover:bg-white/10'}`}
-              >
-                <FaDollarSign className="text-green-400 text-base sm:text-lg" />
-                <span className="hidden xs:inline sm:inline">금융정보관리</span>
-                <span className="inline xs:hidden sm:hidden">금융</span>
-              </Link>
             </div>
           </div>
         </div>

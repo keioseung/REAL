@@ -6,8 +6,11 @@ import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine,
 
 const adminMenus = [
   { href: '/admin/ai-info', label: 'AI 정보 관리', icon: FaBrain, desc: 'AI 정보 등록, 수정, 삭제 등', color: 'from-blue-500 to-cyan-500' },
+  { href: '/admin/prompt', label: 'AI 프롬프트 관리', icon: FaComments, desc: 'AI 프롬프트 등록, 수정, 삭제 등', color: 'from-blue-400 to-blue-600' },
   { href: '/admin/stats', label: 'AI 통계', icon: FaChartBar, desc: 'AI 학습 통계', color: 'from-yellow-500 to-orange-500' },
-  { href: '/admin/financial-ai-info', label: '금융 정보 관리', icon: FaChartLine, desc: '금융 정보 등록, 수정, 삭제 등', color: 'from-indigo-500 to-purple-500' },
+  { href: '/admin/financial-ai-info', label: '금융 정보 관리', icon: FaDollarSign, desc: '금융 정보 등록, 수정, 삭제 등', color: 'from-emerald-500 to-teal-500' },
+  { href: '/admin/finance-prompt', label: '금융 프롬프트 관리', icon: FaComments, desc: '금융 프롬프트 등록, 수정, 삭제 등', color: 'from-teal-400 to-cyan-500' },
+  { href: '/admin/finance-stats', label: '금융 통계', icon: FaChartBar, desc: '금융 학습 통계', color: 'from-indigo-500 to-purple-500' },
 ]
 
 export default function AdminPage() {
