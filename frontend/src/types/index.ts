@@ -66,6 +66,9 @@ export interface UserStats {
   total_terms_learned?: number
   total_terms_available?: number
   total_ai_info_available?: number
+  cumulative_quiz_score?: number
+  total_quiz_correct?: number
+  total_quiz_questions?: number
   max_streak?: number
 }
 

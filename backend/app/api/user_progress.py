@@ -255,6 +255,28 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
         except json.JSONDecodeError:
             pass
     
+    # 누적 퀴즈 통계 계산
+    total_quiz_correct = 0
+    total_quiz_questions = 0
+    
+    # 모든 퀴즈 기록 가져오기
+    all_quiz_progress = db.query(UserProgress).filter(
+        UserProgress.session_id == session_id,
+        UserProgress.date.like('__quiz__%')
+    ).all()
+    
+    for quiz_progress in all_quiz_progress:
+        if quiz_progress.stats:
+            try:
+                quiz_data = json.loads(quiz_progress.stats)
+                total_quiz_correct += quiz_data.get('correct', 0)
+                total_quiz_questions += quiz_data.get('total', 0)
+            except json.JSONDecodeError:
+                continue
+    
+    # 누적 퀴즈 점수 계산
+    cumulative_quiz_score = int((total_quiz_correct / total_quiz_questions) * 100) if total_quiz_questions > 0 else 0
+    
     # 총 AI 정보 수 계산 (모든 날짜의 AI 정보 수)
     total_ai_info_available = 0
     all_ai_progress = db.query(UserProgress).filter(
@@ -294,7 +316,10 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
             'today_quiz_correct': today_quiz_correct,
             'today_quiz_total': today_quiz_total,
             'total_ai_info_available': total_ai_info_available,
-            'total_terms_available': total_terms_available
+            'total_terms_available': total_terms_available,
+            'cumulative_quiz_score': cumulative_quiz_score,
+            'total_quiz_correct': total_quiz_correct,
+            'total_quiz_questions': total_quiz_questions
         })
         return stats
     
@@ -310,7 +335,10 @@ def get_user_stats(session_id: str, db: Session = Depends(get_db)):
         'today_quiz_correct': today_quiz_correct,
         'today_quiz_total': today_quiz_total,
         'total_ai_info_available': total_ai_info_available,
-        'total_terms_available': total_terms_available
+        'total_terms_available': total_terms_available,
+        'cumulative_quiz_score': cumulative_quiz_score,
+        'total_quiz_correct': total_quiz_correct,
+        'total_quiz_questions': total_quiz_questions
     }
 
 @router.post("/stats/{session_id}")

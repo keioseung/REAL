@@ -133,21 +133,21 @@ function ProgressSection({ sessionId }: ProgressSectionProps) {
           </div>
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-white/70 text-sm">오늘 점수</span>
+              <span className="text-white/70 text-sm">누적 점수</span>
               <span className="text-green-400 font-bold text-lg">
-                {stats?.today_quiz_score || 0}%
+                {stats?.cumulative_quiz_score || 0}%
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-white/70 text-sm">정답률</span>
+              <span className="text-white/70 text-sm">총 정답률</span>
               <span className="text-white font-semibold">
-                {stats?.today_quiz_correct || 0}/{stats?.today_quiz_total || 0}
+                {stats?.total_quiz_correct || 0}/{stats?.total_quiz_questions || 0}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-white/70 text-sm">최고 점수</span>
+              <span className="text-white/70 text-sm">오늘 점수</span>
               <span className="text-white/50 text-sm">
-                {stats?.quiz_score || 0}%
+                {stats?.today_quiz_score || 0}%
               </span>
             </div>
           </div>

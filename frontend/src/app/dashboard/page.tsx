@@ -611,12 +611,14 @@ export default function DashboardPage() {
                         <div className="flex items-center justify-between mb-2">
                           <div className="text-sm text-white/60">퀴즈 점수</div>
                           <div className="text-xs text-white/40">
-                            최고: {userStats?.quiz_score || quizScore}%
+                            누적: {userStats?.total_quiz_questions || 0}문제
                           </div>
                         </div>
-                        <div className="text-2xl font-bold text-green-400 mb-1">{quizScore}%</div>
+                        <div className="text-2xl font-bold text-green-400 mb-1">
+                          {userStats?.cumulative_quiz_score || quizScore}%
+                        </div>
                         <div className="text-xs text-white/50">
-                          오늘: {userStats?.today_quiz_correct || 0}/{userStats?.today_quiz_total || 0} 정답
+                          총 {userStats?.total_quiz_correct || 0}/{userStats?.total_quiz_questions || 0} 정답
                         </div>
                       </div>
                     </div>
