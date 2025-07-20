@@ -9,6 +9,7 @@ export default function IntroPage() {
   const [typedText, setTypedText] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isTyping, setIsTyping] = useState(true)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   
   const fullText = "AI Mastery Hub"
   const taglines = [
@@ -42,6 +43,15 @@ export default function IntroPage() {
     }
   }, [isTyping, taglines.length])
 
+  // 마우스 위치 추적
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
       {/* 고급스러운 배경 효과 */}
@@ -49,17 +59,51 @@ export default function IntroPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.15),transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,255,0.15),transparent_50%)]" />
       
+      {/* 움직이는 그라데이션 배경 */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-pink-900/20 animate-gradient-shift" />
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-transparent to-purple-900/10 animate-gradient-float" />
+      
+      {/* 인터랙티브 마우스 효과 */}
+      <div 
+        className="absolute w-96 h-96 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-full blur-3xl pointer-events-none transition-all duration-1000 ease-out"
+        style={{
+          left: mousePosition.x - 192,
+          top: mousePosition.y - 192,
+          transform: 'translate(-50%, -50%)'
+        }}
+      />
+      
       {/* 움직이는 파티클 효과 */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(30)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-white/20 rounded-full animate-float"
+            className="absolute w-1 h-1 bg-white/30 rounded-full animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 3}s`,
               animationDuration: `${3 + Math.random() * 4}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* 빛나는 효과 */}
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/15 to-purple-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-gradient-to-r from-pink-500/10 to-yellow-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+
+      {/* 움직이는 선 효과 */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-px h-32 bg-gradient-to-b from-transparent via-purple-500/30 to-transparent animate-slide-down"
+            style={{
+              left: `${20 + i * 15}%`,
+              animationDelay: `${i * 0.5}s`,
+              animationDuration: '4s'
             }}
           />
         ))}
@@ -72,13 +116,15 @@ export default function IntroPage() {
           {/* 로고 및 제목 */}
           <div className="flex flex-col items-center gap-8 mb-12">
             <div className="relative">
-              <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl">
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl animate-glow">
                 <FaRobot className="text-4xl md:text-5xl text-white" />
               </div>
               <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse" />
+              {/* 빛나는 효과 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-3xl blur-xl animate-pulse" />
             </div>
             <div>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight leading-tight mb-6">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight leading-tight mb-6 animate-text-glow">
                 {typedText}
                 {isTyping && <span className="animate-blink">|</span>}
               </h1>
@@ -109,7 +155,7 @@ export default function IntroPage() {
 
           {/* CTA 버튼 */}
           <button
-            className="group px-12 md:px-16 py-5 md:py-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white text-xl md:text-2xl rounded-2xl font-bold shadow-2xl hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all flex items-center gap-4 mx-auto animate-fade-in hover:scale-105 active:scale-95 relative overflow-hidden"
+            className="group px-12 md:px-16 py-5 md:py-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white text-xl md:text-2xl rounded-2xl font-bold shadow-2xl hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 transition-all flex items-center gap-4 mx-auto animate-fade-in hover:scale-105 active:scale-95 relative overflow-hidden animate-button-glow"
             onClick={() => router.push('/auth')}
           >
             <span className="relative z-10">지금 시작하기</span>
@@ -142,11 +188,13 @@ export default function IntroPage() {
           ].map((feature, index) => (
             <div
               key={index}
-              className="group bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/10 relative overflow-hidden"
+              className="group bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/10 relative overflow-hidden animate-card-float"
+              style={{ animationDelay: `${index * 0.2}s` }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 animate-icon-glow`}>
                   <feature.icon className="text-white text-2xl" />
                 </div>
                 <h3 className="text-white font-bold text-2xl mb-4">{feature.title}</h3>
@@ -163,8 +211,8 @@ export default function IntroPage() {
             { label: "퀴즈 문제", value: "500+", icon: FaRocket },
             { label: "학습자", value: "10K+", icon: FaChartLine }
           ].map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div key={index} className="text-center animate-stat-fade-in" style={{ animationDelay: `${index * 0.3}s` }}>
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-stat-glow">
                 <stat.icon className="text-purple-400 text-2xl md:text-3xl" />
               </div>
               <div className="text-3xl md:text-4xl font-bold text-white mb-2">{stat.value}</div>
@@ -209,6 +257,79 @@ export default function IntroPage() {
         }
         .animate-fade-in {
           animation: fade-in 1.5s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes gradient-shift {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(10px) translateY(-10px); }
+          50% { transform: translateX(-5px) translateY(5px); }
+          75% { transform: translateX(5px) translateY(-5px); }
+        }
+        .animate-gradient-shift {
+          animation: gradient-shift 8s ease-in-out infinite;
+        }
+        @keyframes gradient-float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-20px) scale(1.1); }
+        }
+        .animate-gradient-float {
+          animation: gradient-float 6s ease-in-out infinite;
+        }
+        @keyframes slide-down {
+          0% { transform: translateY(-100vh); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(100vh); opacity: 0; }
+        }
+        .animate-slide-down {
+          animation: slide-down 4s linear infinite;
+        }
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); }
+          50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.6); }
+        }
+        .animate-glow {
+          animation: glow 3s ease-in-out infinite;
+        }
+        @keyframes text-glow {
+          0%, 100% { filter: drop-shadow(0 0 10px rgba(147, 51, 234, 0.3)); }
+          50% { filter: drop-shadow(0 0 20px rgba(147, 51, 234, 0.6)); }
+        }
+        .animate-text-glow {
+          animation: text-glow 4s ease-in-out infinite;
+        }
+        @keyframes button-glow {
+          0%, 100% { box-shadow: 0 0 30px rgba(147, 51, 234, 0.2); }
+          50% { box-shadow: 0 0 50px rgba(147, 51, 234, 0.4); }
+        }
+        .animate-button-glow {
+          animation: button-glow 3s ease-in-out infinite;
+        }
+        @keyframes card-float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-card-float {
+          animation: card-float 4s ease-in-out infinite;
+        }
+        @keyframes icon-glow {
+          0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+          50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); }
+        }
+        .animate-icon-glow {
+          animation: icon-glow 2s ease-in-out infinite;
+        }
+        @keyframes stat-fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-stat-fade-in {
+          animation: stat-fade-in 1s ease-out both;
+        }
+        @keyframes stat-glow {
+          0%, 100% { box-shadow: 0 0 15px rgba(147, 51, 234, 0.2); }
+          50% { box-shadow: 0 0 25px rgba(147, 51, 234, 0.4); }
+        }
+        .animate-stat-glow {
+          animation: stat-glow 3s ease-in-out infinite;
         }
       `}</style>
     </div>
