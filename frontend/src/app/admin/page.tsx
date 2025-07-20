@@ -2,12 +2,20 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaCog, FaChartBar, FaComments, FaDatabase } from 'react-icons/fa'
+import { FaRobot, FaArrowRight, FaGlobe, FaCode, FaBrain, FaRocket, FaChartLine, FaTrophy, FaLightbulb, FaUsers, FaBookOpen, FaCalendar, FaClipboard, FaBullseye, FaCog, FaChartBar, FaComments, FaDatabase, FaDollarSign, FaChartPie, FaCoins } from 'react-icons/fa'
 
 const adminMenus = [
+  // AI 학습 관리
   { href: '/admin/ai-info', label: 'AI 정보 관리', icon: FaBrain, desc: 'AI 정보 등록, 수정, 삭제 등', color: 'from-blue-500 to-cyan-500' },
   { href: '/admin/prompt', label: '프롬프트 관리', icon: FaComments, desc: 'AI 프롬프트 관리', color: 'from-green-500 to-emerald-500' },
-  { href: '/admin/stats', label: '사용자 통계', icon: FaChartBar, desc: '전체 사용자 학습/퀴즈 통계', color: 'from-yellow-500 to-orange-500' },
+  { href: '/admin/quiz', label: 'AI 퀴즈 관리', icon: FaBullseye, desc: 'AI 퀴즈 등록, 수정, 삭제', color: 'from-purple-500 to-pink-500' },
+  { href: '/admin/stats', label: 'AI 통계', icon: FaChartBar, desc: 'AI 학습 통계', color: 'from-yellow-500 to-orange-500' },
+  
+  // 금융 학습 관리
+  { href: '/admin/finance', label: '금융 정보 관리', icon: FaDollarSign, desc: '금융 정보 등록, 수정, 삭제 등', color: 'from-emerald-500 to-teal-500' },
+  { href: '/admin/finance-prompt', label: '금융 프롬프트 관리', icon: FaComments, desc: '금융 프롬프트 관리', color: 'from-teal-500 to-cyan-500' },
+  { href: '/admin/finance-quiz', label: '금융 퀴즈 관리', icon: FaChartPie, desc: '금융 퀴즈 등록, 수정, 삭제', color: 'from-cyan-500 to-blue-500' },
+  { href: '/admin/finance-stats', label: '금융 통계', icon: FaCoins, desc: '금융 학습 통계', color: 'from-indigo-500 to-purple-500' },
 ]
 
 export default function AdminPage() {
@@ -22,7 +30,7 @@ export default function AdminPage() {
   // 환영 메시지 애니메이션
   const [currentWelcome, setCurrentWelcome] = useState(0)
   const welcomeMessages = [
-    "AI Mastery Hub를 관리하세요! 🚀",
+    "AI & 금융 Mastery Hub를 관리하세요! 🚀",
     "사용자들의 학습을 지원해보세요! 💡",
     "함께 성장하는 플랫폼을 만들어가요! 🌟"
   ]
@@ -95,17 +103,17 @@ export default function AdminPage() {
         </div>
 
         {/* 관리자 메뉴 카드들 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-7xl">
           {adminMenus.map((menu, index) => (
             <button
               key={menu.href}
               onClick={() => router.push(menu.href)}
-              className="group glass card-hover p-8 md:p-10 border border-white/10 text-left flex flex-col gap-4 md:gap-6 shadow-lg"
+              className="group glass card-hover p-6 md:p-8 border border-white/10 text-left flex flex-col gap-4 md:gap-6 shadow-lg"
             >
               <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-r ${menu.color} flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300`}>
                 <menu.icon className="text-white text-xl md:text-2xl" />
               </div>
-              <h3 className="gradient-text font-bold text-xl md:text-2xl mb-2 md:mb-3">{menu.label}</h3>
+              <h3 className="gradient-text font-bold text-lg md:text-xl mb-2 md:mb-3">{menu.label}</h3>
               <p className="text-gray-300 text-sm md:text-base leading-relaxed">{menu.desc}</p>
               <div className="flex items-center gap-2 mt-4 md:mt-6 text-purple-300 group-hover:text-purple-200 transition-colors">
                 <span className="text-sm md:text-base font-semibold">관리하기</span>
@@ -123,7 +131,7 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <FaCode className="text-pink-400" />
-            <span>AI Mastery Hub 관리</span>
+            <span>AI & 금융 Mastery Hub 관리</span>
           </div>
         </div>
       </div>

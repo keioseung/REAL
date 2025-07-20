@@ -198,74 +198,103 @@ export default function FinanceDashboardPage() {
 
   // 주간 학습 데이터 - 실제 사용자 데이터 기반 (월~일 7일 모두)
   const getWeeklyDates = () => {
-    const dates = []
-    const today = new Date()
-    const dayOfWeek = today.getDay() // 0: 일요일, 1: 월요일, ..., 6: 토요일
-    
-    // 월요일부터 시작하도록 조정
-    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-    const monday = new Date(today)
-    monday.setDate(today.getDate() + mondayOffset)
-    
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(monday)
-      date.setDate(monday.getDate() + i)
-      dates.push(date.toISOString().split('T')[0])
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0: 일, 1: 월, ...
+    // 이번주 월요일 구하기
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+    // 7일치 날짜 배열 생성
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d;
+    });
+  };
+  const weeklyDates = getWeeklyDates();
+  const weeklyData = weeklyDates.map((dateObj, idx) => {
+    const dateStr = dateObj.toISOString().split('T')[0];
+    // 금융 정보, 용어, 퀴즈 데이터 추출 (userProgress 기준)
+    const finance = Array.isArray(userProgress?.[dateStr]) ? userProgress[dateStr].length : 0;
+    const termsArr =
+      userProgress &&
+      typeof userProgress.terms_by_date === 'object' &&
+      userProgress.terms_by_date !== null &&
+      !Array.isArray(userProgress.terms_by_date) &&
+      Object.prototype.hasOwnProperty.call(userProgress.terms_by_date, dateStr)
+        ? (userProgress.terms_by_date as Record<string, any[]>)[dateStr]
+        : undefined;
+    const terms = Array.isArray(termsArr) ? termsArr.length : 0;
+    let quiz = 0;
+    const quizScoreArr =
+      userProgress &&
+      typeof userProgress.quiz_score_by_date === 'object' &&
+      userProgress.quiz_score_by_date !== null &&
+      !Array.isArray(userProgress.quiz_score_by_date) &&
+      Object.prototype.hasOwnProperty.call(userProgress.quiz_score_by_date, dateStr)
+        ? (userProgress.quiz_score_by_date as Record<string, any[]>)[dateStr]
+        : undefined;
+    if (Array.isArray(quizScoreArr)) {
+      const totalQuestions = quizScoreArr.length;
+      const correctAnswers = quizScoreArr.filter((score: number) => score > 0).length;
+      quiz = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+    } else if (typeof quizScoreArr === 'number') {
+      quiz = quizScoreArr;
     }
-    return dates
-  }
-
-  const weeklyDates = getWeeklyDates()
-  const weeklyData = weeklyDates.map((date, index) => {
-    const dayNames = ['월', '화', '수', '목', '금', '토', '일']
-    const isToday = date === today.toISOString().split('T')[0]
-    
-    // 실제 사용자 데이터에서 해당 날짜의 학습 현황 가져오기
-    const dayProgress = userProgress?.[date] || []
-    const dayTerms = userProgress?.total_terms_learned?.filter((term: any) => 
-      term.date === date
-    ) || []
-    const dayQuiz = userProgress?.quiz_score?.filter((score: any) => 
-      score.date === date
-    ) || []
-    
+    // 오늘 여부
+    const isToday = dateStr === selectedDate;
+    // 요일명
+    const days = ['월', '화', '수', '목', '금', '토', '일'];
     return {
-      day: dayNames[index],
-      finance: dayProgress.length,
-      terms: dayTerms.length,
-      quiz: dayQuiz.length,
-      isToday
-    }
-  })
+      day: days[idx],
+      finance,
+      terms,
+      quiz,
+      isToday,
+    };
+  });
 
-  // 강제 업데이트 상태
+  // 오늘 학습 데이터 반영
+  const todayIndex = todayDay === 0 ? 6 : todayDay - 1 // 일요일은 인덱스 6
+  weeklyData[todayIndex].finance = learnedFinanceInfo
+  weeklyData[todayIndex].terms = learnedTerms
+  weeklyData[todayIndex].quiz = Math.min(quizScore, 100) // 퀴즈 점수는 최대 100점
+
+  // 금융 정보 3개만 정확히 보여줌
+  const financeInfoFixed = financeInfo && financeInfo.length > 0 ? financeInfo.slice(0, 3) : []
+
   const [forceUpdate, setForceUpdate] = useState(0)
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-
+  
+  // 진행률 업데이트 핸들러
   const handleProgressUpdate = () => {
-    setForceUpdate(prev => prev + 1)
     queryClient.invalidateQueries({ queryKey: ['financeUserProgress', sessionId] })
     queryClient.invalidateQueries({ queryKey: ['financeUserStats', sessionId] })
+    queryClient.invalidateQueries({ queryKey: ['financeLearnedTerms', sessionId] })
+    setForceUpdate(prev => prev + 1) // 강제 리렌더링
   }
 
+  // 새로고침 핸들러(탭별)
   const handleRefresh = () => window.location.reload()
 
+  // 토스트 알림 상태
+  const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const showToast = (type: 'success' | 'error', message: string) => {
     setToast({ type, message })
-    setTimeout(() => setToast(null), 3000)
+    setTimeout(() => setToast(null), 2500)
   }
 
-  // 금융 정보 데이터 고정 (로딩 중이거나 데이터가 없을 때 기본값)
-  const financeInfoFixed = financeInfo || []
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 relative overflow-hidden">
-      {/* 배경 애니메이션 */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 relative overflow-hidden px-4">
+      {/* 고급스러운 배경 효과 */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,119,198,0.15),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,255,0.15),transparent_50%)]" />
+      
+      {/* 움직이는 파티클 효과 */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(15)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-green-400/20 rounded-full animate-float"
+            className="absolute w-1 h-1 bg-white/20 rounded-full animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -468,6 +497,45 @@ export default function FinanceDashboardPage() {
           )}
         </motion.div>
       </main>
+
+      {/* 커스텀 애니메이션 스타일 */}
+      <style jsx global>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.2; }
+          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 3s infinite;
+        }
+        @keyframes blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        .animate-blink {
+          animation: blink 1s infinite;
+        }
+        @keyframes fade-in-out {
+          0%, 100% { opacity: 0; transform: translateY(10px); }
+          20%, 80% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-out {
+          animation: fade-in-out 3s ease-in-out infinite;
+        }
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: none; }
+        }
+        .animate-fade-in {
+          animation: fade-in 1.5s cubic-bezier(0.22,1,0.36,1) both;
+        }
+      `}</style>
     </div>
   )
 } 

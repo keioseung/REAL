@@ -71,14 +71,14 @@ export const baseContentAPI = {
 
 // 금융 관련 API들
 export const financeInfoAPI = {
-  getAll: (skip: number = 0, limit: number = 10) => 
-    api.get(`/api/finance/finance-info?skip=${skip}&limit=${limit}`),
-  getById: (id: number) => api.get(`/api/finance/finance-info/${id}`),
-  add: (data: any) => api.post('/api/finance/finance-info', data),
-  update: (id: number, data: any) => api.put(`/api/finance/finance-info/${id}`, data),
-  delete: (id: number) => api.delete(`/api/finance/finance-info/${id}`),
-  getWithTerms: (skip: number = 0, limit: number = 10) => 
-    api.get(`/api/finance/finance-info-with-terms?skip=${skip}&limit=${limit}`),
+  getByDate: (date: string) => api.get(`/api/finance/finance-info/${date}`),
+  add: (data: any) => api.post('/api/finance/finance-info/', data),
+  delete: (date: string) => api.delete(`/api/finance/finance-info/${date}`),
+  getAllDates: () => api.get('/api/finance/finance-info/dates/all'),
+  fetchNews: () => api.get('/api/finance/finance-info/news/fetch'),
+  getTermsQuiz: (sessionId: string) => api.get(`/api/finance/finance-info/terms-quiz/${sessionId}`),
+  getTermsQuizByDate: (date: string) => api.get(`/api/finance/finance-info/terms-quiz-by-date/${date}`),
+  getLearnedTerms: (sessionId: string) => api.get(`/api/finance/finance-info/learned-terms/${sessionId}`),
 }
 
 export const financeTermAPI = {
@@ -93,33 +93,32 @@ export const financeTermAPI = {
 }
 
 export const financeUserProgressAPI = {
-  createProgress: (data: any) => api.post('/api/finance/finance-progress', data),
-  getUserProgress: (userId: number) => api.get(`/api/finance/finance-progress/${userId}`),
-  getLearnedTerms: (userId: number, dateFilter?: string) => {
-    const params = dateFilter ? `?date_filter=${dateFilter}` : '';
-    return api.get(`/api/finance/finance-learned-terms/${userId}${params}`);
-  },
-  getStats: (userId: number) => api.get(`/api/finance/finance-stats/${userId}`),
-  getPeriodStats: (userId: number, period: string) => 
-    api.get(`/api/finance/finance-period-stats/${userId}?period=${period}`),
-  recordQuizResult: (userId: number, quizData: any) => 
-    api.post(`/api/finance/finance-quiz-result?user_id=${userId}`, quizData),
-  getQuizHistory: (userId: number) => api.get(`/api/finance/finance-quiz-history/${userId}`),
+  get: (sessionId: string) => api.get(`/api/finance/finance-user-progress/${sessionId}`),
+  update: (sessionId: string, date: string, infoIndex: number) => 
+    api.post(`/api/finance/finance-user-progress/${sessionId}/${date}/${infoIndex}`),
+  updateTermProgress: (sessionId: string, termData: any) => 
+    api.post(`/api/finance/finance-user-progress/term-progress/${sessionId}`, termData),
+  getStats: (sessionId: string) => api.get(`/api/finance/finance-user-progress/stats/${sessionId}`),
+  getPeriodStats: (sessionId: string, startDate: string, endDate: string) => 
+    api.get(`/api/finance/finance-user-progress/period-stats/${sessionId}?start_date=${startDate}&end_date=${endDate}`),
+  updateStats: (sessionId: string, stats: any) => 
+    api.post(`/api/finance/finance-user-progress/stats/${sessionId}`, stats),
+  updateQuizScore: (sessionId: string, scoreData: any) => 
+    api.post(`/api/finance/finance-user-progress/quiz-score/${sessionId}`, scoreData),
+  checkAchievements: (sessionId: string) => 
+    api.get(`/api/finance/finance-user-progress/achievements/${sessionId}`),
+  deleteByDate: (sessionId: string, date: string) => api.delete(`/api/finance/finance-user-progress/${sessionId}/${date}`),
+  deleteInfoIndex: (sessionId: string, date: string, infoIndex: number) => api.delete(`/api/finance/finance-user-progress/${sessionId}/${date}/${infoIndex}`),
 }
 
 // 금융 퀴즈 API
 export const financeQuizAPI = {
-  getAll: () => api.get('/api/finance-quiz/'),
-  getById: (id: number) => api.get(`/api/finance-quiz/${id}`),
-  create: (data: any) => api.post('/api/finance-quiz/', data),
+  getTopics: () => api.get('/api/finance-quiz/topics'),
+  getByTopic: (topic: string) => api.get(`/api/finance-quiz/${topic}`),
+  add: (data: any) => api.post('/api/finance-quiz/', data),
   update: (id: number, data: any) => api.put(`/api/finance-quiz/${id}`, data),
   delete: (id: number) => api.delete(`/api/finance-quiz/${id}`),
-  getRandom: (count: number, difficulty?: string, category?: string) => {
-    const params = new URLSearchParams();
-    if (difficulty) params.append('difficulty', difficulty);
-    if (category) params.append('category', category);
-    return api.get(`/api/finance-quiz/random/${count}?${params.toString()}`);
-  },
+  generate: (topic: string) => api.get(`/api/finance-quiz/generate/${topic}`),
 }
 
 // 금융 통계 API

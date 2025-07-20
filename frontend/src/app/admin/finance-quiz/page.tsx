@@ -1,395 +1,175 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { FaDollarSign, FaPlus, FaEdit, FaTrash, FaQuestion, FaSearch, FaFilter } from 'react-icons/fa'
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { financeQuizAPI } from '@/lib/api'
 
-interface FinanceQuiz {
+// Quiz 타입을 API 응답에 맞게 수정
+interface Quiz {
   id: number
+  topic: string
   question: string
-  options: string[]
-  correct_answer: number
+  option1: string
+  option2: string
+  option3: string
+  option4: string
+  correct: number
   explanation: string
-  difficulty: string
-  category: string
-  created_at: string
-  updated_at: string
 }
 
-interface FinanceQuizForm {
-  question: string
-  options: string[]
-  correct_answer: number
-  explanation: string
-  difficulty: string
-  category: string
-}
+export default function AdminFinanceQuizPage() {
+  const queryClient = useQueryClient()
+  const [topic, setTopic] = useState('')
+  const [question, setQuestion] = useState('')
+  const [answer, setAnswer] = useState('')
+  const [choices, setChoices] = useState(['', '', '', ''])
+  const [explanation, setExplanation] = useState('')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-export default function FinanceQuizAdminPage() {
-  const [quizzes, setQuizzes] = useState<FinanceQuiz[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedDifficulty, setSelectedDifficulty] = useState('all')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [formData, setFormData] = useState<FinanceQuizForm>({
-    question: '',
-    options: ['', '', '', ''],
-    correct_answer: 0,
-    explanation: '',
-    difficulty: '초급',
-    category: '주식'
-  })
-
-  useEffect(() => {
-    fetchQuizzes()
-  }, [])
-
-  const fetchQuizzes = async () => {
-    try {
-      setLoading(true)
-      const response = await financeQuizAPI.getAll()
-      setQuizzes(response.data)
-    } catch (err) {
-      setError('퀴즈를 불러오는데 실패했습니다.')
-      console.error('Error fetching quizzes:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      if (editingId) {
-        await financeQuizAPI.update(editingId, formData)
-      } else {
-        await financeQuizAPI.create(formData)
+  // useQuery에서 받아온 데이터를 바로 사용
+  const { data: quizzes = [], refetch } = useQuery({
+    queryKey: ['finance-quizzes'],
+    queryFn: async () => {
+      const res = await financeQuizAPI.getTopics()
+      if (res.data.length > 0) {
+        const quizRes = await financeQuizAPI.getByTopic(res.data[0])
+        return quizRes.data as Quiz[]
       }
-      setShowForm(false)
-      setEditingId(null)
-      setFormData({
-        question: '',
-        options: ['', '', '', ''],
-        correct_answer: 0,
-        explanation: '',
-        difficulty: '초급',
-        category: '주식'
-      })
-      fetchQuizzes()
-    } catch (err) {
-      setError(editingId ? '수정에 실패했습니다.' : '생성에 실패했습니다.')
-      console.error('Error saving quiz:', err)
+      return []
     }
-  }
-
-  const handleEdit = (quiz: FinanceQuiz) => {
-    setEditingId(quiz.id)
-    setFormData({
-      question: quiz.question,
-      options: quiz.options,
-      correct_answer: quiz.correct_answer,
-      explanation: quiz.explanation,
-      difficulty: quiz.difficulty,
-      category: quiz.category
-    })
-    setShowForm(true)
-  }
-
-  const handleDelete = async (id: number) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return
-    try {
-      await financeQuizAPI.delete(id)
-      fetchQuizzes()
-    } catch (err) {
-      setError('삭제에 실패했습니다.')
-      console.error('Error deleting quiz:', err)
-    }
-  }
-
-  const updateOption = (index: number, value: string) => {
-    const newOptions = [...formData.options]
-    newOptions[index] = value
-    setFormData({ ...formData, options: newOptions })
-  }
-
-  const filteredQuizzes = quizzes.filter(quiz => {
-    const matchesSearch = quiz.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         quiz.explanation.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesDifficulty = selectedDifficulty === 'all' || quiz.difficulty === selectedDifficulty
-    const matchesCategory = selectedCategory === 'all' || quiz.category === selectedCategory
-    return matchesSearch && matchesDifficulty && matchesCategory
   })
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case '초급': return 'bg-green-500/20 text-green-400 border-green-500/30'
-      case '중급': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-      case '고급': return 'bg-red-500/20 text-red-400 border-red-500/30'
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+  const addOrUpdateMutation = useMutation({
+    mutationFn: async () => {
+      const correctIndex = choices.findIndex(c => c.trim() === answer.trim())
+      if (correctIndex === -1) {
+        throw new Error('정답이 오답 목록에 없습니다.')
+      }
+      const quizPayload = {
+        topic,
+        question,
+        option1: choices[0],
+        option2: choices[1],
+        option3: choices[2],
+        option4: choices[3],
+        correct: correctIndex,
+        explanation
+      }
+      if (editId) {
+        return financeQuizAPI.update(Number(editId), quizPayload)
+      } else {
+        return financeQuizAPI.add(quizPayload)
+      }
+    },
+    onMutate: () => {
+      setError('')
+      setSuccess('')
+    },
+    onSuccess: () => {
+      refetch()
+      setTopic('')
+      setQuestion('')
+      setAnswer('')
+      setChoices(['', '', '', ''])
+      setExplanation('')
+      setEditId(null)
+      setSuccess('등록이 완료되었습니다!')
+    },
+    onError: (err: any) => {
+      setError(err?.message || '등록에 실패했습니다. 다시 시도해주세요.')
     }
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    if (!topic.trim() || !question.trim() || !answer.trim() || choices.some(c => !c.trim())) {
+      setError('모든 항목(주제, 문제, 정답, 오답)을 입력하세요.')
+      return
+    }
+    if (!choices.includes(answer)) {
+      setError('정답은 오답 목록 중 하나여야 합니다.')
+      return
+    }
+    addOrUpdateMutation.mutate()
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
-      </div>
-    )
+  const handleEdit = (q: Quiz) => {
+    setEditId(q.id.toString())
+    setTopic(q.topic)
+    setQuestion(q.question)
+    setAnswer(q.option1) // 편집 시 정답은 option1로 설정
+    setChoices([q.option1, q.option2, q.option3, q.option4])
+    setExplanation(q.explanation || '')
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await financeQuizAPI.delete(Number(id))
+      refetch()
+      setSuccess('삭제가 완료되었습니다!')
+    } catch {
+      setError('삭제에 실패했습니다. 다시 시도해주세요.')
+    }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-          <FaQuestion className="text-green-400" />
-          금융 퀴즈 관리
-        </h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
-        >
-          <FaPlus />
-          새 퀴즈 추가
+    <div className="max-w-3xl mx-auto mt-16 p-8 bg-white rounded-3xl shadow-2xl">
+      <h2 className="text-3xl font-extrabold mb-8 text-cyan-700 flex items-center gap-2">🎯 금융 퀴즈 관리</h2>
+      <form onSubmit={handleSubmit} className="mb-10 bg-cyan-50 rounded-xl p-6 shadow flex flex-col gap-6">
+        <div className="bg-white rounded-xl border border-cyan-100 shadow-sm p-6 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-cyan-700">주제</label>
+            <input type="text" placeholder="주제" value={topic} onChange={e => setTopic(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-cyan-300" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-cyan-700">문제</label>
+            <input type="text" placeholder="문제" value={question} onChange={e => setQuestion(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-cyan-300" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-cyan-700">정답</label>
+            <input type="text" placeholder="정답" value={answer} onChange={e => setAnswer(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-cyan-300" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-cyan-700">오답</label>
+            {choices.map((c, i) => (
+              <input key={i} type="text" placeholder={`오답${i+1}`} value={c} onChange={e => setChoices(choices.map((cc, idx) => idx === i ? e.target.value : cc))} className="p-2 border rounded focus:ring-2 focus:ring-cyan-300 mb-1" />
+            ))}
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="font-semibold text-cyan-700">해설</label>
+            <textarea placeholder="해설 (선택)" value={explanation} onChange={e => setExplanation(e.target.value)} className="p-2 border rounded focus:ring-2 focus:ring-cyan-300" rows={2} />
+          </div>
+        </div>
+        {error && <div className="text-red-500 font-semibold text-center mt-2">{error}</div>}
+        {success && <div className="text-green-600 font-semibold text-center mt-2">{success}</div>}
+        <button type="submit" disabled={addOrUpdateMutation.isPending} className="mt-4 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-bold hover:from-cyan-700 hover:to-blue-700 transition w-full text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+          {addOrUpdateMutation.isPending ? '등록 중...' : (editId ? '수정' : '등록')}
         </button>
-      </div>
-
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-          <p className="text-red-400">{error}</p>
-        </div>
-      )}
-
-      {/* 검색 및 필터 */}
-      <div className="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40" />
-            <input
-              type="text"
-              placeholder="문제 또는 설명 검색..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-green-500"
-            />
-          </div>
-          <select
-            value={selectedDifficulty}
-            onChange={(e) => setSelectedDifficulty(e.target.value)}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-green-500"
-          >
-            <option value="all">모든 난이도</option>
-            <option value="초급">초급</option>
-            <option value="중급">중급</option>
-            <option value="고급">고급</option>
-          </select>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-green-500"
-          >
-            <option value="all">모든 카테고리</option>
-            <option value="주식">주식</option>
-            <option value="채권">채권</option>
-            <option value="펀드">펀드</option>
-            <option value="보험">보험</option>
-            <option value="부동산">부동산</option>
-            <option value="암호화폐">암호화폐</option>
-          </select>
-          <div className="flex items-center gap-2 text-white/60">
-            <FaFilter />
-            <span>{filteredQuizzes.length}개 결과</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 퀴즈 목록 */}
-      <div className="grid gap-4">
-        {filteredQuizzes.map((quiz) => (
-          <div
-            key={quiz.id}
-            className="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10 hover:border-white/20 transition-all"
-          >
-            <div className="flex items-start justify-between">
+      </form>
+      <div className="grid gap-6">
+        {quizzes.length === 0 && <div className="text-gray-400 text-center">등록된 퀴즈가 없습니다.</div>}
+        {quizzes.map(q => {
+          const options = [q.option1, q.option2, q.option3, q.option4];
+          return (
+            <div key={q.id} className="bg-gradient-to-r from-cyan-100 to-blue-100 rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className={`px-3 py-1 rounded-full text-sm border ${getDifficultyColor(quiz.difficulty)}`}>
-                    {quiz.difficulty}
-                  </span>
-                  <span className="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-sm">
-                    {quiz.category}
-                  </span>
-                </div>
-                
-                <h3 className="text-lg font-semibold text-white mb-4">{quiz.question}</h3>
-                
-                <div className="space-y-2 mb-4">
-                  {quiz.options.map((option, index) => (
-                    <div
-                      key={index}
-                      className={`p-3 rounded-lg border ${
-                        index === quiz.correct_answer
-                          ? 'bg-green-500/20 border-green-500/30 text-green-400'
-                          : 'bg-white/5 border-white/10 text-white/70'
-                      }`}
-                    >
-                      <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
-                      {option}
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
-                  <p className="text-blue-400 text-sm">
-                    <strong>정답:</strong> {String.fromCharCode(65 + quiz.correct_answer)}. {quiz.options[quiz.correct_answer]}
-                  </p>
-                  <p className="text-blue-300 text-sm mt-2">{quiz.explanation}</p>
-                </div>
-                
-                <div className="flex items-center gap-4 text-sm text-white/50">
-                  <span>생성: {new Date(quiz.created_at).toLocaleDateString('ko-KR')}</span>
-                  <span>수정: {new Date(quiz.updated_at).toLocaleDateString('ko-KR')}</span>
-                </div>
+                <div className="font-bold text-lg text-cyan-900 mb-1">{q.question}</div>
+                <div className="text-green-700 text-sm mb-1">정답: {options[q.correct]}</div>
+                <div className="text-gray-700 text-sm mb-1">오답: {options.filter((_,i)=>i!==q.correct).join(', ')}</div>
+                {q.explanation && <div className="text-cyan-700 text-sm bg-cyan-50 rounded p-2 mt-2">해설: {q.explanation}</div>}
               </div>
-              
-              <div className="flex items-center gap-2 ml-4">
-                <button
-                  onClick={() => handleEdit(quiz)}
-                  className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  title="수정"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  onClick={() => handleDelete(quiz.id)}
-                  className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                  title="삭제"
-                >
-                  <FaTrash />
-                </button>
+              <div className="flex gap-2 mt-2 md:mt-0">
+                <button onClick={() => handleEdit(q)} className="px-4 py-2 bg-yellow-400 text-white rounded-xl font-bold hover:bg-yellow-500 transition">수정</button>
+                <button onClick={() => handleDelete(q.id.toString())} className="px-4 py-2 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">삭제</button>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-
-      {/* 폼 모달 */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900 rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              {editingId ? '퀴즈 수정' : '새 퀴즈 추가'}
-            </h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-white mb-2">문제</label>
-                <textarea
-                  value={formData.question}
-                  onChange={(e) => setFormData({...formData, question: e.target.value})}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-green-500"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-white mb-2">보기</label>
-                {formData.options.map((option, index) => (
-                  <div key={index} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="radio"
-                      name="correct_answer"
-                      checked={formData.correct_answer === index}
-                      onChange={() => setFormData({...formData, correct_answer: index})}
-                      className="text-green-500"
-                    />
-                    <input
-                      type="text"
-                      value={option}
-                      onChange={(e) => updateOption(index, e.target.value)}
-                      placeholder={`보기 ${index + 1}`}
-                      className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-green-500"
-                      required
-                    />
-                  </div>
-                ))}
-              </div>
-              
-              <div>
-                <label className="block text-white mb-2">해설</label>
-                <textarea
-                  value={formData.explanation}
-                  onChange={(e) => setFormData({...formData, explanation: e.target.value})}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-green-500"
-                  required
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-white mb-2">난이도</label>
-                  <select
-                    value={formData.difficulty}
-                    onChange={(e) => setFormData({...formData, difficulty: e.target.value})}
-                    className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-green-500"
-                  >
-                    <option value="초급">초급</option>
-                    <option value="중급">중급</option>
-                    <option value="고급">고급</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-white mb-2">카테고리</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-green-500"
-                  >
-                    <option value="주식">주식</option>
-                    <option value="채권">채권</option>
-                    <option value="펀드">펀드</option>
-                    <option value="보험">보험</option>
-                    <option value="부동산">부동산</option>
-                    <option value="암호화폐">암호화폐</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 pt-4">
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  {editingId ? '수정' : '추가'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false)
-                    setEditingId(null)
-                    setFormData({
-                      question: '',
-                      options: ['', '', '', ''],
-                      correct_answer: 0,
-                      explanation: '',
-                      difficulty: '초급',
-                      category: '주식'
-                    })
-                  }}
-                  className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 } 
