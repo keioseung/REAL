@@ -111,9 +111,19 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   const maxQuiz = Math.max(...chartData.map((d: PeriodData) => d.quiz_score), 1)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {/* 테스트용 버튼 - 최상단에 배치 */}
+      <div className="fixed top-20 left-4 z-[9999] bg-red-500 p-2 rounded">
+        <button
+          onClick={() => alert('테스트 버튼 클릭됨!')}
+          className="bg-yellow-500 text-black px-4 py-2 rounded"
+        >
+          테스트 버튼
+        </button>
+      </div>
+
       {/* 날짜 및 기간 선택 */}
-      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between relative z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-white/70" />
@@ -131,12 +141,14 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               onClick={() => {
                 alert('진행률 탭 - 날짜 input 클릭됨!')
               }}
-              className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer touch-manipulation"
+              className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer touch-manipulation relative z-20"
               style={{ 
                 colorScheme: 'dark',
                 minHeight: '44px',
                 WebkitAppearance: 'none',
-                MozAppearance: 'none'
+                MozAppearance: 'none',
+                position: 'relative',
+                zIndex: 9999
               }}
             />
           </div>
@@ -145,7 +157,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-white/80 text-sm font-medium">기간:</span>
-            <div className="flex bg-white/10 rounded-lg p-1">
+            <div className="flex bg-white/10 rounded-lg p-1 relative z-20">
               <button
                 type="button"
                 onClick={() => {
@@ -156,7 +168,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('주간 버튼 터치됨!')
                   handlePeriodChange('week')
                 }}
-                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] ${
+                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] relative z-30 ${
                   periodType === 'week'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20 active:bg-white/30'
@@ -165,7 +177,9 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   WebkitTapHighlightColor: 'transparent',
                   WebkitTouchCallout: 'none',
                   WebkitUserSelect: 'none',
-                  userSelect: 'none'
+                  userSelect: 'none',
+                  position: 'relative',
+                  zIndex: 9999
                 }}
               >
                 주간
@@ -180,7 +194,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('월간 버튼 터치됨!')
                   handlePeriodChange('month')
                 }}
-                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] ${
+                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] relative z-30 ${
                   periodType === 'month'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20 active:bg-white/30'
@@ -189,7 +203,9 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   WebkitTapHighlightColor: 'transparent',
                   WebkitTouchCallout: 'none',
                   WebkitUserSelect: 'none',
-                  userSelect: 'none'
+                  userSelect: 'none',
+                  position: 'relative',
+                  zIndex: 9999
                 }}
               >
                 월간
@@ -204,7 +220,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('사용자 버튼 터치됨!')
                   handlePeriodChange('custom')
                 }}
-                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] ${
+                className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] relative z-30 ${
                   periodType === 'custom'
                     ? 'bg-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/20 active:bg-white/30'
@@ -213,7 +229,9 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   WebkitTapHighlightColor: 'transparent',
                   WebkitTouchCallout: 'none',
                   WebkitUserSelect: 'none',
-                  userSelect: 'none'
+                  userSelect: 'none',
+                  position: 'relative',
+                  zIndex: 9999
                 }}
               >
                 사용자
@@ -222,7 +240,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
           </div>
 
           {periodType === 'custom' && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 relative z-20">
               <input
                 type="date"
                 value={customStartDate}
@@ -230,11 +248,13 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('시작 날짜 변경됨!')
                   handleCustomStartDateChange(e.target.value)
                 }}
-                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation"
+                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
                 style={{ 
                   minHeight: '44px',
                   WebkitAppearance: 'none',
-                  MozAppearance: 'none'
+                  MozAppearance: 'none',
+                  position: 'relative',
+                  zIndex: 9999
                 }}
               />
               <span className="text-white/50">~</span>
@@ -245,11 +265,13 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   alert('종료 날짜 변경됨!')
                   handleCustomEndDateChange(e.target.value)
                 }}
-                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation"
+                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
                 style={{ 
                   minHeight: '44px',
                   WebkitAppearance: 'none',
-                  MozAppearance: 'none'
+                  MozAppearance: 'none',
+                  position: 'relative',
+                  zIndex: 9999
                 }}
               />
             </div>
