@@ -28,10 +28,10 @@ interface FinanceInfoCardProps {
   index: number
   date: string
   sessionId: string
-  isLearned: boolean
-  onProgressUpdate: () => void
-  forceUpdate: number
-  setForceUpdate: (value: number) => void
+  isLearned?: boolean
+  onProgressUpdate?: () => void
+  forceUpdate?: number
+  setForceUpdate?: (fn: (prev: number) => number) => void
 }
 
 export default function FinanceInfoCard({
@@ -39,14 +39,14 @@ export default function FinanceInfoCard({
   index,
   date,
   sessionId,
-  isLearned,
+  isLearned: isLearnedProp,
   onProgressUpdate,
   forceUpdate,
   setForceUpdate
 }: FinanceInfoCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
-  const [learnedTerms, setLearnedTerms] = useState<Set<number>>(new Set())
+  const [learnedTerms, setLearnedTerms] = useState<Set<string>>(new Set())
   const [showAllTerms, setShowAllTerms] = useState(false)
   const queryClient = useQueryClient()
 
@@ -54,13 +54,9 @@ export default function FinanceInfoCard({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const stored = localStorage.getItem('financeLearnedTerms')
+        const stored = localStorage.getItem('learnedTerms_'+sessionId+'_'+date+'_'+index)
         if (stored) {
-          const parsed = JSON.parse(stored)
-          const key = `${sessionId}_${date}_${index}`
-          if (parsed[key]) {
-            setLearnedTerms(new Set(parsed[key]))
-          }
+          setLearnedTerms(new Set(JSON.parse(stored)))
         }
       } catch (error) {
         console.error('Failed to parse learned terms:', error)
@@ -75,22 +71,22 @@ export default function FinanceInfoCard({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['financeUserProgress', sessionId] })
-      onProgressUpdate()
+      onProgressUpdate && onProgressUpdate()
     }
   })
 
   // 용어 학습 상태 업데이트 뮤테이션
   const updateTermProgressMutation = useMutation({
-    mutationFn: async (termId: number) => {
+    mutationFn: async (term: string) => {
       await financeUserProgressAPI.updateTermProgress(sessionId, {
-        term_id: termId,
+        term: term,
         date: date,
         finance_info_id: info.id
       })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['financeUserProgress', sessionId] })
-      onProgressUpdate()
+      onProgressUpdate && onProgressUpdate()
     }
   })
 
@@ -110,30 +106,26 @@ export default function FinanceInfoCard({
         localStorage.setItem('userProgress', JSON.stringify(parsed))
       }
       
-      setForceUpdate(forceUpdate + 1)
+      setForceUpdate && setForceUpdate(prev => prev + 1)
     } catch (error) {
       console.error('Error updating progress:', error)
     }
   }
 
-  const handleTermLearn = async (termId: number) => {
+  const handleTermLearn = async (term: string) => {
     try {
-      await updateTermProgressMutation.mutateAsync(termId)
-      
+      await updateTermProgressMutation.mutateAsync(term)
       // 로컬 스토리지 업데이트
       if (typeof window !== 'undefined') {
-        const stored = localStorage.getItem('financeLearnedTerms')
-        const parsed = stored ? JSON.parse(stored) : {}
-        const key = `${sessionId}_${date}_${index}`
-        if (!parsed[key]) parsed[key] = []
-        if (!parsed[key].includes(termId)) {
-          parsed[key].push(termId)
+        const stored = localStorage.getItem('learnedTerms_'+sessionId+'_'+date+'_'+index)
+        const parsed: string[] = stored ? JSON.parse(stored) : []
+        if (!parsed.includes(term)) {
+          parsed.push(term)
         }
-        localStorage.setItem('financeLearnedTerms', JSON.stringify(parsed))
-        setLearnedTerms(new Set(parsed[key]))
+        localStorage.setItem('learnedTerms_'+sessionId+'_'+date+'_'+index, JSON.stringify(parsed))
+        setLearnedTerms(new Set(parsed))
       }
-      
-      setForceUpdate(forceUpdate + 1)
+      setForceUpdate && setForceUpdate(prev => prev + 1)
     } catch (error) {
       console.error('Error updating term progress:', error)
     }
@@ -169,7 +161,7 @@ export default function FinanceInfoCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className={`glass backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-xl border transition-all duration-300 ${
-        isLearned 
+        isLearnedProp 
           ? 'border-green-500/50 bg-green-500/5' 
           : 'border-white/10 hover:border-white/20'
       }`}
@@ -181,7 +173,7 @@ export default function FinanceInfoCard({
             <h3 className="text-xl md:text-2xl font-bold text-white line-clamp-2">
               {info.title}
             </h3>
-            {isLearned && (
+            {isLearnedProp && (
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -244,7 +236,7 @@ export default function FinanceInfoCard({
                 className="space-y-3"
               >
                 {displayedTerms?.map((term) => {
-                  const isTermLearned = learnedTerms.has(term.id)
+                  const isTermLearned = learnedTerms.has(term.term)
                   return (
                     <motion.div
                       key={term.id}
@@ -282,7 +274,7 @@ export default function FinanceInfoCard({
                         
                         {!isTermLearned && (
                           <button
-                            onClick={() => handleTermLearn(term.id)}
+                            onClick={() => handleTermLearn(term.term)}
                             className="ml-4 p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                             title="학습 완료"
                           >
@@ -315,7 +307,7 @@ export default function FinanceInfoCard({
           <span>생성: {new Date(info.created_at).toLocaleDateString('ko-KR')}</span>
         </div>
         
-        {!isLearned && (
+        {!isLearnedProp && (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -334,7 +326,7 @@ export default function FinanceInfoCard({
           </motion.button>
         )}
         
-        {isLearned && (
+        {isLearnedProp && (
           <div className="flex items-center gap-2 text-green-400">
             <FaCheck />
             <span className="font-semibold">학습 완료</span>
