@@ -105,6 +105,8 @@ export const financeUserProgressAPI = {
     api.post(`/api/finance/finance-user-progress/stats/${sessionId}`, stats),
   updateQuizScore: (sessionId: string, scoreData: any) => 
     api.post(`/api/finance/finance-user-progress/quiz-score/${sessionId}`, scoreData),
+  recordQuizResult: (sessionId: string, resultData: any) => 
+    api.post(`/api/finance/finance-user-progress/quiz-score/${sessionId}`, resultData),
   checkAchievements: (sessionId: string) => 
     api.get(`/api/finance/finance-user-progress/achievements/${sessionId}`),
   deleteByDate: (sessionId: string, date: string) => api.delete(`/api/finance/finance-user-progress/${sessionId}/${date}`),

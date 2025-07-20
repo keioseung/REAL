@@ -134,7 +134,7 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
   const saveQuizResult = async () => {
     try {
       // 실제 구현에서는 사용자 ID가 필요
-      await financeUserProgressAPI.recordQuizResult(1, {
+      await financeUserProgressAPI.recordQuizResult(sessionId, {
         score: score,
         total_questions: totalQuestions,
         correct_answers: score,
