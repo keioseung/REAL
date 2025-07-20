@@ -208,37 +208,45 @@ export default function FinanceStatsAdminPage() {
           {selectedPeriod === 'week' ? '주간' : '월간'} 활동 현황
         </h3>
         <div className="space-y-4">
-          {(selectedPeriod === 'week' ? stats.weekly_activity : stats.monthly_activity).map((item, index) => (
-            <div key={index} className="flex items-center gap-4">
-              <div className="w-24 text-sm text-white/60">
-                {selectedPeriod === 'week' ? item.week : item.month}
-              </div>
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <FaUsers className="text-blue-400 text-sm" />
-                    <span className="text-white text-sm">{item.users}명</span>
+          {(selectedPeriod === 'week' ? stats.weekly_activity : stats.monthly_activity).map((item, index) => {
+            const periodLabel = selectedPeriod === 'week' 
+              ? (item as { week: string }).week 
+              : (item as { month: string }).month;
+            const activityData = selectedPeriod === 'week' ? stats.weekly_activity : stats.monthly_activity;
+            const maxUsers = Math.max(...activityData.map(x => x.users));
+            
+            return (
+              <div key={index} className="flex items-center gap-4">
+                <div className="w-24 text-sm text-white/60">
+                  {periodLabel}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <FaUsers className="text-blue-400 text-sm" />
+                      <span className="text-white text-sm">{item.users}명</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaDollarSign className="text-green-400 text-sm" />
+                      <span className="text-white text-sm">{item.terms}개</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaTrophy className="text-yellow-400 text-sm" />
+                      <span className="text-white text-sm">{item.quizzes}회</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <FaDollarSign className="text-green-400 text-sm" />
-                    <span className="text-white text-sm">{item.terms}개</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaTrophy className="text-yellow-400 text-sm" />
-                    <span className="text-white text-sm">{item.quizzes}회</span>
+                  <div className="w-full bg-white/10 rounded-full h-2">
+                    <div
+                      className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${Math.min((item.users / maxUsers) * 100, 100)}%` 
+                      }}
+                    />
                   </div>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full transition-all duration-500"
-                    style={{ 
-                      width: `${Math.min((item.users / Math.max(...(selectedPeriod === 'week' ? stats.weekly_activity : stats.monthly_activity).map(x => x.users))) * 100, 100)}%` 
-                    }}
-                  />
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
