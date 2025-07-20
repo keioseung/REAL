@@ -200,7 +200,7 @@ export default function ProgressSection({ sessionId }: ProgressSectionProps) {
           {(selectedPeriod === 'week' ? stats.weekly_stats : stats.monthly_stats).map((item, index) => (
             <div key={index} className="flex items-center gap-4">
               <div className="w-24 text-sm text-white/60">
-                {selectedPeriod === 'week' ? item.week : item.month}
+                {selectedPeriod === 'week' ? (item as { week: string; learned_count: number }).week : (item as { month: string; learned_count: number }).month}
               </div>
               <div className="flex-1 bg-white/10 rounded-full h-4 relative">
                 <div
