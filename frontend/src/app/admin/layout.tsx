@@ -15,12 +15,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       color: 'text-blue-400'
     },
     {
-      name: 'AI 퀴즈 관리',
-      href: '/admin/quiz',
-      icon: FaQuestion,
-      color: 'text-blue-400'
-    },
-    {
       name: 'AI 통계',
       href: '/admin/stats',
       icon: FaChartLine,
@@ -30,12 +24,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       name: '금융 정보 관리',
       href: '/admin/finance',
       icon: FaDollarSign,
-      color: 'text-green-400'
-    },
-    {
-      name: '금융 퀴즈 관리',
-      href: '/admin/finance-quiz',
-      icon: FaQuestion,
       color: 'text-green-400'
     },
     {
