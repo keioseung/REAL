@@ -224,8 +224,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               <div className="text-center">
                 <span className="text-white/80 text-sm font-medium">사용자 정의 기간 설정</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
+              <div className="flex flex-col gap-3">
+                <div className="w-full">
                   <label className="block text-white/70 text-xs font-medium mb-2">
                     📅 시작일
                   </label>
@@ -245,12 +245,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                     }}
                   />
                 </div>
-                <div className="flex flex-col items-center justify-center">
-                  <div className="w-8 h-0.5 bg-white/30 rounded-full"></div>
-                  <span className="text-white/50 text-xs mt-1">~</span>
-                  <div className="w-8 h-0.5 bg-white/30 rounded-full"></div>
+                <div className="flex items-center justify-center">
+                  <div className="w-16 h-0.5 bg-white/30 rounded-full"></div>
+                  <span className="text-white/50 text-xs mx-2">↓</span>
+                  <div className="w-16 h-0.5 bg-white/30 rounded-full"></div>
                 </div>
-                <div className="flex-1">
+                <div className="w-full">
                   <label className="block text-white/70 text-xs font-medium mb-2">
                     📅 종료일
                   </label>
