@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, timedelta
@@ -164,3 +164,23 @@ def get_finance_info_with_terms(
         result.append(info_dict)
     
     return result 
+
+@router.get("/finance-info/dates/all")
+def get_all_finance_info_dates(db: Session = Depends(get_db)):
+    dates = [row.date for row in db.query(FinanceInfo).order_by(FinanceInfo.date).all()]
+    return dates
+
+@router.get("/finance-info/{date}")
+def get_finance_info_by_date(date: str, db: Session = Depends(get_db)):
+    finance_info = db.query(FinanceInfo).filter(FinanceInfo.date == date).all()
+    return finance_info or []
+
+@router.delete("/finance-info/{date}")
+def delete_finance_info_by_date(date: str, db: Session = Depends(get_db)):
+    finance_infos = db.query(FinanceInfo).filter(FinanceInfo.date == date).all()
+    if not finance_infos:
+        raise HTTPException(status_code=404, detail="Finance info not found")
+    for info in finance_infos:
+        db.delete(info)
+    db.commit()
+    return {"message": "Finance info deleted successfully"} 

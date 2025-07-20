@@ -233,3 +233,115 @@ class FinanceQuizScoreResponse(BaseModel):
 
     class Config:
         from_attributes = True 
+
+# 금융학습용 스키마 (AI학습과 1:1 구조)
+class FinancialTermItem(BaseModel):
+    term: str
+    description: str
+
+class FinanceAIInfoItem(BaseModel):
+    title: str
+    content: str
+    terms: Optional[List[FinancialTermItem]] = []
+
+class FinanceAIInfoCreate(BaseModel):
+    date: str
+    infos: List[FinanceAIInfoItem]
+
+class FinanceAIInfoResponse(BaseModel):
+    id: int
+    date: str
+    infos: List[FinanceAIInfoItem]
+    created_at: str
+    class Config:
+        from_attributes = True
+
+class FinancialQuizCreate(BaseModel):
+    topic: str
+    question: str
+    option1: str
+    option2: str
+    option3: str
+    option4: str
+    correct: int
+    explanation: str
+
+class FinancialQuizResponse(BaseModel):
+    id: int
+    topic: str
+    question: str
+    option1: str
+    option2: str
+    option3: str
+    option4: str
+    correct: int
+    explanation: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class FinancialUserProgressCreate(BaseModel):
+    session_id: str
+    date: str
+    learned_info: List[int]
+    stats: Optional[dict] = None
+
+class FinancialUserProgressResponse(BaseModel):
+    id: int
+    session_id: str
+    date: str
+    learned_info: List[int]
+    stats: Optional[dict]
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class FinancialPromptCreate(BaseModel):
+    title: str
+    content: str
+    category: str
+
+class FinancialPromptResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    category: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class FinancialBaseContentCreate(BaseModel):
+    title: str
+    content: str
+    category: str
+
+class FinancialBaseContentResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    category: str
+    created_at: str
+    class Config:
+        from_attributes = True
+
+class FinancialTermResponse(BaseModel):
+    id: int
+    term: str
+    description: str
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class FinancialUsersCreate(BaseModel):
+    username: str
+    email: str
+    hashed_password: str
+
+class FinancialUsersResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    hashed_password: str
+    created_at: datetime
+    class Config:
+        from_attributes = True 

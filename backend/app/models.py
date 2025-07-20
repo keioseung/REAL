@@ -166,3 +166,72 @@ class FinanceQuizScore(Base):
     # 관계 설정
     user = relationship("User")
     quiz = relationship("FinanceQuiz") 
+
+# 금융학습용 모델 (AI학습과 1:1 구조)
+class FinanceAIInfo(Base):
+    __tablename__ = "finance_ai_info"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(String, index=True)
+    info1_title = Column(Text)
+    info1_content = Column(Text)
+    info1_terms = Column(Text)  # JSON 직렬화된 용어 리스트
+    info2_title = Column(Text)
+    info2_content = Column(Text)
+    info2_terms = Column(Text)  # JSON 직렬화된 용어 리스트
+    info3_title = Column(Text)
+    info3_content = Column(Text)
+    info3_terms = Column(Text)  # JSON 직렬화된 용어 리스트
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class FinancialQuiz(Base):
+    __tablename__ = "financial_quiz"
+    id = Column(Integer, primary_key=True, index=True)
+    topic = Column(String, index=True)
+    question = Column(Text)
+    option1 = Column(Text)
+    option2 = Column(Text)
+    option3 = Column(Text)
+    option4 = Column(Text)
+    correct = Column(Integer)
+    explanation = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class FinancialUserProgress(Base):
+    __tablename__ = "financial_user_progress"
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, index=True)
+    date = Column(String, index=True)
+    learned_info = Column(Text)  # JSON 직렬화 문자열
+    stats = Column(Text)         # JSON 직렬화 문자열
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class FinancialPrompt(Base):
+    __tablename__ = "financial_prompt"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String)
+    content = Column(Text)
+    category = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class FinancialBaseContent(Base):
+    __tablename__ = "financial_base_content"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String)
+    content = Column(Text)
+    category = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class FinancialTerm(Base):
+    __tablename__ = "financial_term"
+    id = Column(Integer, primary_key=True, index=True)
+    term = Column(String, unique=True, index=True)
+    description = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class FinancialUsers(Base):
+    __tablename__ = "financial_users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now()) 

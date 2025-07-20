@@ -128,3 +128,50 @@ export const financeQuizAPI = {
 export const financeStatsAPI = {
   getOverallStats: () => api.get('/api/finance-stats/overall'),
 } 
+
+// 금융학습용 API (AI학습과 1:1 구조)
+export const financialAIInfoAPI = {
+  getByDate: (date: string) => api.get(`/api/finance-ai-info/${date}`),
+  add: (data: any) => api.post('/api/finance-ai-info/', data),
+  delete: (date: string) => api.delete(`/api/finance-ai-info/${date}`),
+  getAllDates: () => api.get('/api/finance-ai-info/dates/all'),
+}
+
+export const financialQuizAPI = {
+  getTopics: () => api.get('/api/financial-quiz/topics'),
+  getByTopic: (topic: string) => api.get(`/api/financial-quiz/${topic}`),
+  add: (data: any) => api.post('/api/financial-quiz/', data),
+  update: (id: number, data: any) => api.put(`/api/financial-quiz/${id}`, data),
+  delete: (id: number) => api.delete(`/api/financial-quiz/${id}`),
+  generate: (topic: string) => api.get(`/api/financial-quiz/generate/${topic}`),
+}
+
+export const financialUserProgressAPI = {
+  get: (sessionId: string) => api.get(`/api/financial-user-progress/${sessionId}`),
+  update: (sessionId: string, date: string, infoIndex: number) => 
+    api.post(`/api/financial-user-progress/${sessionId}/${date}/${infoIndex}`),
+  updateTermProgress: (sessionId: string, termData: any) => 
+    api.post(`/api/financial-user-progress/term-progress/${sessionId}`, termData),
+  getStats: (sessionId: string) => api.get(`/api/financial-user-progress/stats/${sessionId}`),
+}
+
+export const financialPromptAPI = {
+  getAll: () => api.get('/api/financial-prompt/'),
+  add: (data: any) => api.post('/api/financial-prompt/', data),
+  update: (id: number, data: any) => api.put(`/api/financial-prompt/${id}`, data),
+  delete: (id: number) => api.delete(`/api/financial-prompt/${id}`),
+  getByCategory: (category: string) => api.get(`/api/financial-prompt/category/${category}`),
+}
+
+export const financialBaseContentAPI = {
+  getAll: () => api.get('/api/financial-base-content/'),
+  add: (data: any) => api.post('/api/financial-base-content/', data),
+  update: (id: number, data: any) => api.put(`/api/financial-base-content/${id}`, data),
+  delete: (id: number) => api.delete(`/api/financial-base-content/${id}`),
+  getByCategory: (category: string) => api.get(`/api/financial-base-content/category/${category}`),
+}
+
+export const financialTermAPI = {
+  getAll: () => api.get('/api/financial-term/all'),
+  getRandom: () => api.get('/api/financial-term/random'),
+} 
