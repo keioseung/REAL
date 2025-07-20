@@ -112,16 +112,6 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
 
   return (
     <div className="space-y-8 relative">
-      {/* 테스트용 버튼 - 최상단에 배치 */}
-      <div className="fixed top-20 left-4 z-[9999] bg-red-500 p-2 rounded">
-        <button
-          onClick={() => alert('테스트 버튼 클릭됨!')}
-          className="bg-yellow-500 text-black px-4 py-2 rounded"
-        >
-          테스트 버튼
-        </button>
-      </div>
-
       {/* 날짜 및 기간 선택 */}
       <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between relative z-10">
         <div className="flex items-center gap-4">
@@ -135,11 +125,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               type="date"
               value={selectedDate || new Date().toISOString().split('T')[0]}
               onChange={(e) => {
-                alert('진행률 탭 - 날짜 변경됨! ' + e.target.value)
                 handleDateChange(e.target.value)
-              }}
-              onClick={() => {
-                alert('진행률 탭 - 날짜 input 클릭됨!')
               }}
               className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer touch-manipulation relative z-20"
               style={{ 
@@ -161,11 +147,9 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               <button
                 type="button"
                 onClick={() => {
-                  alert('주간 버튼 클릭됨!')
                   handlePeriodChange('week')
                 }}
                 onTouchStart={() => {
-                  alert('주간 버튼 터치됨!')
                   handlePeriodChange('week')
                 }}
                 className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] relative z-30 ${
@@ -187,11 +171,9 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               <button
                 type="button"
                 onClick={() => {
-                  alert('월간 버튼 클릭됨!')
                   handlePeriodChange('month')
                 }}
                 onTouchStart={() => {
-                  alert('월간 버튼 터치됨!')
                   handlePeriodChange('month')
                 }}
                 className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] relative z-30 ${
@@ -213,11 +195,9 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               <button
                 type="button"
                 onClick={() => {
-                  alert('사용자 버튼 클릭됨!')
                   handlePeriodChange('custom')
                 }}
                 onTouchStart={() => {
-                  alert('사용자 버튼 터치됨!')
                   handlePeriodChange('custom')
                 }}
                 className={`px-4 py-3 rounded-md text-sm font-medium transition-all cursor-pointer touch-manipulation min-w-[70px] min-h-[44px] relative z-30 ${
@@ -241,39 +221,43 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
 
           {periodType === 'custom' && (
             <div className="flex items-center gap-2 relative z-20">
-              <input
-                type="date"
-                value={customStartDate}
-                onChange={(e) => {
-                  alert('시작 날짜 변경됨!')
-                  handleCustomStartDateChange(e.target.value)
-                }}
-                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
-                style={{ 
-                  minHeight: '44px',
-                  WebkitAppearance: 'none',
-                  MozAppearance: 'none',
-                  position: 'relative',
-                  zIndex: 9999
-                }}
-              />
-              <span className="text-white/50">~</span>
-              <input
-                type="date"
-                value={customEndDate}
-                onChange={(e) => {
-                  alert('종료 날짜 변경됨!')
-                  handleCustomEndDateChange(e.target.value)
-                }}
-                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
-                style={{ 
-                  minHeight: '44px',
-                  WebkitAppearance: 'none',
-                  MozAppearance: 'none',
-                  position: 'relative',
-                  zIndex: 9999
-                }}
-              />
+              <div className="flex flex-col gap-1">
+                <label className="text-white/60 text-xs">시작일</label>
+                <input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => {
+                    handleCustomStartDateChange(e.target.value)
+                  }}
+                  className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
+                  style={{ 
+                    minHeight: '44px',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    position: 'relative',
+                    zIndex: 9999
+                  }}
+                />
+              </div>
+              <span className="text-white/50 self-end mb-2">~</span>
+              <div className="flex flex-col gap-1">
+                <label className="text-white/60 text-xs">종료일</label>
+                <input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => {
+                    handleCustomEndDateChange(e.target.value)
+                  }}
+                  className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer touch-manipulation relative z-30"
+                  style={{ 
+                    minHeight: '44px',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    position: 'relative',
+                    zIndex: 9999
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
