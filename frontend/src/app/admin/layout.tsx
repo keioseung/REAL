@@ -1,9 +1,90 @@
 "use client"
 
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { FaBrain, FaDollarSign, FaChartLine, FaQuestion, FaCog } from 'react-icons/fa'
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
+  const navigation = [
+    {
+      name: 'AI 정보 관리',
+      href: '/admin/ai-info',
+      icon: FaBrain,
+      color: 'text-blue-400'
+    },
+    {
+      name: 'AI 퀴즈 관리',
+      href: '/admin/quiz',
+      icon: FaQuestion,
+      color: 'text-blue-400'
+    },
+    {
+      name: 'AI 통계',
+      href: '/admin/stats',
+      icon: FaChartLine,
+      color: 'text-blue-400'
+    },
+    {
+      name: '금융 정보 관리',
+      href: '/admin/finance',
+      icon: FaDollarSign,
+      color: 'text-green-400'
+    },
+    {
+      name: '금융 퀴즈 관리',
+      href: '/admin/finance-quiz',
+      icon: FaQuestion,
+      color: 'text-green-400'
+    },
+    {
+      name: '금융 통계',
+      href: '/admin/finance-stats',
+      icon: FaChartLine,
+      color: 'text-green-400'
+    }
+  ]
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
-      {children}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+      {/* 네비게이션 */}
+      <nav className="bg-black/20 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/admin" className="flex items-center gap-2 text-white font-bold text-xl">
+                <FaCog className="text-blue-400" />
+                관리자 대시보드
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'text-white/60 hover:text-white/80 hover:bg-white/10'
+                    }`}
+                  >
+                    <item.icon className={item.color} />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* 메인 콘텐츠 */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
     </div>
   )
 } 

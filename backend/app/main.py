@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api import ai_info, quiz, prompt, base_content, term, finance_info, finance_user_progress
+from .api import ai_info, quiz, prompt, base_content, term, finance_info, finance_user_progress, finance_quiz, finance_stats
 
 app = FastAPI()
 
@@ -21,4 +21,6 @@ app.include_router(term.router, prefix="/api/term")
 
 # 금융 관련 라우터들
 app.include_router(finance_info.router, prefix="/api/finance")
-app.include_router(finance_user_progress.router, prefix="/api/finance") 
+app.include_router(finance_user_progress.router, prefix="/api/finance")
+app.include_router(finance_quiz.router, prefix="/api")
+app.include_router(finance_stats.router, prefix="/api") 

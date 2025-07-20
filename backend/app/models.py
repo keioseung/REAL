@@ -136,4 +136,33 @@ class UserFinanceQuiz(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # 관계 설정
-    user = relationship("User", back_populates="finance_quizzes") 
+    user = relationship("User", back_populates="finance_quizzes")
+
+class FinanceQuiz(Base):
+    __tablename__ = "finance_quiz"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    question = Column(Text, nullable=False)
+    options = Column(JSON, nullable=False)  # ["옵션1", "옵션2", "옵션3", "옵션4"]
+    correct_answer = Column(Integer, nullable=False)  # 0-3 인덱스
+    explanation = Column(Text, nullable=False)
+    difficulty = Column(String, default="초급")  # 초급, 중급, 고급
+    category = Column(String, default="주식")  # 주식, 채권, 펀드, 보험, 부동산, 암호화폐
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+class FinanceQuizScore(Base):
+    __tablename__ = "finance_quiz_scores"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    quiz_id = Column(Integer, ForeignKey("finance_quiz.id"), nullable=False)
+    score = Column(Integer, nullable=False)
+    total_questions = Column(Integer, nullable=False)
+    correct_answers = Column(Integer, nullable=False)
+    answers = Column(JSON)  # 사용자 답변 기록
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # 관계 설정
+    user = relationship("User")
+    quiz = relationship("FinanceQuiz") 

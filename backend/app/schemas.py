@@ -180,4 +180,56 @@ class UserFinanceQuizResponse(BaseModel):
     created_at: datetime
 
     class Config:
+        from_attributes = True
+
+# 금융 퀴즈 스키마들
+class FinanceQuizCreate(BaseModel):
+    question: str
+    options: List[str]
+    correct_answer: int
+    explanation: str
+    difficulty: str = "초급"
+    category: str = "주식"
+
+class FinanceQuizUpdate(BaseModel):
+    question: Optional[str] = None
+    options: Optional[List[str]] = None
+    correct_answer: Optional[int] = None
+    explanation: Optional[str] = None
+    difficulty: Optional[str] = None
+    category: Optional[str] = None
+
+class FinanceQuizResponse(BaseModel):
+    id: int
+    question: str
+    options: List[str]
+    correct_answer: int
+    explanation: str
+    difficulty: str
+    category: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class FinanceQuizScoreCreate(BaseModel):
+    user_id: int
+    quiz_id: int
+    score: int
+    total_questions: int
+    correct_answers: int
+    answers: Optional[List[int]] = None
+
+class FinanceQuizScoreResponse(BaseModel):
+    id: int
+    user_id: int
+    quiz_id: int
+    score: int
+    total_questions: int
+    correct_answers: int
+    answers: Optional[List[int]]
+    created_at: datetime
+
+    class Config:
         from_attributes = True 

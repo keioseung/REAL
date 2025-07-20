@@ -105,4 +105,24 @@ export const financeUserProgressAPI = {
   recordQuizResult: (userId: number, quizData: any) => 
     api.post(`/api/finance/finance-quiz-result?user_id=${userId}`, quizData),
   getQuizHistory: (userId: number) => api.get(`/api/finance/finance-quiz-history/${userId}`),
+}
+
+// 금융 퀴즈 API
+export const financeQuizAPI = {
+  getAll: () => api.get('/api/finance-quiz/'),
+  getById: (id: number) => api.get(`/api/finance-quiz/${id}`),
+  create: (data: any) => api.post('/api/finance-quiz/', data),
+  update: (id: number, data: any) => api.put(`/api/finance-quiz/${id}`, data),
+  delete: (id: number) => api.delete(`/api/finance-quiz/${id}`),
+  getRandom: (count: number, difficulty?: string, category?: string) => {
+    const params = new URLSearchParams();
+    if (difficulty) params.append('difficulty', difficulty);
+    if (category) params.append('category', category);
+    return api.get(`/api/finance-quiz/random/${count}?${params.toString()}`);
+  },
+}
+
+// 금융 통계 API
+export const financeStatsAPI = {
+  getOverallStats: () => api.get('/api/finance-stats/overall'),
 } 
