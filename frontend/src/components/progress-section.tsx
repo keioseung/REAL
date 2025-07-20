@@ -83,12 +83,14 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
 
   // 날짜 변경 핸들러
   const handleDateChange = (date: string) => {
+    console.log('날짜 변경:', date)
     setCurrentDate(date)
     onDateChange?.(date)
   }
 
   // 기간 변경 핸들러
   const handlePeriodChange = (type: 'week' | 'month' | 'custom') => {
+    console.log('기간 변경:', type)
     setPeriodType(type)
     if (type === 'custom') {
       const today = new Date()
@@ -101,10 +103,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
 
   // 커스텀 날짜 변경 핸들러
   const handleCustomStartDateChange = (date: string) => {
+    console.log('시작 날짜 변경:', date)
     setCustomStartDate(date)
   }
 
   const handleCustomEndDateChange = (date: string) => {
+    console.log('종료 날짜 변경:', date)
     setCustomEndDate(date)
   }
 
@@ -129,7 +133,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               type="date"
               value={currentDate}
               onChange={(e) => handleDateChange(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+              style={{ colorScheme: 'dark' }}
             />
           </div>
         </div>
@@ -141,11 +146,12 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               {(['week', 'month', 'custom'] as const).map((type) => (
                 <button
                   key={type}
+                  type="button"
                   onClick={() => handlePeriodChange(type)}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all cursor-pointer ${
                     periodType === type
                       ? 'bg-blue-500 text-white shadow-lg'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      : 'text-white/70 hover:text-white hover:bg-white/20'
                   }`}
                 >
                   {type === 'week' ? '주간' : type === 'month' ? '월간' : '사용자'}
@@ -160,14 +166,14 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                 type="date"
                 value={customStartDate}
                 onChange={(e) => handleCustomStartDateChange(e.target.value)}
-                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
               />
               <span className="text-white/50">~</span>
               <input
                 type="date"
                 value={customEndDate}
                 onChange={(e) => handleCustomEndDateChange(e.target.value)}
-                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
               />
             </div>
           )}
