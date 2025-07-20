@@ -21,9 +21,12 @@ interface QuizQuestion {
 
 interface TermsQuizSectionProps {
   sessionId: string
+  selectedDate: string
+  onProgressUpdate: () => void
+  onDateChange: (date: string) => void
 }
 
-export default function TermsQuizSection({ sessionId }: TermsQuizSectionProps) {
+export default function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate, onDateChange }: TermsQuizSectionProps) {
   const [terms, setTerms] = useState<FinanceTerm[]>([])
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -36,7 +39,6 @@ export default function TermsQuizSection({ sessionId }: TermsQuizSectionProps) {
   const [quizCompleted, setQuizCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedDate, setSelectedDate] = useState('all')
   const [availableDates, setAvailableDates] = useState<string[]>([])
 
   useEffect(() => {
