@@ -212,11 +212,11 @@ export default function IntroPage() {
             { label: "지식 점검", value: "실전 퀴즈", icon: FaChartLine }
           ].map((stat, index) => (
             <div key={index} className="text-center animate-stat-fade-in" style={{ animationDelay: `${index * 0.3}s` }}>
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-stat-glow">
-                <stat.icon className="text-purple-400 text-2xl md:text-3xl" />
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 animate-stat-glow">
+                <stat.icon className="text-purple-400 text-xl md:text-2xl" />
               </div>
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2">{stat.value}</div>
-              <div className="text-white/60 text-lg">{stat.label}</div>
+              <div className="text-xl md:text-2xl font-bold text-white mb-1">{stat.value}</div>
+              <div className="text-white/60 text-sm">{stat.label}</div>
             </div>
           ))}
         </div>

@@ -116,4 +116,10 @@ export interface NewsItem {
   title: string
   content: string
   link: string
+}
+
+export interface User {
+  username: string
+  password: string
+  role: 'admin' | 'user'
 } 
