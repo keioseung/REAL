@@ -136,20 +136,28 @@ export default function IntroPage() {
             </div>
           </div>
 
-          {/* 메인 설명 */}
-          <div className="max-w-3xl mx-auto mb-16">
-            <p className="text-xl md:text-2xl text-white/80 leading-relaxed">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 font-bold">
-                AI 학습의 새로운 경험
+          {/* 메인 텍스트 */}
+          <div className="text-center mb-12 md:mb-16 max-w-4xl mx-auto">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                매일 업데이트되는 AI 정보
               </span>
               <br />
               <span className="text-white/90">
-                매일 업데이트되는 AI 정보와 관련 용어를 학습하고
+                관련 용어를 학습하고
               </span>
               <br />
-              <span className="text-white/90">
-                실전 퀴즈로 지식을 점검해보세요
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                실전 퀴즈로 지식을 점검
               </span>
+              <br />
+              <span className="text-white/80 text-lg md:text-xl lg:text-2xl font-medium">
+                해보세요
+              </span>
+            </h2>
+            <p className="text-white/70 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto">
+              최신 AI 트렌드와 핵심 개념을 체계적으로 학습하고,<br />
+              실전 문제를 통해 확실한 이해를 확인하세요
             </p>
           </div>
 
