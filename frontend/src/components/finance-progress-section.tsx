@@ -20,9 +20,11 @@ interface ProgressStats {
 
 interface ProgressSectionProps {
   sessionId: string
+  selectedDate: string
+  onDateChange: (date: string) => void
 }
 
-export default function ProgressSection({ sessionId }: ProgressSectionProps) {
+export default function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSectionProps) {
   const [stats, setStats] = useState<ProgressStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
