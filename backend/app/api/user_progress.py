@@ -570,19 +570,24 @@ def get_period_stats(session_id: str, start_date: str, end_date: str, db: Sessio
             except json.JSONDecodeError:
                 pass
         
-        # 용어 학습 수
+        # 용어 학습 수 - 날짜별로 그룹핑하여 중복 제거
         terms_progress = db.query(UserProgress).filter(
             UserProgress.session_id == session_id,
             UserProgress.date.like(f'__terms__{date}%')
         ).all()
         
         terms_count = 0
+        unique_terms = set()  # 중복 제거를 위한 set
+        
         for term_progress in terms_progress:
             if term_progress.learned_info:
                 try:
-                    terms_count += len(json.loads(term_progress.learned_info))
+                    terms = json.loads(term_progress.learned_info)
+                    unique_terms.update(terms)  # 중복 제거
                 except json.JSONDecodeError:
                     continue
+        
+        terms_count = len(unique_terms)
         
         # 퀴즈 점수
         quiz_progress = db.query(UserProgress).filter(

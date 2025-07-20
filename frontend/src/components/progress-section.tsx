@@ -104,11 +104,31 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
     setCustomEndDate(date)
   }
 
-  // 그래프 데이터 준비
+  // 그래프 데이터 준비 - 중복 제거 및 정렬
   const chartData = periodStats?.period_data || []
-  const maxAI = Math.max(...chartData.map((d: PeriodData) => d.ai_info), 1)
-  const maxTerms = Math.max(...chartData.map((d: PeriodData) => d.terms), 1)
-  const maxQuiz = Math.max(...chartData.map((d: PeriodData) => d.quiz_score), 1)
+  
+  // 날짜별로 중복 제거하고 정렬
+  const uniqueChartData = chartData.reduce((acc: PeriodData[], current: PeriodData) => {
+    const existingIndex = acc.findIndex(item => item.date === current.date)
+    if (existingIndex === -1) {
+      acc.push(current)
+    } else {
+      // 중복된 날짜가 있으면 더 높은 값을 사용
+      acc[existingIndex] = {
+        ...acc[existingIndex],
+        ai_info: Math.max(acc[existingIndex].ai_info, current.ai_info),
+        terms: Math.max(acc[existingIndex].terms, current.terms),
+        quiz_score: Math.max(acc[existingIndex].quiz_score, current.quiz_score),
+        quiz_correct: Math.max(acc[existingIndex].quiz_correct, current.quiz_correct),
+        quiz_total: Math.max(acc[existingIndex].quiz_total, current.quiz_total)
+      }
+    }
+    return acc
+  }, []).sort((a: PeriodData, b: PeriodData) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  
+  const maxAI = Math.max(...uniqueChartData.map((d: PeriodData) => d.ai_info), 1)
+  const maxTerms = Math.max(...uniqueChartData.map((d: PeriodData) => d.terms), 1)
+  const maxQuiz = Math.max(...uniqueChartData.map((d: PeriodData) => d.quiz_score), 1)
 
   return (
     <div className="space-y-8 relative">
@@ -407,7 +427,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
 
         {/* 그래프 컨테이너 */}
         <div className="glass rounded-2xl p-6">
-          {chartData.length > 0 ? (
+          {uniqueChartData.length > 0 ? (
             <div className="space-y-8">
               {/* AI 정보 추이 */}
               <div>
@@ -421,7 +441,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   </span>
                 </div>
                 <div className="flex items-end gap-1 h-32">
-                  {chartData.map((data, index) => (
+                  {uniqueChartData.map((data, index) => (
                     <div key={index} className="flex-1 flex flex-col items-center">
                       <div className="relative w-full">
                         <div
@@ -457,7 +477,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   </span>
                 </div>
                 <div className="flex items-end gap-1 h-32">
-                  {chartData.map((data, index) => (
+                  {uniqueChartData.map((data, index) => (
                     <div key={index} className="flex-1 flex flex-col items-center">
                       <div className="relative w-full">
                         <div
@@ -493,7 +513,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                   </span>
                 </div>
                 <div className="flex items-end gap-1 h-32">
-                  {chartData.map((data, index) => (
+                  {uniqueChartData.map((data, index) => (
                     <div key={index} className="flex-1 flex flex-col items-center">
                       <div className="relative w-full">
                         <div
