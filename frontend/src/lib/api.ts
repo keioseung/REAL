@@ -72,6 +72,7 @@ export const baseContentAPI = {
 // 금융 관련 API들
 export const financeInfoAPI = {
   getByDate: (date: string) => api.get(`/api/finance/finance-info/${date}`),
+  getAll: () => api.get('/api/finance/finance-info/'),
   add: (data: any) => api.post('/api/finance/finance-info/', data),
   delete: (date: string) => api.delete(`/api/finance/finance-info/${date}`),
   getAllDates: () => api.get('/api/finance/finance-info/dates/all'),
