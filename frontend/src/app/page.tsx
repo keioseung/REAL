@@ -13,10 +13,10 @@ export default function IntroPage() {
   
   const fullText = "AI Mastery Hub"
   const taglines = [
-    "인공지능의 미래를 탐험하세요",
-    "매일 업데이트되는 AI 트렌드",
-    "실전 퀴즈로 실력 점검",
-    "나만의 학습 통계와 성취"
+    "매일 새로운 AI 정보로 지식을 쌓아보세요",
+    "실전 퀴즈로 학습한 내용을 점검하세요",
+    "개인별 학습 진행률을 체계적으로 관리하세요",
+    "AI 세계의 핵심 개념을 쉽게 이해하세요"
   ]
   const [currentTagline, setCurrentTagline] = useState(0)
 
@@ -140,15 +140,15 @@ export default function IntroPage() {
           <div className="max-w-3xl mx-auto mb-16">
             <p className="text-xl md:text-2xl text-white/80 leading-relaxed">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 font-bold">
-                AI 학습의 새로운 차원
+                AI 학습의 새로운 경험
               </span>
               <br />
               <span className="text-white/90">
-                최신 AI 정보와 실전 퀴즈로 인공지능의 세계를
+                매일 업데이트되는 AI 정보와 관련 용어를 학습하고
               </span>
               <br />
               <span className="text-white/90">
-                쉽고 재미있게 탐험해보세요
+                실전 퀴즈로 지식을 점검해보세요
               </span>
             </p>
           </div>
@@ -169,20 +169,20 @@ export default function IntroPage() {
           {[
             { 
               icon: FaBrain, 
-              title: "AI 트렌드", 
-              desc: "매일 업데이트되는 최신 AI 정보와 트렌드를 한눈에 확인하세요. 전문가들이 선별한 핵심 내용으로 AI 세계의 최전선을 경험해보세요.", 
+              title: "AI 정보 학습", 
+              desc: "매일 새로운 AI 정보를 제공합니다. 각 정보에는 관련 용어들이 포함되어 있어 AI 개념을 체계적으로 학습할 수 있습니다.", 
               color: "from-blue-500 to-cyan-500"
             },
             { 
               icon: FaRocket, 
-              title: "실전 퀴즈", 
-              desc: "AI 지식을 실전 퀴즈로 점검하고 실력을 향상시켜보세요. 다양한 난이도의 문제로 체계적인 학습이 가능합니다.", 
+              title: "용어 퀴즈", 
+              desc: "학습한 AI 정보의 관련 용어들을 퀴즈로 점검합니다. 다양한 난이도의 문제로 지식 이해도를 확인하고 실력을 향상시켜보세요.", 
               color: "from-purple-500 to-pink-500"
             },
             { 
               icon: FaChartLine, 
-              title: "학습 통계", 
-              desc: "개인별 학습 진행 상황을 상세한 통계로 추적하고 분석하세요. 목표 설정과 성과 관리를 통해 효율적인 학습을 지원합니다.", 
+              title: "학습 진행률", 
+              desc: "개인별 학습 진행 상황을 상세한 통계로 추적합니다. 일별, 주별, 월별 학습 현황을 확인하고 목표를 설정해보세요.", 
               color: "from-green-500 to-emerald-500"
             }
           ].map((feature, index) => (
@@ -207,9 +207,9 @@ export default function IntroPage() {
         {/* 하단 통계 */}
         <div className="grid grid-cols-3 gap-8 md:gap-12 w-full max-w-4xl">
           {[
-            { label: "AI 정보", value: "1000+", icon: FaBrain },
-            { label: "퀴즈 문제", value: "500+", icon: FaRocket },
-            { label: "학습자", value: "10K+", icon: FaChartLine }
+            { label: "매일 AI 정보", value: "3개", icon: FaBrain },
+            { label: "관련 용어", value: "20개", icon: FaRocket },
+            { label: "실전 퀴즈", value: "체계적", icon: FaChartLine }
           ].map((stat, index) => (
             <div key={index} className="text-center animate-stat-fade-in" style={{ animationDelay: `${index * 0.3}s` }}>
               <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-stat-glow">
