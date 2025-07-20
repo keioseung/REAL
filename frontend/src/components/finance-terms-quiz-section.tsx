@@ -206,7 +206,7 @@ export default function TermsQuizSection({ sessionId, selectedDate, onProgressUp
             <FaCalendar className="text-white/60" />
             <select
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={(e) => onDateChange(e.target.value)}
               className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
             >
               <option value="all">전체 기간</option>
