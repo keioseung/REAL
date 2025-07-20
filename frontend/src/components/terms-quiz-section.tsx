@@ -155,8 +155,8 @@ function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate, onDateCha
       <div className="flex items-center justify-between mb-6">
         <div className="text-white/70 text-sm">
           {isLoading ? '퀴즈를 생성하고 있습니다...' : 
-           quizData?.quizzes ? `총 ${quizData.total_terms}개 용어 중 ${quizData.quizzes.length}개 출제` : 
-           '선택한 날짜에 등록된 용어가 없습니다'}
+           quizData?.quizzes && quizData.quizzes.length > 0 ? `총 ${quizData.total_terms}개 용어 중 ${quizData.quizzes.length}개 출제` : 
+           ''}
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="quiz-date-select" className="text-white/80 text-sm font-medium">
