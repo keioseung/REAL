@@ -71,14 +71,7 @@ export default function FinanceInfoCard({
   // 학습 상태 업데이트 뮤테이션
   const updateProgressMutation = useMutation({
     mutationFn: async () => {
-      // 임시 사용자 ID (실제로는 세션에서 사용자 ID를 가져와야 함)
-      const userId = 1
-      await financeUserProgressAPI.createProgress({
-        user_id: userId,
-        finance_info_id: info.id,
-        date: date,
-        info_index: index
-      })
+      await financeUserProgressAPI.update(sessionId, date, index)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['financeUserProgress', sessionId] })
@@ -89,10 +82,7 @@ export default function FinanceInfoCard({
   // 용어 학습 상태 업데이트 뮤테이션
   const updateTermProgressMutation = useMutation({
     mutationFn: async (termId: number) => {
-      // 임시 사용자 ID (실제로는 세션에서 사용자 ID를 가져와야 함)
-      const userId = 1
-      await financeUserProgressAPI.createProgress({
-        user_id: userId,
+      await financeUserProgressAPI.updateTermProgress(sessionId, {
         term_id: termId,
         date: date,
         finance_info_id: info.id
