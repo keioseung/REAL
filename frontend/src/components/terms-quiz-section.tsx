@@ -176,10 +176,6 @@ function TermsQuizSection({ sessionId, selectedDate, onProgressUpdate }: TermsQu
   return (
     <section className="mb-8 relative">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-          <Target className="w-8 h-8" />
-          {selectedDate} 용어 퀴즈
-        </h2>
         <div className="text-white/70 text-sm">
           총 {quizData.total_terms}개 용어 중 {quizData.quizzes.length}개 출제
         </div>
