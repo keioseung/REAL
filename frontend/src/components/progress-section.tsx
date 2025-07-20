@@ -125,11 +125,11 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               type="date"
               value={selectedDate || new Date().toISOString().split('T')[0]}
               onChange={(e) => {
-                console.log('진행률 탭 - 날짜 input 클릭됨!', e.target.value)
+                alert('진행률 탭 - 날짜 변경됨! ' + e.target.value)
                 handleDateChange(e.target.value)
               }}
-              onClick={(e) => {
-                console.log('진행률 탭 - 날짜 input 클릭됨!')
+              onClick={() => {
+                alert('진행률 탭 - 날짜 input 클릭됨!')
               }}
               className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
               style={{ colorScheme: 'dark' }}
@@ -143,10 +143,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
             <div className="flex bg-white/10 rounded-lg p-1">
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  console.log('주간 버튼 클릭됨!')
+                onClick={() => {
+                  alert('주간 버튼 클릭됨!')
                   handlePeriodChange('week')
                 }}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
@@ -159,10 +157,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               </button>
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  console.log('월간 버튼 클릭됨!')
+                onClick={() => {
+                  alert('월간 버튼 클릭됨!')
                   handlePeriodChange('month')
                 }}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
@@ -175,10 +171,8 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               </button>
               <button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  console.log('사용자 버튼 클릭됨!')
+                onClick={() => {
+                  alert('사용자 버튼 클릭됨!')
                   handlePeriodChange('custom')
                 }}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all cursor-pointer min-w-[60px] ${
@@ -198,7 +192,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                 type="date"
                 value={customStartDate}
                 onChange={(e) => {
-                  console.log('시작 날짜 input 클릭됨!')
+                  alert('시작 날짜 변경됨!')
                   handleCustomStartDateChange(e.target.value)
                 }}
                 className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
@@ -208,7 +202,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
                 type="date"
                 value={customEndDate}
                 onChange={(e) => {
-                  console.log('종료 날짜 input 클릭됨!')
+                  alert('종료 날짜 변경됨!')
                   handleCustomEndDateChange(e.target.value)
                 }}
                 className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
