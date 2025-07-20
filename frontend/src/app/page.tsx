@@ -207,9 +207,9 @@ export default function IntroPage() {
         {/* 하단 통계 */}
         <div className="grid grid-cols-3 gap-8 md:gap-12 w-full max-w-4xl">
           {[
-            { label: "매일 AI 정보", value: "3개", icon: FaBrain },
-            { label: "관련 용어", value: "20개", icon: FaRocket },
-            { label: "실전 퀴즈", value: "체계적", icon: FaChartLine }
+            { label: "매일 새로운", value: "AI 정보", icon: FaBrain },
+            { label: "핵심 개념", value: "관련 용어", icon: FaRocket },
+            { label: "지식 점검", value: "실전 퀴즈", icon: FaChartLine }
           ].map((stat, index) => (
             <div key={index} className="text-center animate-stat-fade-in" style={{ animationDelay: `${index * 0.3}s` }}>
               <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-stat-glow">
