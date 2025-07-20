@@ -40,11 +40,11 @@ export default function LearnedTermsSection({ sessionId }: LearnedTermsSectionPr
       setLearnedTerms(response.data)
       
       // 사용 가능한 날짜들 추출
-      const dateStrings = response.data.map((term: LearnedTerm) => 
+      const dateStrings: string[] = response.data.map((term: LearnedTerm) => 
         term.learned_at.split(' ')[0]
       )
-      const uniqueDates = Array.from(new Set(dateStrings))
-      const sortedDates = uniqueDates.sort().reverse()
+      const uniqueDates: string[] = Array.from(new Set(dateStrings))
+      const sortedDates: string[] = uniqueDates.sort().reverse()
       setAvailableDates(sortedDates)
     } catch (err) {
       setError('학습한 용어를 불러오는데 실패했습니다.')
