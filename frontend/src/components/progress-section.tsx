@@ -35,6 +35,13 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
 
+  // selectedDate prop이 변경되면 currentDate 업데이트
+  useEffect(() => {
+    if (selectedDate) {
+      setCurrentDate(selectedDate)
+    }
+  }, [selectedDate])
+
   const { data: stats } = useUserStats(sessionId)
 
   // 기간별 데이터 계산
@@ -92,11 +99,20 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
     }
   }
 
+  // 커스텀 날짜 변경 핸들러
+  const handleCustomStartDateChange = (date: string) => {
+    setCustomStartDate(date)
+  }
+
+  const handleCustomEndDateChange = (date: string) => {
+    setCustomEndDate(date)
+  }
+
   // 그래프 데이터 준비
   const chartData = periodStats?.period_data || []
-  const maxAI = Math.max(...chartData.map(d => d.ai_info), 1)
-  const maxTerms = Math.max(...chartData.map(d => d.terms), 1)
-  const maxQuiz = Math.max(...chartData.map(d => d.quiz_score), 1)
+  const maxAI = Math.max(...chartData.map((d: PeriodData) => d.ai_info), 1)
+  const maxTerms = Math.max(...chartData.map((d: PeriodData) => d.terms), 1)
+  const maxQuiz = Math.max(...chartData.map((d: PeriodData) => d.quiz_score), 1)
 
   return (
     <div className="space-y-8">
@@ -143,14 +159,14 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
               <input
                 type="date"
                 value={customStartDate}
-                onChange={(e) => setCustomStartDate(e.target.value)}
+                onChange={(e) => handleCustomStartDateChange(e.target.value)}
                 className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <span className="text-white/50">~</span>
               <input
                 type="date"
                 value={customEndDate}
-                onChange={(e) => setCustomEndDate(e.target.value)}
+                onChange={(e) => handleCustomEndDateChange(e.target.value)}
                 className="bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
