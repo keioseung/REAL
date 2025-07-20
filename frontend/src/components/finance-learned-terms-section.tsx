@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { FaDollarSign, FaCalendar, FaFilter, FaCheck } from 'react-icons/fa'
-import { financeUserProgressAPI } from '@/lib/api'
+import { financeInfoAPI } from '@/lib/api'
 
 interface LearnedTerm {
   id: number
@@ -35,8 +35,7 @@ export default function LearnedTermsSection({ sessionId }: LearnedTermsSectionPr
   const fetchLearnedTerms = async () => {
     try {
       setLoading(true)
-      // 실제 구현에서는 사용자 ID가 필요
-      const response = await financeUserProgressAPI.getLearnedTerms(1, selectedDate)
+      const response = await financeInfoAPI.getLearnedTerms(sessionId)
       setLearnedTerms(response.data)
       
       // 사용 가능한 날짜들 추출
