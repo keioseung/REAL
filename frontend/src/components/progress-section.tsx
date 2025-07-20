@@ -30,21 +30,10 @@ interface PeriodStats {
 }
 
 function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSectionProps) {
-  // 독립적인 날짜 상태 관리
-  const [currentDate, setCurrentDate] = useState(() => {
-    // selectedDate가 있으면 사용, 없으면 오늘 날짜
-    return selectedDate || new Date().toISOString().split('T')[0]
-  })
+  // 외부에서 전달받은 selectedDate를 직접 사용
   const [periodType, setPeriodType] = useState<'week' | 'month' | 'custom'>('week')
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
-
-  // selectedDate prop이 변경되면 currentDate 업데이트
-  useEffect(() => {
-    if (selectedDate) {
-      setCurrentDate(selectedDate)
-    }
-  }, [selectedDate])
 
   const { data: stats } = useUserStats(sessionId)
 
@@ -85,10 +74,9 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
     enabled: !!sessionId && !!periodDates.start && !!periodDates.end,
   })
 
-  // 날짜 변경 핸들러
+  // 날짜 변경 핸들러 - 상위 컴포넌트에 알림
   const handleDateChange = (date: string) => {
     console.log('진행률 탭 - 날짜 변경:', date)
-    setCurrentDate(date)
     onDateChange?.(date)
   }
 
@@ -135,7 +123,7 @@ function ProgressSection({ sessionId, selectedDate, onDateChange }: ProgressSect
             <input
               id="progress-date"
               type="date"
-              value={currentDate}
+              value={selectedDate || new Date().toISOString().split('T')[0]}
               onChange={(e) => {
                 console.log('진행률 탭 - 날짜 input 클릭됨!', e.target.value)
                 handleDateChange(e.target.value)
